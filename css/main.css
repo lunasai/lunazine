@@ -33,6 +33,13 @@ body {
   color: var(--color-neutral-fg);
 }
 
+/* ─── Text selection ─────────────────────────────────────────── */
+
+::selection {
+  background-color: var(--color-selection-bg);
+  color: var(--color-selection-fg);
+}
+
 /* ─── Accessibility utilities ───────────────────────────────── */
 
 .sr-only {
@@ -503,7 +510,7 @@ body {
 
 .about__body {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
+  font-weight: var(--font-weight-extra-light);
   font-size: var(--typography-body-sm);
   line-height: var(--line-height-normal);
   color: var(--color-neutral-fg);
@@ -553,8 +560,8 @@ body {
 .pixel-pile-footer {
   position: relative;
   width: 100%;
-  height: 160px;
-  overflow: hidden;
+  height: 60px;
+  overflow: visible;
   flex-shrink: 0; /* don't collapse inside flex containers */
 }
 

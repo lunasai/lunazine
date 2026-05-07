@@ -163,7 +163,7 @@
   // Canvas inside .pixel-pile-footer that runs a falling-sand simulation.
   // ═══════════════════════════════════════════════════════════════════════════════
 
-  const PILE_HEIGHT      = 160;
+  const PILE_HEIGHT      = 600;
   const MAX_PILE_PARTICLES = 2000;
   const HOVER_RADIUS     = 40;
   const HOVER_PROBABILITY = 0.08;
@@ -177,12 +177,13 @@
   const pileCanvas = document.createElement("canvas");
   Object.assign(pileCanvas.style, {
     position:      "absolute",
-    top:           "0",
+    bottom:        "0",
+    top:           "auto",
     left:          "0",
     width:         "100%",
-    height:        "100%",
+    height:        PILE_HEIGHT + "px",
     pointerEvents: "none",
-    zIndex:        "0",
+    zIndex:        "-1",
   });
   pileContainer.insertBefore(pileCanvas, pileContainer.firstChild);
 
@@ -215,6 +216,7 @@
     const w = Math.max(1, Math.round(pileContainer.getBoundingClientRect().width));
     pileCanvas.width  = w;
     pileCanvas.height = PILE_HEIGHT;
+    pileCanvas.style.height = PILE_HEIGHT + "px";
     pileGrid = initPile(Math.ceil(w / DOT_SIZE));
   }
 
