@@ -1,6 +1,7 @@
 /*
   component-navbar.css
   Depends on: css/tokens.css
+  Primary nav items (work / about): use `a.button` from css/component-button.css
 */
 
 .navbar {
@@ -24,6 +25,38 @@
   height: var(--space-6); /* 24px */
   flex: 0 0 auto;
   display: block;
+  position: relative;
+}
+
+.navbar__logo-mark[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  transform: translateY(-2px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-neutral-fg);
+  background: var(--color-neutral-opacity-strong);
+  border: 1px solid var(--color-neutral-stroke-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.navbar__logo-mark[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar__logo-mark[data-tooltip]::after {
+    transition: none;
+  }
 }
 
 .navbar__logo-mark img {
@@ -57,33 +90,7 @@
   padding: 0;
 }
 
-.navbar__link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding-block: var(--space-1); /* 4px */
-  gap: var(--space-2); /* 8px (reserved for optional icon) */
-  height: var(--space-6); /* 24px — matches Figma Header button instances */
-
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-mono); /* 14px default */
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
-
-  color: var(--color-neutral-fg);
-  text-decoration: none;
-  cursor: pointer;
-}
-
 .navbar__brand:focus-visible {
-  outline: 2px solid var(--color-accent-fg);
-  outline-offset: 2px;
-  border-radius: var(--radius-md);
-}
-
-.navbar__link:focus-visible {
   outline: 2px solid var(--color-accent-fg);
   outline-offset: 2px;
   border-radius: var(--radius-md);

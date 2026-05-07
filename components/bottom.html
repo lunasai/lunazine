@@ -2,10 +2,13 @@
 <!-- Requires: css/tokens.css and css/component-bottom.css -->
 
 <footer class="bottom" aria-label="Footer status bar">
-  <div class="bottom__moonphase" aria-label="Current moon phase">
-    <span aria-hidden="true">◑</span>
-    <span>w. crescent</span>
-  </div>
+  <button
+    type="button"
+    class="button bottom__contact js-copy-email"
+    data-email="lunaborgo@gmail.com"
+    data-copied-text="email copied"
+    aria-label="Copy email lunaborgo@gmail.com to clipboard"
+  >email me</button>
 
   <time class="bottom__time" datetime="22:00:00">22:00:00 AMS</time>
 

@@ -1,12 +1,19 @@
 {
   "name": "luna_web",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
+  "description": "Luna Borgo portfolio — static HTML, CSS, and JavaScript",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "node ./scripts/build.mjs",
+    "preview": "serve dist -p 4173"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "devDependencies": {
+    "serve": "^14.2.4",
+    "vite": "^6.3.5"
+  }
 }

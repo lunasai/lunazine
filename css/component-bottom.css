@@ -5,8 +5,9 @@
 
 .bottom {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-2); /* 8px */
+  position: relative;
   width: 100%;
 
   font-family: var(--font-mono);
@@ -19,17 +20,33 @@
   color: var(--color-neutral-fg-muted);
 }
 
-.bottom__moonphase {
-  flex: 1 0 0;
-  min-width: 0;
-  align-self: stretch;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2); /* 8px */
+.bottom__contact {
+  flex: 0 0 auto;
+  color: var(--color-neutral-fg-muted);
 }
 
 .bottom__time {
-  flex: 0 0 auto;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Retro step-blink on the colon separators — classic digital-clock feel */
+@keyframes bottom-clock-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.bottom__time-sep {
+  animation: bottom-clock-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom__time-sep {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 .bottom__mode {

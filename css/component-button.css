@@ -34,6 +34,18 @@
   cursor: pointer;
 }
 
+a.button {
+  text-decoration: none;
+}
+
+a.button:visited {
+  color: var(--color-neutral-fg);
+}
+
+a.button.button--accent:visited {
+  color: var(--color-accent-fg);
+}
+
 .button--accent {
   color: var(--color-accent-fg);
   /* Figma accent CTAs (e.g. 368:13289, 374:8790): h-[25px] vs default nav button 24px */

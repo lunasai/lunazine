@@ -1,11 +1,12 @@
 <!-- component-navbar.html -->
-<!-- Requires: css/tokens.css and css/component-navbar.css -->
+<!-- Requires: css/tokens.css, css/component-navbar.css, and css/component-button.css -->
 
 <header class="navbar" role="banner" aria-label="Site header">
   <a class="navbar__brand" href="/" aria-label="Home">
     <span class="navbar__logo-mark" aria-hidden="true">
-      <img
-        src="https://www.figma.com/api/mcp/asset/125f3092-12b0-4b3c-965d-29261cdc779e"
+        <img
+        id="moon-logo"
+        src="./assets/moon-icon/full%20moon.svg"
         alt=""
       />
     </span>
@@ -15,10 +16,10 @@
     </span>
   </a>
 
-  <nav class="navbar__nav" aria-label="Primary">
+  <nav class="navbar__nav" aria-label="Primary navigation">
     <ul class="navbar__nav-list">
-      <li><a class="navbar__link" href="#work">work</a></li>
-      <li><a class="navbar__link" href="#about">about</a></li>
+      <li><a class="button" href="#work">work</a></li>
+      <li><a class="button" href="#about">about</a></li>
     </ul>
   </nav>
 </header>

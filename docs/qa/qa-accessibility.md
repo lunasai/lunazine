@@ -42,7 +42,7 @@
 
 **Criterion:** WCAG 2.4.7 Focus Visible  
 **Where:** `component-navbar.css`, navbar brand anchor  
-**Problem:** The brand/logo link (`<a class="navbar__brand">`) is keyboard-focusable but has no visible focus indicator. `.navbar__link:focus-visible` and `.button:focus-visible` are defined, but `.navbar__brand` is missing its rule.  
+**Problem:** The brand/logo link (`<a class="navbar__brand">`) is keyboard-focusable but has no visible focus indicator. Nav work/about links use `.button:focus-visible`, but `.navbar__brand` was missing its rule.  
 **Fix:** Added `.navbar__brand:focus-visible` with matching `outline: 2px solid var(--color-accent-fg); outline-offset: 2px; border-radius: var(--radius-md);`.
 
 ---
@@ -138,7 +138,7 @@ No contrast failures detected in either theme.
 | Element                       | Tab-reachable | Focus visible | Notes                                 |
 | ----------------------------- | ------------- | ------------- | ------------------------------------- |
 | `.navbar__brand` (logo link)  | ✅             | ✅ (after fix) | Focus style added                     |
-| `.navbar__link` (work, about) | ✅             | ✅             | `.navbar__link:focus-visible` present |
+| `a.button` (work, about)      | ✅             | ✅             | `.button:focus-visible` present       |
 | `#theme-light` button         | ✅             | ✅             | `.button:focus-visible` present       |
 | `#theme-dark` button          | ✅             | ✅             | `.button:focus-visible` present       |
 | `.button--accent` CV link     | ✅             | ✅             | `a.button:focus-visible` matches      |
