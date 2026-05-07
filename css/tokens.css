@@ -116,6 +116,10 @@
   --color-highlight-fg:               #8eff8e;   /* green-900 */
   --color-highlight-fg-on-highlight:  #18161d;   /* gray-100  */
 
+  /* ── Selection ──────────────────────────────────────────────*/
+  --color-selection-bg:               #5543e466; /* accent-purple ~40%    */
+  --color-selection-fg:               #ffffffcc; /* alpha-invert-800      */
+
   /* ── Neutral ─────────────────────────────────────────────────*/
   --color-neutral-bg:                 #121426;   /* blue-100              */
   --color-neutral-bg-elevated:        #ffffff1f; /* alpha-invert-100      */
@@ -190,6 +194,9 @@
   --color-highlight-fg:               #5543e4;
   --color-highlight-fg-on-highlight:  #28246d;   /* navy on purple               */
 
+  --color-selection-bg:               #5543e433; /* accent-purple ~20% on white  */
+  --color-selection-fg:               #09070dcc; /* alpha-invert-800             */
+
   --color-neutral-bg:                 #f7f8ff;   /* warm off-white               */
   --color-neutral-bg-elevated:        #09070d1f;
   --color-neutral-fg:                 #09070dcc;
@@ -217,13 +224,15 @@
   --font-mono-ascii: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* ── Font weights ────────────────────────────────────────────
-     display / body / body-sm / inline-link = 300 (Light)
-     title                                  = 500 (Medium)
-     mono                                   = 400 (Regular)
+     display / body / inline-link = 300 (Light)
+     body-sm                      = 200 (Extra Light)
+     title                        = 500 (Medium)
+     mono                         = 400 (Regular)
   ────────────────────────────────────────────────────────────── */
-  --font-weight-light:   300;
-  --font-weight-regular: 400;
-  --font-weight-medium:  500;
+  --font-weight-extra-light: 200;
+  --font-weight-light:       300;
+  --font-weight-regular:     400;
+  --font-weight-medium:      500;
 
   /* ── Line heights ────────────────────────────────────────────
      Figma unitless multipliers.

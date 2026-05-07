@@ -61,7 +61,7 @@ Use `--color-*` **semantic tokens** in all component and layout CSS.
 | `--typography-footnote` | 12px | 12px | 12px |
 
 **Rules:**
-- Display/title: `font-weight: var(--font-weight-light)` (300) for display, `var(--font-weight-medium)` (500) for title.
+- Display/body/inline-link: `font-weight: var(--font-weight-light)` (300); body-sm: `var(--font-weight-extra-light)` (200); title: `var(--font-weight-medium)` (500).
 - Mono: always `text-transform: uppercase`; `letter-spacing: var(--letter-spacing-mono)` (0.04em).
 - Minimum font size anywhere: **11px**.
 - No hardcoded `font-family` strings — use tokens only.
