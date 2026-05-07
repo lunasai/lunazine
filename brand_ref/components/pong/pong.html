@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#121426" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>LUNA PONG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-bg:      #121426;
+      --color-accent:  #5543E4;
+      --color-primary: #8EFF8E;
+      --color-text:    #ffffff;
+      --color-muted:   rgba(255,255,255,0.48);
+      --color-line:    rgba(255,255,255,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      min-height: 100%;
+      min-height: 100dvh;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: 'DM Mono', monospace;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      /* Safe area: portrait phones with notch / home bar */
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      height: 100%;
+      min-height: 0;
+      max-height: 100dvh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      border-right: 1px solid var(--color-line);
+      display: flex;
+      flex-direction: column;
+      padding: 32px 24px;
+      gap: 32px;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar-brand-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .sidebar-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      letter-spacing: 0.06em;
+      line-height: 1.6;
+    }
+
+    .sidebar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      letter-spacing: 0.06em;
+    }
+
+    .level-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .level-btn {
+      background: transparent;
+      border: 1px solid var(--color-line);
+      color: var(--color-muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      letter-spacing: 0.04em;
+    }
+
+    .level-btn:hover { border-color: var(--color-accent); color: var(--color-text); }
+
+    .level-btn.is-active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+    }
+
+    .controls-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .controls-key {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--color-muted);
+    }
+
+    .controls-action {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--color-primary);
+    }
+
+    .sidebar-back,
+    a.sidebar-back {
+      margin-top: auto;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      cursor: pointer;
+      text-align: left;
+      transition: color 0.15s ease;
+    }
+
+    a.sidebar-back { text-decoration: none; }
+    a.sidebar-back:hover { color: var(--color-text); }
+    .sidebar-back:hover { color: var(--color-text); }
+
+    .pong-mobile-hint {
+      display: none;
+      font-size: 9px;
+      text-align: center;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+    }
+
+    .pong-mobile-pause-wrap {
+      display: none;
+      width: 100%;
+    }
+
+    .pong-mobile-pause {
+      display: block;
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 12px;
+      background: rgba(85, 67, 228, 0.12);
+      border: 1px solid var(--color-line);
+      color: var(--color-primary);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+    }
+
+    .pong-mobile-pause:active { opacity: 0.85; }
+
+    /* ── Game area ── */
+    .game-area {
+      position: relative;
+      cursor: none;
+      overflow: hidden;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    #pong-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    @media (max-width: 768px) {
+      .pong-mobile-hint { display: block; }
+      .pong-mobile-pause-wrap { display: block; }
+
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, auto) 1fr;
+        max-height: 100dvh;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--color-line);
+        padding: 10px 12px 12px;
+        gap: 10px;
+        max-height: 44dvh;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .sidebar-title { font-size: 9px; }
+
+      .level-buttons {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 6px;
+      }
+
+      .level-btn {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+        text-align: center;
+        padding: 10px 4px;
+        font-size: 8px;
+        min-height: 44px;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+      }
+
+      .pong-controls-block {
+        display: none;
+      }
+
+      a.sidebar-back,
+      button.sidebar-back {
+        margin-top: 6px;
+        text-align: center;
+        display: block;
+        width: 100%;
+        padding: 12px 16px;
+        min-height: 48px;
+        background: rgba(85, 67, 228, 0.18);
+        border: 1px solid var(--color-line);
+        border-radius: 2px;
+        color: var(--color-text) !important;
+        box-sizing: border-box;
+        cursor: pointer;
+      }
+
+      .game-area {
+        min-height: 0;
+        cursor: default;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <p class="pong-mobile-hint">Touch &amp; drag on the court to move your paddle</p>
+    <div class="pong-mobile-pause-wrap">
+      <button type="button" class="pong-mobile-pause" id="pong-pause" aria-pressed="false">pause / resume</button>
+    </div>
+    <div class="sidebar-brand">
+      <span class="sidebar-brand-name">luna</span>
+      <span class="sidebar-title">pong</span>
+    </div>
+
+    <div class="sidebar-section">
+      <span class="sidebar-label">level</span>
+      <div class="level-buttons">
+        <button class="level-btn" type="button" data-level="0">01 — easy</button>
+        <button class="level-btn" type="button" data-level="1">02 — medium</button>
+        <button class="level-btn" type="button" data-level="2">03 — hard</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section pong-controls-block">
+      <span class="sidebar-label">controls</span>
+      <div class="controls-list">
+        <div class="controls-row">
+          <span class="controls-key">mouse / touch</span>
+          <span class="controls-action">move paddle</span>
+        </div>
+        <div class="controls-row">
+          <span class="controls-key">↑ ↓</span>
+          <span class="controls-action">move paddle</span>
+        </div>
+        <div class="controls-row">
+          <span class="controls-key">space / p</span>
+          <span class="controls-action">pause</span>
+        </div>
+        <div class="controls-row">
+          <span class="controls-key">z / x</span>
+          <span class="controls-action">level</span>
+        </div>
+      </div>
+    </div>
+
+    <a class="sidebar-back" href="/">← back to site</a>
+  </aside>
+
+  <div class="game-area" id="game-area">
+    <canvas id="pong-canvas"></canvas>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ── Config ──
+  const LEVELS = [
+    { ballSpeed: 8.5,  aiSpeed: 5.5,  speedCap: 19, serveDelay: 600 },
+    { ballSpeed: 11,   aiSpeed: 7.65, speedCap: 25, serveDelay: 400 },
+    { ballSpeed: 14,   aiSpeed: 10.2, speedCap: 32, serveDelay: 250 },
+  ];
+  const KB_SPEED = 7;
+  const PADDLE_W_PCT  = 0.045;
+  const PADDLE_H_PCT  = 0.262;
+  const BALL_SIZE_PCT = 0.044;
+
+  // ── State ──
+  let levelIndex = Math.min(2, Math.max(0, parseInt(localStorage.getItem('luna-pong-level') || '0', 10)));
+  let W = 0, H = 0;
+  let paused  = false;
+  let serving = true;
+  let serveTimer = null;
+  let mouseY = -1;
+  let keys   = {};
+  let scores = { left: 0, right: 0 };
+
+  let aiErrorOffset = 0;
+
+  let leftPaddle  = { x: 0, y: 0, w: 0, h: 0 };
+  let rightPaddle = { x: 0, y: 0, w: 0, h: 0 };
+  let ball = { x: 0, y: 0, size: 0, vx: 0, vy: 0 };
+
+  // ── Canvas / DOM ──
+  const canvas    = document.getElementById('pong-canvas');
+  const gameArea  = document.getElementById('game-area');
+  const ctx       = canvas.getContext('2d');
+  const levelBtns = document.querySelectorAll('.level-btn');
+
+  // ── Colors ──
+  function getColors() {
+    const s = getComputedStyle(document.documentElement);
+    return {
+      bg:      s.getPropertyValue('--color-bg').trim()      || '#121426',
+      accent:  s.getPropertyValue('--color-accent').trim()  || '#5543E4',
+      primary: s.getPropertyValue('--color-primary').trim() || '#8A8AFF',
+      text:    s.getPropertyValue('--color-text').trim()    || '#ffffff',
+    };
+  }
+
+  function hexToRgba(hex, alpha) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const r = parseInt(hex.slice(0,2), 16);
+    const g = parseInt(hex.slice(2,4), 16);
+    const b = parseInt(hex.slice(4,6), 16);
+    if (isNaN(r)) return `rgba(255,255,255,${alpha})`;
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  // ── Level UI ──
+  function updateLevelUI() {
+    levelBtns.forEach(btn => {
+      btn.classList.toggle('is-active', parseInt(btn.dataset.level, 10) === levelIndex);
+    });
+    localStorage.setItem('luna-pong-level', levelIndex);
+  }
+
+  function setLevel(newIndex) {
+    const old = LEVELS[levelIndex];
+    levelIndex = Math.min(2, Math.max(0, newIndex));
+    const nw  = LEVELS[levelIndex];
+    if (!serving) {
+      const ratio = nw.ballSpeed / old.ballSpeed;
+      ball.vx *= ratio;
+      ball.vy *= ratio;
+      capSpeed();
+    }
+    updateLevelUI();
+  }
+
+  levelBtns.forEach(btn => {
+    btn.addEventListener('click', () => setLevel(parseInt(btn.dataset.level, 10)));
+  });
+
+  // ── Speed cap ──
+  function capSpeed() {
+    const cap = LEVELS[levelIndex].speedCap;
+    const mag = Math.hypot(ball.vx, ball.vy);
+    if (mag > cap) {
+      ball.vx = (ball.vx / mag) * cap;
+      ball.vy = (ball.vy / mag) * cap;
+    }
+  }
+
+  // ── Serve ──
+  // Error factor controls how far off-center the AI aims (as a fraction of paddle height).
+  // Higher = more beatable. Randomized on each serve so behavior varies naturally.
+  const AI_ERROR_FACTOR = [0.63, 0.35, 0.14]; // easy / medium / hard
+
+  function randomizeAiError() {
+    const factor = AI_ERROR_FACTOR[levelIndex];
+    aiErrorOffset = (Math.random() - 0.5) * rightPaddle.h * factor * 2;
+  }
+
+  function resetBall(direction, immediate) {
+    ball.x  = W / 2 - ball.size / 2;
+    ball.y  = H / 2 - ball.size / 2;
+    ball.vx = 0;
+    ball.vy = 0;
+    serving = true;
+    clearTimeout(serveTimer);
+    randomizeAiError();
+    const delay = immediate ? 0 : LEVELS[levelIndex].serveDelay;
+    serveTimer = setTimeout(() => {
+      serving = false;
+      const angle = Math.random() * 0.5 - 0.25;
+      const spd   = LEVELS[levelIndex].ballSpeed;
+      ball.vx = direction * spd * Math.cos(angle);
+      ball.vy = spd * Math.sin(angle);
+    }, delay);
+  }
+
+  // ── Resize ──
+  function resize() {
+    W = gameArea.clientWidth;
+    H = gameArea.clientHeight;
+    canvas.width  = W;
+    canvas.height = H;
+
+    const isNarrow = W < 520;
+    const pm = isNarrow ? 1.15 : 1;
+    const bm = isNarrow ? 1.1 : 1;
+    const pw = Math.round(W * PADDLE_W_PCT * pm);
+    const ph = Math.round(H * PADDLE_H_PCT * pm);
+    const bs = Math.round(W * BALL_SIZE_PCT * bm);
+
+    leftPaddle.w  = pw; leftPaddle.h  = ph; leftPaddle.x  = 0;
+    rightPaddle.w = pw; rightPaddle.h = ph; rightPaddle.x = W - pw;
+    leftPaddle.y  = Math.min(leftPaddle.y,  H - ph);
+    rightPaddle.y = Math.min(rightPaddle.y, H - ph);
+    ball.size = bs;
+
+    resetBall(1, true);
+  }
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(gameArea);
+
+  // ── Input: desktop = window mouse (full-screen Y like original), mobile = touch on court
+  // ──
+  function yFromClientY(clientY) {
+    const r = canvas.getBoundingClientRect();
+    return clientY - r.top;
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    const r = canvas.getBoundingClientRect();
+    mouseY = e.clientY - r.top;
+  });
+  gameArea.addEventListener('mouseleave', () => {
+    mouseY = -1;
+  });
+
+  gameArea.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;
+    e.preventDefault();
+    mouseY = yFromClientY(e.clientY);
+    try {
+      (gameArea).setPointerCapture(e.pointerId);
+    } catch (err) { void err; }
+  }, { passive: false });
+
+  gameArea.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'mouse') return;
+    e.preventDefault();
+    mouseY = yFromClientY(e.clientY);
+  }, { passive: false });
+
+  // Fallback (older iOS) when Pointer Events are missing or incomplete
+  if (!window.PointerEvent) {
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (e.touches[0]) mouseY = yFromClientY(e.touches[0].clientY);
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (e.touches[0]) mouseY = yFromClientY(e.touches[0].clientY);
+    }, { passive: false });
+  }
+
+  const pauseEl = document.getElementById('pong-pause');
+  if (pauseEl) {
+    pauseEl.addEventListener('click', () => {
+      paused = !paused;
+    });
+  }
+
+  window.addEventListener('keydown', e => {
+    keys[e.code] = true;
+    if (e.code === 'Space' || e.code === 'KeyP') {
+      e.preventDefault();
+      paused = !paused;
+    }
+    if (e.code === 'KeyZ') setLevel(levelIndex - 1);
+    if (e.code === 'KeyX') setLevel(levelIndex + 1);
+  });
+  window.addEventListener('keyup', e => { delete keys[e.code]; });
+
+  // ── Update ──
+  function update() {
+    // Player paddle
+    if (mouseY >= 0) {
+      leftPaddle.y = mouseY - leftPaddle.h / 2;
+    } else {
+      if (keys['ArrowUp'])   leftPaddle.y -= KB_SPEED;
+      if (keys['ArrowDown']) leftPaddle.y += KB_SPEED;
+    }
+    leftPaddle.y = Math.max(0, Math.min(H - leftPaddle.h, leftPaddle.y));
+
+    if (paused || serving) return;
+
+    // AI paddle — only tracks when ball is heading toward it, with positional error
+    if (ball.vx > 0) {
+      const target = (ball.y + ball.size / 2) + aiErrorOffset - (rightPaddle.h / 2);
+      const diff = target - rightPaddle.y;
+      if (Math.abs(diff) > 1) {
+        rightPaddle.y += Math.sign(diff) * Math.min(LEVELS[levelIndex].aiSpeed, Math.abs(diff));
+      }
+    }
+    rightPaddle.y = Math.max(0, Math.min(H - rightPaddle.h, rightPaddle.y));
+
+    // Ball movement
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    // Wall bounces
+    if (ball.y <= 0) { ball.y = 0; ball.vy = Math.abs(ball.vy); }
+    if (ball.y + ball.size >= H) { ball.y = H - ball.size; ball.vy = -Math.abs(ball.vy); }
+
+    // Paddle collisions — AABB, direction-gated
+    const ballCx = ball.x + ball.size / 2;
+    const ballCy = ball.y + ball.size / 2;
+
+    if (ball.vx < 0 &&
+        ball.x < leftPaddle.x + leftPaddle.w &&
+        ball.x + ball.size > leftPaddle.x &&
+        ballCy > leftPaddle.y &&
+        ballCy < leftPaddle.y + leftPaddle.h) {
+      ball.x = leftPaddle.x + leftPaddle.w;
+      const relY = ((ballCy - leftPaddle.y) / leftPaddle.h) - 0.5;
+      ball.vx = Math.abs(ball.vx) * 1.04;
+      ball.vy = relY * LEVELS[levelIndex].ballSpeed * 2.2;
+      capSpeed();
+      randomizeAiError();
+    }
+
+    if (ball.vx > 0 &&
+        ball.x + ball.size > rightPaddle.x &&
+        ball.x < rightPaddle.x + rightPaddle.w &&
+        ballCy > rightPaddle.y &&
+        ballCy < rightPaddle.y + rightPaddle.h) {
+      ball.x = rightPaddle.x - ball.size;
+      const relY = ((ballCy - rightPaddle.y) / rightPaddle.h) - 0.5;
+      ball.vx = -Math.abs(ball.vx) * 1.04;
+      ball.vy = relY * LEVELS[levelIndex].ballSpeed * 2.2;
+      capSpeed();
+    }
+
+    // Scoring
+    if (ball.x + ball.size < 0) {
+      scores.right = Math.min(999, scores.right + 1);
+      resetBall(1, false);
+    }
+    if (ball.x > W) {
+      scores.left = Math.min(999, scores.left + 1);
+      resetBall(-1, false);
+    }
+  }
+
+  // ── Draw ──
+  function draw() {
+    const c = getColors();
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = c.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Center dashed line
+    ctx.save();
+    ctx.setLineDash([8, 10]);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = hexToRgba(c.text, 0.15);
+    ctx.beginPath();
+    ctx.moveTo(W / 2, 0);
+    ctx.lineTo(W / 2, H);
+    ctx.stroke();
+    ctx.restore();
+
+    // Scores
+    const scoreSize = W < 400 ? 12 : 20;
+    const scoreY = W < 400 ? 12 : 36;
+    ctx.font = `${scoreSize}px 'Press Start 2P', monospace`;
+    ctx.fillStyle = c.accent;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(String(scores.left).padStart(3, '0'), W / 4, scoreY);
+    ctx.fillText(String(scores.right).padStart(3, '0'), 3 * W / 4, scoreY);
+
+    // Paddles
+    ctx.fillStyle = c.accent;
+    ctx.fillRect(leftPaddle.x,  leftPaddle.y,  leftPaddle.w,  leftPaddle.h);
+    ctx.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.w, rightPaddle.h);
+
+    // Ball
+    ctx.fillStyle = c.primary;
+    ctx.fillRect(ball.x, ball.y, ball.size, ball.size);
+
+    // Pause overlay
+    if (paused) {
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.font = `${scoreSize}px 'Press Start 2P', monospace`;
+      ctx.fillStyle = c.accent;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('PAUSED', W / 2, H / 2);
+    }
+
+    // Serve dots
+    if (serving && !paused) {
+      ctx.font = `${scoreSize}px 'Press Start 2P', monospace`;
+      ctx.fillStyle = hexToRgba(c.accent, 0.5);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('• • •', W / 2, H / 2 + ball.size * 2);
+    }
+  }
+
+  // ── Loop ──
+  function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // ── Init ──
+  updateLevelUI();
+  // Wait for first resize to fire via ResizeObserver
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

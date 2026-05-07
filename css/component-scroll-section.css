@@ -1,0 +1,82 @@
+/*
+  component-scroll-section.css
+  Depends on: css/tokens.css
+
+  Figma: "scroll section" (node 346:5401)
+  Variant/property: Step = 10 | 15 | 20 | 25 | 30 | 35
+*/
+
+.scroll-section {
+  width: 2px;   /* Figma width; no token exists */
+  height: 1024px; /* Figma height; no token exists */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.scroll-section__segment {
+  flex: 1 0 0;
+  min-height: 0;
+  width: 100%;
+  background: var(--color-neutral-stroke-subtle);
+}
+
+/* Gradient used by Step=10,20,30 on specific segments */
+.scroll-section__segment--fade {
+  background: linear-gradient(
+    to bottom,
+    var(--color-accent-fg) 65.375%,
+    var(--color-neutral-stroke-subtle) 65.385%
+  );
+}
+
+/* Default (Step=10) */
+.scroll-section[data-step="10"] .scroll-section__segment:nth-child(1) {
+  background: linear-gradient(
+    to bottom,
+    var(--color-accent-fg) 65.375%,
+    var(--color-neutral-stroke-subtle) 65.385%
+  );
+}
+
+/* Step=15 */
+.scroll-section[data-step="15"] .scroll-section__segment:nth-child(1) {
+  background: var(--color-accent-fg);
+}
+
+/* Step=20 */
+.scroll-section[data-step="20"] .scroll-section__segment:nth-child(1) {
+  background: var(--color-accent-fg);
+}
+.scroll-section[data-step="20"] .scroll-section__segment:nth-child(2) {
+  background: linear-gradient(
+    to bottom,
+    var(--color-accent-fg) 65.375%,
+    var(--color-neutral-stroke-subtle) 65.385%
+  );
+}
+
+/* Step=25 */
+.scroll-section[data-step="25"] .scroll-section__segment:nth-child(1),
+.scroll-section[data-step="25"] .scroll-section__segment:nth-child(2) {
+  background: var(--color-accent-fg);
+}
+
+/* Step=30 */
+.scroll-section[data-step="30"] .scroll-section__segment:nth-child(1),
+.scroll-section[data-step="30"] .scroll-section__segment:nth-child(2) {
+  background: var(--color-accent-fg);
+}
+.scroll-section[data-step="30"] .scroll-section__segment:nth-child(3) {
+  background: linear-gradient(
+    to bottom,
+    var(--color-accent-fg) 65.375%,
+    var(--color-neutral-stroke-subtle) 65.385%
+  );
+}
+
+/* Step=35 */
+.scroll-section[data-step="35"] .scroll-section__segment {
+  background: var(--color-accent-fg);
+}
+

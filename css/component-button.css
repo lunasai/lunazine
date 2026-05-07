@@ -1,0 +1,89 @@
+/*
+  component-button.css
+  Depends on: css/tokens.css
+
+  Figma variants observed (node 216:3742):
+  - status: Default | hover
+  - textColor: default | accent
+  - active: boolean (shows 4px indicator)
+  - showIcon: boolean (optional 16px icon)
+*/
+
+.button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: var(--space-1) 0; /* 4px top/bottom; horizontal padding is 0 in Figma */
+  margin: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2); /* 8px */
+  height: var(--space-6); /* 24px */
+
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  color: var(--color-neutral-fg);
+  cursor: pointer;
+}
+
+.button--accent {
+  color: var(--color-accent-fg);
+  /* Figma accent CTAs (e.g. 368:13289, 374:8790): h-[25px] vs default nav button 24px */
+  height: 25px;
+  box-sizing: border-box;
+}
+
+.button--hover,
+.button:hover {
+  background: var(--color-accent-bg);
+  color: var(--color-neutral-fg-on-accent);
+}
+
+.button--hover.button--accent,
+.button--accent:hover {
+  /* Figma "hover + accent" uses on-accent text color */
+  color: var(--color-neutral-fg-on-accent);
+}
+
+.button__icon {
+  width: var(--space-4);  /* 16px */
+  height: var(--space-4); /* 16px */
+  flex: 0 0 auto;
+  display: block;
+}
+
+.button__icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.button__indicator {
+  width: var(--space-1);  /* 4px */
+  height: var(--space-1); /* 4px */
+  background: var(--color-accent-bg);
+}
+
+.button--accent .button__indicator {
+  background: var(--color-accent-fg);
+}
+
+.button--hover .button__indicator,
+.button:hover .button__indicator {
+  background: var(--color-neutral-fg-on-accent);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+

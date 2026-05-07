@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Luna Borgo</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Montagu+Slab:opsz,wght@16..144,300;16..144,400;16..144,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./css/tokens.css" />
+    <link rel="stylesheet" href="./css/grid.css" />
+
+    <link rel="stylesheet" href="./css/component-navbar.css" />
+    <link rel="stylesheet" href="./css/component-button.css" />
+    <link rel="stylesheet" href="./css/component-bottom.css" />
+    <link rel="stylesheet" href="./css/component-scroll-section.css" />
+
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <!-- ── Fixed header: inset var(--spacing-margin) from top/left/right ── -->
+    <div class="site-header">
+      <header class="navbar" role="banner" aria-label="Site header">
+        <a class="navbar__brand" href="/" aria-label="Home">
+          <span class="navbar__logo-mark" aria-hidden="true">
+            <img src="https://www.figma.com/api/mcp/asset/125f3092-12b0-4b3c-965d-29261cdc779e" alt="" />
+          </span>
+          <span class="navbar__logo-type">
+            luna<br />
+            borgo
+          </span>
+        </a>
+
+        <nav class="navbar__nav" aria-label="Primary navigation">
+          <ul class="navbar__nav-list">
+            <li><a class="navbar__link" href="#work">work</a></li>
+            <li><a class="navbar__link" href="#about">about</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+
+    <!-- ── Fixed footer: inset var(--spacing-margin) from bottom/left/right ── -->
+    <div class="site-footer">
+      <footer class="bottom" aria-label="Footer status bar">
+        <div class="bottom__moonphase" aria-label="Current moon phase">
+          <span aria-hidden="true">◑</span>
+          <span>w. crescent</span>
+        </div>
+
+        <time class="bottom__time" datetime="22:00:00">22:00:00 AMS</time>
+
+        <div class="bottom__mode" aria-label="Theme toggle">
+          <button class="button" type="button" aria-pressed="false" id="theme-light" aria-label="Switch to light mode">light</button>
+          <button class="button" type="button" aria-pressed="true" id="theme-dark" aria-label="Switch to dark mode">dark</button>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ── Progress bar: tracks active work slide (aria-hidden — decorative) ── -->
+    <div class="progress-bar" aria-hidden="true">
+      <div class="progress-bar__fill"></div>
+    </div>
+
+    <!-- ── Scrollable content ── -->
+    <main class="site" aria-label="Portfolio" id="main-content">
+
+      <!-- SECTION 1: intro -->
+      <h1 class="sr-only">Luna Borgo — Portfolio</h1>
+      <section class="section section--intro" id="intro" aria-label="Intro">
+        <div class="page-grid">
+          <div class="col-content intro__content">
+            <div class="intro__text">
+              <p>
+                Hi, I'm Luna <span aria-hidden="true" lang="ja">シ</span> A designer focused on brand expression and scalable digital experiences. I build systems for teams that need to design at scale
+                <span class="accent">without losing their soul.</span>
+              </p>
+              <p>
+                For over twelve years, I've helped brands to turn creative vision into real experiences while building shared design languages that brings teams together.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Work slides: CSS scroll-snap navigation ───────────────
+           Each section is a full-viewport snap point.
+           scroll-snap-stop: always (set in CSS) ensures one slide
+           per gesture — the browser handles the "pause" natively.
+           ──────────────────────────────────────────────────────── -->
+
+      <!-- SLIDE 1: Heineken / Crate Design System -->
+      <section class="section section--work" id="work" aria-label="Work – Heineken, Crate Design System">
+            <div class="page-grid work__row">
+              <div class="col-sidebar">
+                <h2 class="work__title">Heineken</h2>
+                <ul class="work__details">
+                  <li class="work__detail">
+                    <span class="work__detail-arrow" aria-hidden="true">→</span>
+                    <span class="work__detail-text">Crate Design System</span>
+                  </li>
+                  <li class="work__detail">
+                    <span class="work__detail-arrow" aria-hidden="true">→</span>
+                    <span class="work__detail-text">2022–Present</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="col-body">
+                <div class="work__body">
+                  <p>I am a founding member of Crate, Heineken's global design system that powers eazle, a unified B2B platform merging over 40 regional platforms into one scalable ecosystem.</p>
+                  <p>I built Crate from scratch — from tokens, components and workflows to, most recently, AI automations — working closely with engineers and a growing community of contributors.</p>
+                </div>
+                <ul class="work__metrics">
+                  <li class="work__detail">
+                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
+                    <span class="work__detail-text">235 contributors across 45 countries</span>
+                  </li>
+                  <li class="work__detail">
+                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
+                    <span class="work__detail-text">metric 2</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+      <!-- SLIDE 2: Heineken / Eazle brand-product framework -->
+      <section class="section section--work" aria-label="Work – Heineken, Eazle">
+            <div class="page-grid work__row">
+              <div class="col-sidebar">
+                <h2 class="work__title">Heineken</h2>
+                <ul class="work__details">
+                  <li class="work__detail">
+                    <span class="work__detail-arrow" aria-hidden="true">→</span>
+                    <span class="work__detail-text">Eazle brand-product framework</span>
+                  </li>
+                  <li class="work__detail">
+                    <span class="work__detail-arrow" aria-hidden="true">→</span>
+                    <span class="work__detail-text">2022–Present</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="col-body">
+                <div class="work__body">
+                  <p>Next to Crate, I also led the creation of the brand framework and team culture that launched Eazle, Heineken's B2B platform connecting sales reps and customers across five markets.</p>
+                  <p>I established the design principles and visual language guidance for the brand application, and built collaboration rituals that enabled rapid scaling while keeping a strong design culture.</p>
+                </div>
+                <ul class="work__metrics">
+                  <li class="work__detail">
+                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
+                    <span class="work__detail-text">68% adoption rate</span>
+                  </li>
+                  <li class="work__detail">
+                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
+                    <span class="work__detail-text">99+ component score</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+      <!-- SLIDE 3: Adidas / Product recommendations framework -->
+      <section class="section section--work" aria-label="Work – Adidas">
+            <div class="page-grid work__row">
+              <div class="col-sidebar">
+                <h2 class="work__title">Adidas</h2>
+                <ul class="work__details">
+                  <li class="work__detail">
+                    <span class="work__detail-arrow" aria-hidden="true">→</span>
+                    <span class="work__detail-text">Product recommendations framework</span>
+                  </li>
+                  <li class="work__detail">
+                    <span class="work__detail-arrow" aria-hidden="true">→</span>
+                    <span class="work__detail-text">2023–2024</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="col-body">
+                <div class="work__body">
+                  <p>Working closely with designers, data science, and engineering, I led the concept and design of a unified recommendations framework that delivers the right products to the right customers across homepage, PDP, cart, and checkout.</p>
+                  <p>The process started with rapid experimentation and evolved to a collaboration with the design system team to build a shared recommendation component: reusable, consistent, and built to last. The result is a system that balances algorithmic intelligence with editorial control.</p>
+                </div>
+                <ul class="work__metrics">
+                  <li class="work__detail">
+                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
+                    <span class="work__detail-text">68% adoption rate</span>
+                  </li>
+                  <li class="work__detail">
+                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
+                    <span class="work__detail-text">99+ component score</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+      <!-- SLIDE 4: Before that / job experience + CV -->
+      <section class="section section--work" aria-label="Work – Experience">
+            <div class="page-grid work__row">
+              <div class="col-sidebar">
+                <h2 class="work__title">Before that</h2>
+                <ul class="work__details">
+                  <li class="work__detail">
+                    <span class="work__detail-arrow" aria-hidden="true">→</span>
+                    <span class="work__detail-text">Netherlands, Brazil</span>
+                  </li>
+                  <li class="work__detail">
+                    <span class="work__detail-arrow" aria-hidden="true">→</span>
+                    <span class="work__detail-text">Designing since 2017</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="col-body">
+                <div class="work__body">
+                  <p>Led end-to-end UX/UI and brand projects across agency, freelance, and in-house environments. Built reusable UI kits to improve onboarding and developer collaboration, forming the foundation of my systems-oriented approach.</p>
+                </div>
+
+                <ul class="work__experience" aria-label="Job experience">
+                  <li class="work__experience-row">
+                    <span class="work__experience-year">2022–now</span>
+                    <div class="work__experience-role">
+                      <p>Senior Designer, Design Systems</p>
+                      <p>Heineken · Amsterdam</p>
+                    </div>
+                  </li>
+                  <li class="work__experience-row">
+                    <span class="work__experience-year">2019–22</span>
+                    <div class="work__experience-role">
+                      <p>Product Designer, Browse and Delight</p>
+                      <p>Adidas · Amsterdam</p>
+                    </div>
+                  </li>
+                  <li class="work__experience-row">
+                    <span class="work__experience-year">2016–19</span>
+                    <div class="work__experience-role">
+                      <p>UX/UI Designer</p>
+                      <p>Aegon – HCL Technologies</p>
+                    </div>
+                  </li>
+                  <li class="work__experience-row">
+                    <span class="work__experience-year">2016–19</span>
+                    <div class="work__experience-role">
+                      <p>UX/UI Designer</p>
+                      <p>Atabix</p>
+                    </div>
+                  </li>
+                </ul>
+
+                <div class="work__cta">
+                  <a class="button button--accent" href="#"><span aria-hidden="true">&gt;</span> download full cv</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+      <!-- About -->
+      <section class="section section--about" id="about" aria-label="About">
+        <div class="about__scroll">
+        <div class="page-grid">
+          <!-- Upper: centered ASCII art + tagline -->
+          <div class="col-full about__hero">
+            <pre class="about__ascii" aria-hidden="true">
+       _
+       \*-.
+        )  _`-.
+       .  : `. .
+       : _   '  \
+       ; *` _.   `*-._
+       `-.-'          `-.
+         ;       `       `.
+         :.       .        \
+         . \  .   :   .-'   .
+         '  `+.;  ;  '      :
+         :  '  |    ;       ;-.
+         ; '   : :`-:     _.`* ;
+[bug] .*' /  .*' ; .*`- +'  `*'
+      `*-*   `*-*  `*-*'
+            </pre>
+            <p class="about__tagline">Thanks for checking my pixels.</p>
+          </div>
+
+          <!-- Lower: about me text + CTA -->
+          <div class="col-about about__content">
+            <h2 class="about__label">About me</h2>
+            <div class="about__body">
+              <p>Design has been part of my life long before it became my career. Back when computers were still a three-piece setup, a passion for reading and writing led me to start a blog – only to become completely obsessed with how it looked... and with all the gifs I wanted to make.</p>
+              <p>Twelve years later, my obsession with pixels hasn't gone anywhere. Today, I channel it into making design more sustainable – and more fun. With a systems mindset and a passion for craft, I move fluidly between strategy and hands-on, making sure what we imagine is actually something we can ship.</p>
+              <p>By combine storytelling, visual craft and genuine interest, I inspire and connect. Helping brands scale while creating the conditions for teams to do their best work.</p>
+              <p>Away from screens, I'm still a person: I shoot on film, listen to loud music, read a bunch of books while drinking a bunch of coffee, maintain an ever-evolving Japan itinerary I may or may not act on and enjoy living in Amsterdam with a husband (whom I've already converted into a designer) and two cats (still working on those).</p>
+              <p>ok here's my email if you think you need a cool designer hehe thanks bye ;*</p>
+            </div>
+            <div class="about__cta">
+              <a class="button button--accent" href="mailto:lunaborgo@gmail.com"><span aria-hidden="true">&gt;</span> lunaborgo@gmail.com</a>
+            </div>
+          </div>
+        </div>
+        </div><!-- /.about__scroll -->
+      </section>
+
+    </main>
+
+    <script src="./js/work-slides.js" defer></script>
+
+    <script>
+      (function () {
+        const root     = document.documentElement;
+        const btnDark  = document.getElementById("theme-dark");
+        const btnLight = document.getElementById("theme-light");
+
+        function setTheme(theme) {
+          root.setAttribute("data-theme", theme);
+          btnDark.setAttribute("aria-pressed",  theme === "dark"  ? "true" : "false");
+          btnLight.setAttribute("aria-pressed", theme === "light" ? "true" : "false");
+          localStorage.setItem("theme", theme);
+        }
+
+        setTheme(localStorage.getItem("theme") === "light" ? "light" : "dark");
+
+        btnDark.addEventListener("click",  function () { setTheme("dark");  });
+        btnLight.addEventListener("click", function () { setTheme("light"); });
+      })();
+    </script>
+  </body>
+</html>

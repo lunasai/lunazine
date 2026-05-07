@@ -1,0 +1,56 @@
+/*
+  component-bottom.css
+  Depends on: css/tokens.css
+*/
+
+.bottom {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2); /* 8px */
+  width: 100%;
+
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-neutral-fg-muted);
+}
+
+.bottom__moonphase {
+  flex: 1 0 0;
+  min-width: 0;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2); /* 8px */
+}
+
+.bottom__time {
+  flex: 0 0 auto;
+}
+
+.bottom__mode {
+  flex: 1 0 0;
+  min-width: 0;
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: var(--space-2); /* 8px */
+}
+
+.bottom__mode .button {
+  /* Button component defaults to neutral fg; Bottom uses muted fg */
+  color: var(--color-neutral-fg-muted);
+}
+
+/* Figma Footer Mode Toggle (368:13139): inactive control opacity-80 */
+.bottom__mode .button[aria-pressed="false"] {
+  opacity: 0.8;
+}
+
+.bottom__mode .button[aria-pressed="true"] {
+  opacity: 1;
+}
+

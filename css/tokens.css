@@ -1,0 +1,374 @@
+/*
+ * Luna Borgo — New Site
+ * css/tokens.css
+ *
+ * Pure design tokens: CSS custom properties only.
+ * No resets, no element rules, no font-face declarations.
+ *
+ * Source of truth: Figma portfolio_web variables
+ *   Colors / typography / breakpoints:
+ *     https://figma.com/design/FHLbpeVmVdQ8DAtXvSeh2S/portfolio_web?node-id=374-3486
+ *
+ * Structure:
+ *   1.  Breakpoints
+ *   2.  Base color primitives (dark mode default)
+ *   3.  Semantic color tokens (dark mode default)
+ *   4.  Base color primitives — light mode overrides
+ *   5.  Typography: font families & properties
+ *   6.  Typography: responsive size scale
+ *   7.  Layout: spacing margin
+ *   8.  Spacing scale, radii, structural sizes
+ *   9.  Responsive overrides
+ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   1. BREAKPOINTS
+   Figma "responsive" collection — screen/max-width token.
+   These are the canvas widths defining each named mode.
+   NOTE: CSS custom properties cannot be used inside @media
+   queries without build tooling; use the literal px values there.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --screen-x-small:  480px;   /* phone compact    ≤ 480px  */
+  --screen-small:    768px;   /* mobile           ≤ 768px  */
+  --screen-medium:  1200px;   /* compact desktop  ≤ 1200px */
+  --screen-large:   1440px;   /* standard desktop ≤ 1440px */
+  --screen-x-large: 1920px;   /* expanded desktop ≤ 1920px */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   2. BASE COLOR PRIMITIVES — DARK MODE (default)
+   Figma "colors" collection, Mode: dark.
+   Raw palette swatches — use semantic aliases in components.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Alpha (dark-tinted overlays) ────────────────────────────*/
+  --color-base-alpha-040: #09070d0a;
+  --color-base-alpha-080: #09070d14;
+  --color-base-alpha-100: #09070d1f;
+  --color-base-alpha-300: #09070d52;
+  --color-base-alpha-600: #09070d9e;
+  --color-base-alpha-800: #09070dcc;
+
+  /* ── Alpha-invert (light-tinted overlays) ────────────────────*/
+  --color-base-alpha-invert-040: #ffffff0a;
+  --color-base-alpha-invert-080: #ffffff14;
+  --color-base-alpha-invert-100: #ffffff1f;
+  --color-base-alpha-invert-300: #ffffff52;
+  --color-base-alpha-invert-600: #ffffff9e;
+  --color-base-alpha-invert-800: #ffffffcc;
+
+  /* ── Blue scale (dark: deep navy → purple → lavender) ────────*/
+  --color-base-blue-100:  #121426;
+  --color-base-blue-200:  #060713;
+  --color-base-blue-300:  #1f1e4e;
+  --color-base-blue-400:  #292370;
+  --color-base-blue-500:  #312d81;
+  --color-base-blue-600:  #3b3890;
+  --color-base-blue-700:  #4a30d3;
+  --color-base-blue-800:  #4745a5;
+  --color-base-blue-900:  #5543e4;
+  --color-base-blue-1000: #5552c4;
+  --color-base-blue-1100: #8a8aff;
+  --color-base-blue-1200: #dbe0ff;
+
+  /* ── Gray scale (dark: near-black → near-white) ──────────────*/
+  --color-base-gray-100:  #18161d;
+  --color-base-gray-200:  #09070d;
+  --color-base-gray-300:  #231f2a;
+  --color-base-gray-400:  #322e3a;
+  --color-base-gray-500:  #2b2732;
+  --color-base-gray-600:  #3b3743;
+  --color-base-gray-700:  #494551;
+  --color-base-gray-800:  #625e6b;
+  --color-base-gray-900:  #706b79;
+  --color-base-gray-1000: #b6b1bf;
+  --color-base-gray-1100: #efedf4;
+  --color-base-gray-1200: #ffffff;
+
+  /* ── Green ───────────────────────────────────────────────────*/
+  --color-base-green-900: #8eff8e;
+
+  /* ── White ───────────────────────────────────────────────────*/
+  --color-base-white: #ffffff;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   3. SEMANTIC COLOR TOKENS — DARK MODE (default)
+   Figma "colors" collection, Mode: dark — semantic group.
+   Use these in components and layout, not the base primitives.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Accent ──────────────────────────────────────────────────*/
+  --color-accent-bg:                  #5543e4;   /* blue-900  */
+  --color-accent-fg:                  #8a8aff;   /* blue-1100 */
+
+  /* ── Highlight ───────────────────────────────────────────────*/
+  --color-highlight-bg:               #8eff8e;   /* green-900 */
+  --color-highlight-fg:               #8eff8e;   /* green-900 */
+  --color-highlight-fg-on-highlight:  #18161d;   /* gray-100  */
+
+  /* ── Neutral ─────────────────────────────────────────────────*/
+  --color-neutral-bg:                 #121426;   /* blue-100              */
+  --color-neutral-bg-elevated:        #ffffff1f; /* alpha-invert-100      */
+  --color-neutral-fg:                 #ffffffcc; /* alpha-invert-800      */
+  --color-neutral-fg-muted:           #ffffff9e; /* alpha-invert-600      */
+  --color-neutral-fg-on-accent:       #ffffffcc; /* alpha-invert-800      */
+  --color-neutral-opacity-strong:     #09070dcc; /* alpha-800             */
+  --color-neutral-stroke:             #ffffff52; /* alpha-invert-300      */
+  --color-neutral-stroke-subtle:      #ffffff14; /* alpha-invert-080      */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   4. BASE COLOR PRIMITIVES + SEMANTIC — LIGHT MODE OVERRIDES
+   Figma "colors" collection, Mode: light.
+   Apply via data-theme="light" on <html> or <body>.
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="light"] {
+
+  /* ── Alpha (light mode: alpha and alpha-invert swap roles) ───*/
+  --color-base-alpha-040: #ffffff0a;
+  --color-base-alpha-080: #ffffff14;
+  --color-base-alpha-100: #ffffff1f;
+  --color-base-alpha-300: #ffffff52;
+  --color-base-alpha-600: #ffffff9e;
+  --color-base-alpha-800: #ffffffcc;
+
+  --color-base-alpha-invert-040: #09070d0a;
+  --color-base-alpha-invert-080: #09070d14;
+  --color-base-alpha-invert-100: #09070d1f;
+  --color-base-alpha-invert-300: #09070d52;
+  --color-base-alpha-invert-600: #09070d9e;
+  --color-base-alpha-invert-800: #09070dcc;
+
+  /* ── Blue scale (light: near-white pastels → deep navy) ──────*/
+  --color-base-blue-100:  #fdfdff;
+  --color-base-blue-200:  #f7f8ff;
+  --color-base-blue-300:  #eff1ff;
+  --color-base-blue-400:  #e3e7ff;
+  --color-base-blue-500:  #d6dcff;
+  --color-base-blue-600:  #c6cdff;
+  --color-base-blue-700:  #b1b9ff;
+  --color-base-blue-800:  #959cff;
+  --color-base-blue-900:  #5543e4;
+  --color-base-blue-1000: #5549dc;
+  --color-base-blue-1100: #4937ca;
+  --color-base-blue-1200: #28246d;
+
+  /* ── Gray scale (light: near-white → near-black) ─────────────*/
+  --color-base-gray-100:  #fcfcfd;
+  --color-base-gray-200:  #faf9fc;
+  --color-base-gray-300:  #f1eff4;
+  --color-base-gray-400:  #e9e7ed;
+  --color-base-gray-500:  #e2e0e8;
+  --color-base-gray-600:  #dbd8e2;
+  --color-base-gray-700:  #d0ccd8;
+  --color-base-gray-800:  #beb9c8;
+  --color-base-gray-900:  #66626e;
+  --color-base-gray-1000: #26232b;
+  --color-base-gray-1100: #211e25;
+  --color-base-gray-1200: #09070d;
+
+  /* ── Green (same in both modes) ──────────────────────────────*/
+  /* --color-base-green-900: #8eff8e */
+
+  /* ── Semantic overrides ──────────────────────────────────────*/
+  --color-accent-bg:                  #5543e4;   /* same purple accent           */
+  --color-accent-fg:                  #5543e4;   /* solid (no lavender in light) */
+
+  --color-highlight-bg:               #5543e4;   /* purple replaces green        */
+  --color-highlight-fg:               #5543e4;
+  --color-highlight-fg-on-highlight:  #28246d;   /* navy on purple               */
+
+  --color-neutral-bg:                 #f7f8ff;   /* warm off-white               */
+  --color-neutral-bg-elevated:        #09070d1f;
+  --color-neutral-fg:                 #09070dcc;
+  --color-neutral-fg-muted:           #09070d9e;
+  --color-neutral-fg-on-accent:       #ffffff;
+  --color-neutral-opacity-strong:     #ffffff9e;
+  --color-neutral-stroke:             #09070d14;
+  --color-neutral-stroke-subtle:      #09070d14;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   5. TYPOGRAPHY — FONT FAMILIES & PROPERTIES
+   Figma type style definitions.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Font families ───────────────────────────────────────────
+     @font-face / @import lives in base.css or equivalent.
+  ────────────────────────────────────────────────────────────── */
+  --font-serif: 'Montagu Slab', Georgia, serif;
+  --font-mono:  'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Figma node 368:13282 — ASCII art uses DM Mono Light */
+  --font-mono-ascii: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ── Font weights ────────────────────────────────────────────
+     display / body / body-sm / inline-link = 300 (Light)
+     title                                  = 500 (Medium)
+     mono                                   = 400 (Regular)
+  ────────────────────────────────────────────────────────────── */
+  --font-weight-light:   300;
+  --font-weight-regular: 400;
+  --font-weight-medium:  500;
+
+  /* ── Line heights ────────────────────────────────────────────
+     Figma unitless multipliers.
+  ────────────────────────────────────────────────────────────── */
+  --line-height-tight:  1.2;    /* display, title                    */
+  --line-height-normal: 1.38;   /* body, body-sm, mono, inline-link  */
+
+  /* ── Letter spacing ──────────────────────────────────────────
+     Figma "4" for mono = 4% of font-size = 0.04em.
+  ────────────────────────────────────────────────────────────── */
+  /* Figma display/title: letterSpacing -1 → −1 % of font-size (see MCP: tracking-[-0.4px] at 40 px) */
+  --letter-spacing-tight: -0.01em; /* display, title   */
+  --letter-spacing-body:   0em;    /* body, inline-link */
+  --letter-spacing-mono:   0.04em; /* Space Mono        */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   6. TYPOGRAPHY — RESPONSIVE SIZE SCALE
+   Figma "responsive" collection, typography group.
+   :root holds large / x-large values (≥ 1201px).
+   Overridden per breakpoint in section 9.
+
+   Figma variable name        → CSS custom property
+   ─────────────────────────────────────────────────
+   typography/display         → --typography-display
+   typography/title           → --typography-title
+   typography/body            → --typography-body
+   typography/body sm         → --typography-body-sm
+   typography/mono            → --typography-mono
+   Inline_Link                → --typography-inline-link  (fixed)
+
+   Per-breakpoint values (px):
+   ┌──────────────────────┬────────┬───────┬────────┬───────┬─────────┐
+   │ Token                │ x-lrg  │ large │ medium │ small │ x-small │
+   ├──────────────────────┼────────┼───────┼────────┼───────┼─────────┤
+   │ --typography-display │  40    │  40   │  32    │  28   │  28     │
+   │ --typography-title   │  32    │  32   │  24    │  24   │  24     │
+   │ --typography-body    │  24    │  24   │  20    │  20   │  18     │
+   │ --typography-body-sm │  16    │  16   │  14    │  14   │  14     │
+   │ --typography-mono    │  14    │  14   │  14    │  12   │  12     │
+   │ --typography-inline- │  20    │  20   │  20    │  20   │  20     │
+   │   link               │ (fixed across all breakpoints)            │
+   └──────────────────────┴────────┴───────┴────────┴───────┴─────────┘
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --typography-display:     40px;
+  --typography-title:       32px;
+  --typography-body:        24px;
+  --typography-body-sm:     16px;
+  --typography-mono:        14px;
+  --typography-inline-link: 20px;
+  --typography-footnote:    12px; /* Figma typography/footnote — ASCII art (node 368:13282) */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   7. LAYOUT — SPACING MARGIN
+   Figma "responsive" collection — spacing/margins token.
+   :root = large desktop default (1201px–1919px viewport).
+   Overridden per breakpoint in section 9.
+
+   x-large  ≥ 1920px  →  80px   (`get_variable_defs` intro 357:12908)
+   large    1201–1919 →  40px
+   medium   > 768px   →  40px
+   small    > 480px   →  24px
+   x-small  ≤ 480px   →  24px
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --spacing-margin: 40px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   8. SPACING SCALE, RADII, STRUCTURAL SIZES
+   Project-specific tokens not sourced from Figma variables.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Spacing steps: 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ── Border radius ───────────────────────────────────────────*/
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  /* ── Overlay scrim ───────────────────────────────────────────*/
+  --overlay: rgba(0, 0, 0, 0.40);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   9. RESPONSIVE OVERRIDES
+   Desktop-first: :root holds large/x-large defaults.
+   Each @media block narrows the scale for smaller viewports.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── medium: 769px – 1200px ──────────────────────────────────── */
+@media (max-width: 1200px) {
+  :root {
+    --typography-display: 32px;
+    --typography-title:   24px;
+    --typography-body:    20px;
+    --typography-body-sm: 14px;
+    /* --typography-mono stays 14px */
+    --spacing-margin:     40px;
+  }
+}
+
+/* ── small: 481px – 768px ────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --typography-display: 28px;
+    /* --typography-title   stays 24px */
+    /* --typography-body    stays 20px */
+    /* --typography-body-sm stays 14px */
+    --typography-mono:    12px;
+    --spacing-margin:     24px;
+  }
+}
+
+/* ── x-small: ≤ 480px ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    /* --typography-display stays 28px */
+    --typography-body:    18px;
+    /* --typography-body-sm stays 14px */
+    /* --typography-mono    stays 12px */
+  }
+}
+
+/* ── expanded desktop: Figma mode screen/max-width 1920 (see variables on intro 357:12908) ── */
+@media (min-width: 1920px) {
+  :root {
+    --spacing-margin: 80px;
+  }
+}

@@ -1,0 +1,606 @@
+/*
+  css/main.css
+  Full responsive layout: large (1440) → medium (1200) → small (768) → x-small (480).
+  Depends on: css/tokens.css, css/grid.css, component css files.
+*/
+
+/* ─── Document scroll: snap-based navigation ───────────────
+   Mandatory snap ensures the viewport always rests on a defined
+   snap point. scroll-snap-stop: always on each slide prevents
+   skipping. scroll-padding-top offsets for the fixed header so
+   snap targets land below the navbar, not behind it.
+   ────────────────────────────────────────────────────────── */
+
+html {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-neutral-bg);
+  color: var(--color-neutral-fg);
+}
+
+/* ─── Accessibility utilities ───────────────────────────────── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--spacing-margin);
+  z-index: 9999;
+  background: var(--color-accent-bg);
+  color: var(--color-neutral-fg-on-accent);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--typography-mono);
+  letter-spacing: var(--letter-spacing-mono);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 2px;
+}
+
+.skip-link:focus {
+  top: var(--spacing-margin);
+}
+
+/* ─── Fixed chrome ──────────────────────────────────────────────
+   Both bars sit exactly --spacing-margin (40px large) from the
+   viewport edge, matching the Figma frame inset. Left/right
+   mirror the grid margin. Transparent — page scrolls behind.
+   ────────────────────────────────────────────────────────────── */
+
+.site-header,
+.site-footer {
+  position: fixed;
+  left:  var(--spacing-margin);
+  right: var(--spacing-margin);
+  z-index: 100;
+}
+
+.site-header {
+  top: var(--spacing-margin);
+}
+
+.site-footer {
+  bottom: var(--spacing-margin);
+}
+
+/* ─── Scrollable site body ──────────────────────────────────────
+   No top/bottom padding — snap sections start at the viewport edge
+   and manage their own internal clearance from the fixed chrome.
+   ────────────────────────────────────────────────────────────── */
+
+.site {
+  padding: 0;
+}
+
+/* ─── Sections ──────────────────────────────────────────────── */
+
+/* Intro: full viewport, snap point */
+.section--intro {
+  height: 100vh;
+  scroll-snap-align: start;
+}
+
+/* Work slides: each occupies exactly one viewport.
+   scroll-snap-stop: always forces a hard pause at every slide —
+   the browser cannot skip a slide regardless of gesture speed.
+   Flex centers the .page-grid child vertically within the 100vh slide. */
+.section--work {
+  height: 100vh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Progress bar ───────────────────────────────────────────
+   Fixed left edge. Fill scales from top via transform:scaleY.
+   Updates on slide change (driven by JS), not raw scroll delta.
+   ────────────────────────────────────────────────────────── */
+
+.progress-bar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 2px;
+  z-index: 50;          /* above content; below fixed chrome (100) */
+  pointer-events: none;
+}
+
+.progress-bar__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent-fg);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar__fill {
+    transition: none;
+  }
+}
+
+/* ─── Slide content: fade-up on entry ────────────────────────
+   Default opacity: 0 prevents the backwards-fill glitch:
+   when .is-active is toggled, animation-fill-mode:both applies
+   the "from" values (opacity:0) immediately during the delay.
+   Since the default is already 0, there is no visible jump.
+
+   90ms settle delay: snap completes before content arrives.
+   Stagger: title +0ms → details +90ms → col-body +180ms.
+   ────────────────────────────────────────────────────────── */
+
+@keyframes work-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.section--work .work__title,
+.section--work .work__details,
+.section--work .col-body {
+  opacity: 0;
+}
+
+.section--work.is-active .work__title {
+  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1)  90ms both;
+}
+
+.section--work.is-active .work__details {
+  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
+}
+
+.section--work.is-active .col-body {
+  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) 270ms both;
+}
+
+/* ─── About section: fade-up on scroll entry ──────────────────
+   .will-animate is set immediately by JS (opt-in pattern).
+   Without JS the section is fully visible at all times.
+   .is-visible is added by IntersectionObserver — one-shot.
+   ────────────────────────────────────────────────────────── */
+
+.section--about.will-animate {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity   500ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.section--about.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── Reduced motion overrides ────────────────────────────────
+   Disable transform movement; keep fast opacity transitions so
+   state changes remain perceptible without spatial motion.
+
+   Work: animation is disabled so opacity must be set explicitly
+   — active slides show at full opacity, inactive stay hidden.
+   Intro: disable animation and show content immediately.
+   ────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .section--work.is-active .work__title,
+  .section--work.is-active .work__details,
+  .section--work.is-active .col-body {
+    animation: none;
+    opacity: 1;
+  }
+
+  .intro__text p:first-child,
+  .intro__text p:last-child {
+    animation: none;
+  }
+
+  .section--about.will-animate {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+}
+
+/* ─── Intro ─────────────────────────────────────────────────── */
+
+/* y=226.67 in 1440 long-scroll design */
+.intro__content {
+  padding-top: 227px;
+}
+
+/* ─── Intro entrance: staggered fade-up on page load ─────────
+   300ms initial delay lets the page settle before text arrives.
+   Two paragraphs stagger at 300ms and 420ms respectively.
+   animation-fill-mode:both hides them during the delay so no
+   text flashes before the animation begins.
+   ────────────────────────────────────────────────────────── */
+
+@keyframes intro-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.intro__text p:first-child {
+  animation: intro-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
+}
+
+.intro__text p:last-child {
+  animation: intro-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+}
+
+.intro__text {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-display);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-neutral-fg);
+}
+
+.intro__text p {
+  margin: 0;
+}
+
+.intro__text p + p {
+  margin-top: var(--paragraph-spacing);
+}
+
+/* Figma intro body text accent span (368:13140): semantic highlight fg #8eff8e */
+.intro__text .accent {
+  color: var(--color-highlight-fg);
+}
+
+/* ─── Work sections ──────────────────────────────────────────── */
+
+/* Content row — no padding-top needed; section flex-centers it */
+.work__row {
+  padding-top: 0;
+}
+
+/* Left column: project title + detail rows */
+.work__title {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-title); /* 32px */
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-neutral-fg);
+  margin: 0;
+}
+
+.work__details {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-2) 0 0 0; /* 8px gap below title */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2); /* 8px between rows */
+}
+
+.work__detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px; /* Figma: 10px — no exact token */
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+}
+
+.work__detail-arrow {
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+  line-height: inherit;
+}
+
+.work__detail-text {
+  color: var(--color-neutral-fg);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Right column: body text + metrics */
+.work__body {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-body);
+  line-height: var(--line-height-normal);
+  color: var(--color-neutral-fg);
+}
+
+.work__body p {
+  margin: 0;
+}
+
+.work__body p + p {
+  margin-top: var(--space-4); /* 16px — from Figma mb-[16px] */
+}
+
+.work__metrics {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-6) 0 0 0; /* 24px gap below body text */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2); /* 8px between rows */
+}
+
+/* ─── Job experience list (work section #4) ─────────────────── */
+
+.work__experience {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-6) 0 0 0; /* 24px gap below intro paragraph */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4); /* 16px between rows */
+}
+
+.work__experience-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2); /* 8px between year and role */
+}
+
+.work__experience-year {
+  width: 80px; /* Figma: fixed 80px column — no token */
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  color: var(--color-neutral-fg);
+}
+
+.work__experience-role {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  color: var(--color-neutral-fg);
+}
+
+.work__experience-role p {
+  margin: 0;
+}
+
+.work__experience-role p + p {
+  margin-top: var(--space-1); /* 4px between role title and company */
+}
+
+.work__cta {
+  margin-top: var(--space-6); /* 24px gap below experience list */
+}
+
+/* ─── About section ──────────────────────────────────────────── */
+
+/* Full-viewport snap point. Content scrolls inside .about__scroll
+   so the section remains exactly 100vh for snap purposes. */
+.section--about {
+  height: 100vh;
+  scroll-snap-align: start;
+  overflow: hidden;
+}
+
+.about__scroll {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Col 3-10 span (matches x=269.33, w=901.33 at 1440px) */
+.col-about {
+  grid-column: 3 / span 8;
+}
+
+/* Upper hero block: full-width, vertically centred content */
+.about__hero {
+  min-height: 591px; /* Figma Project Info height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6); /* 24px gap between ASCII and tagline */
+  padding-top: calc(var(--spacing-margin) + 24px); /* clear fixed header */
+  overflow-x: auto; /* protect layout if art is wider than viewport */
+}
+
+.about__ascii {
+  font-family: var(--font-mono-ascii);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-footnote);
+  line-height: normal;
+  color: var(--color-neutral-fg);
+  /* text-align must be left so relative spaces are preserved */
+  text-align: left;
+  white-space: pre;
+  /* let content determine width; flex parent centres the block */
+  width: fit-content;
+  margin: 0;
+}
+
+.about__tagline {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-display);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-neutral-fg);
+  text-align: center;
+  margin: 0;
+}
+
+/* Lower content block */
+/* Figma "about me" (368:13286): flex-col gap-[12px] pb-[80px] */
+.about__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3); /* 12px */
+  padding-top: var(--grid-row-gap); /* 16px row-gap from hero */
+  padding-bottom: 80px;
+  box-sizing: border-box;
+}
+
+.about__label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  color: var(--color-neutral-fg);
+  margin: 0;
+}
+
+.about__body {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-body-sm);
+  line-height: var(--line-height-normal);
+  color: var(--color-neutral-fg);
+}
+
+.about__body p {
+  margin: 0;
+}
+
+.about__body p + p {
+  margin-top: var(--space-4); /* 16px */
+}
+
+.about__cta {
+  margin-top: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE OVERRIDES
+   Applied in cascade order — medium first, then small, x-small.
+   Column values cross-referenced against Figma node 374:1278.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── medium: ≤ 1200px ─────────────────────────────────────────
+   Canvas 1200px · margin 40px · col ≈ 78.7px
+   Key changes vs large:
+     · Work sections expand to 1024px (full-viewport panels)
+     · Work content row sits deeper: y = 373px
+     · About section compresses to 1024px min-height
+     · About hero inset doubles to 80px (matches Figma y=80 for Project Info)
+   ─────────────────────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  /* Project Info moves from y=40 to y=80 in medium frames */
+  .about__hero {
+    padding-top: 80px;
+  }
+}
+
+
+/* ─── small: ≤ 768px ────────────────────────────────────────────
+   Canvas 768px · margin 24px · col ≈ 45.3px
+   Key changes vs medium:
+     · Intro text row sits at y = 216px (from 227px)
+     · Work layout STACKS: project info (col 2/span 10) above
+       body text (col 3/span 10, 1-col indent)
+     · Work content row padding-top resets to 216px
+     · About hero inset drops to 64px (Figma Project Info y=64)
+     · col-about narrows to col 2/span 10 (was col 3/span 8)
+   ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Intro: text row at y=216 */
+  .intro__content {
+    padding-top: 216px;
+  }
+
+  /* Work: increase vertical distance between stacked blocks (≈40px) */
+  .work__row {
+    row-gap: var(--space-10); /* 40px */
+    padding-top: 0;
+  }
+
+  /* Work: stacked layout.
+     col-sidebar occupies cols 2–11 (span 10).
+     col-body occupies cols 3–12 (span 10, 1-col indent).
+     Because the ranges overlap, CSS Grid auto-placement pushes
+     col-body into the next row — no explicit row assignment needed.
+     These selectors beat the grid.css collapse (1/span 12) because
+     they are more specific (.section--work .col-*). */
+  .section--work .col-sidebar {
+    grid-column: 2 / span 10;
+  }
+
+  .section--work .col-body {
+    grid-column: 3 / span 10;
+  }
+
+  /* About: hero top inset from Figma Project Info y=64 */
+  .about__hero {
+    padding-top: 64px;
+  }
+
+  /* About-me block: col 2–11 (span 10) at small */
+  .col-about {
+    grid-column: 2 / span 10;
+  }
+}
+
+
+/* ─── x-small: ≤ 480px ──────────────────────────────────────────
+   Canvas 480px · margin 24px · col ≈ 21.3px
+   Column assignments and y-offsets are identical to small.
+   Typography scale adjustments handled entirely by tokens.css
+   (--typography-mono drops to 12px, display/body shrink further).
+   No additional layout overrides required.
+   ─────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* No additional overrides — small rules cascade down. */
+}
+
+/* ─── x-large ≥ 1920px (Figma section 357:12793) ───────────────────
+   MCP `get_variable_defs` intro 357:12908: spacing/margins = 80.
+   Work frame 357:12794: height 1024; Project Info y ≈ 386.67.
+   Intro hero text `357:12911`: y ≈ 253.33 vs long-scroll 226.67 → +26.67px offset.
+   About frame 357:12898: height 1024 (long-scroll about uses 1185 — applies below 1920).
+   ─────────────────────────────────────────────────────────────── */
+
+@media (min-width: 1920px) {
+  .intro__content {
+    padding-top: 254px;
+  }
+}
+

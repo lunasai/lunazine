@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scroll section preview</title>
+
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/component-scroll-section.css" />
+
+    <style>
+      body {
+        margin: 0;
+        padding: var(--spacing-margin);
+        background: var(--color-neutral-bg);
+        color: var(--color-neutral-fg);
+        font-family: var(--font-mono);
+      }
+
+      .grid {
+        display: flex;
+        gap: var(--space-8);
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+      }
+
+      .label {
+        font-size: var(--typography-mono);
+        line-height: var(--line-height-normal);
+        letter-spacing: var(--letter-spacing-mono);
+        text-transform: uppercase;
+        color: var(--color-neutral-fg-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid" aria-label="Scroll indicator variants">
+      <div class="item">
+        <div class="label">Step=10</div>
+        <div class="scroll-section" data-step="10" aria-label="Scroll progress indicator (Step 10)">
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="label">Step=15</div>
+        <div class="scroll-section" data-step="15" aria-label="Scroll progress indicator (Step 15)">
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="label">Step=20</div>
+        <div class="scroll-section" data-step="20" aria-label="Scroll progress indicator (Step 20)">
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="label">Step=25</div>
+        <div class="scroll-section" data-step="25" aria-label="Scroll progress indicator (Step 25)">
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="label">Step=30</div>
+        <div class="scroll-section" data-step="30" aria-label="Scroll progress indicator (Step 30)">
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="label">Step=35</div>
+        <div class="scroll-section" data-step="35" aria-label="Scroll progress indicator (Step 35)">
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+          <span class="scroll-section__segment" aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bottom preview</title>
+
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/component-button.css" />
+    <link rel="stylesheet" href="../css/component-bottom.css" />
+
+    <style>
+      body {
+        margin: 0;
+        padding: var(--spacing-margin);
+        background: var(--color-neutral-bg);
+      }
+    </style>
+  </head>
+  <body>
+    <footer class="bottom" aria-label="Footer status bar">
+      <div class="bottom__moonphase" aria-label="Current moon phase">
+        <span aria-hidden="true">◑</span>
+        <span>w. crescent</span>
+      </div>
+
+      <time class="bottom__time" datetime="22:00:00">22:00:00 AMS</time>
+
+      <div class="bottom__mode" aria-label="Theme toggle">
+        <button class="button" type="button" aria-pressed="true">dark</button>
+        <button class="button" type="button" aria-pressed="false">light</button>
+      </div>
+    </footer>
+  </body>
+</html>
+

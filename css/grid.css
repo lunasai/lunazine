@@ -1,0 +1,264 @@
+/*
+ * Luna Borgo — New Site
+ * css/grid.css
+ *
+ * CSS grid system derived from Figma responsive layout frames.
+ * Depends on css/tokens.css being imported first.
+ *
+ * Source frames: portfolio_web node 295-13185, all five breakpoint sections.
+ * Confirmed values via get_design_context on intro frames at every size:
+ *
+ *   grid-template-columns: repeat(12, 1fr)   ← constant at all breakpoints
+ *   column-gap / row-gap:  16px              ← constant at all breakpoints
+ *   padding-inline:        --spacing-margin  ← varies per breakpoint (tokens.css)
+ *
+ * Breakpoint / margin / computed column-width reference:
+ * ┌─────────┬────────────┬─────────┬───────┬──────────────────────────────┐
+ * │ Mode    │ Canvas(px) │ Margin  │ Gutter│ Col width (1fr, for ref only) │
+ * ├─────────┼────────────┼─────────┼───────┼──────────────────────────────┤
+ * │ x-large │   1920     │  40px   │  16px │  (1920- 80-176)/12 = 138.7px │
+ * │ large   │   1440     │  40px   │  16px │  (1440- 80-176)/12 =  98.7px │
+ * │ medium  │   1200     │  40px   │  16px │  (1200- 80-176)/12 ≈  78.7px │
+ * │ small   │    768     │  24px   │  16px │  ( 768- 48-176)/12 ≈  45.3px │
+ * │ x-small │    480     │  24px   │  16px │  ( 480- 48-176)/12 ≈  21.3px │
+ * └─────────┴────────────┴─────────┴───────┴──────────────────────────────┘
+ *
+ * Paragraph spacing: display text uses 1 blank line (leading-tight × font-size)
+ *   as paragraph separator — represented as --paragraph-spacing below.
+ *
+ * Usage:
+ *   <div class="page-grid">          ← full-width grid container
+ *     <div class="col-span-12">…</div>
+ *     <div class="col-span-3">…</div>
+ *     <div class="col-span-9">…</div>
+ *   </div>
+ *
+ *   <div class="layout-container">   ← centred max-width wrapper (no grid)
+ *     …
+ *   </div>
+ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   1. GRID CUSTOM PROPERTIES
+   All derived from tokens.css.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Grid structure (constant at all breakpoints) ─────────── */
+  --grid-columns:  12;
+  --grid-gutter:   16px;   /* column gap  */
+  --grid-row-gap:  16px;   /* row gap     */
+
+  /* ── Outer margin (alias — driven by --spacing-margin in tokens.css) */
+  --grid-margin:   var(--spacing-margin);   /* 80px ≥1920 → 40px down to 769 → 24px ≤768 */
+
+  /* ── Computed column width (informational; grid uses 1fr) ─────
+     col-width = (canvas - 2×margin - 11×gutter) / 12
+     These cannot be used in grid-template-columns directly
+     because margin is a custom property and calc() inside
+     repeat() is not supported cross-browser. Use 1fr instead.
+  ────────────────────────────────────────────────────────────── */
+  /* x-large: 132px | large: 92px | medium: ~78.7px | small: ~45.3px | x-small: ~21.3px */
+
+  /* ── Paragraph spacing ───────────────────────────────────────
+     One blank display line as used in Figma text blocks.
+     = line-height-tight × current display font-size.
+     Applied as margin-block-end on display-size paragraphs.
+  ────────────────────────────────────────────────────────────── */
+  --paragraph-spacing: calc(var(--line-height-tight) * var(--typography-display));
+  /* x-large: 1.2 × 40px = 48px | medium: 1.2 × 32px = 38.4px | x-small: 1.2 × 28px = 33.6px */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   2. PAGE GRID CONTAINER
+   Full-viewport-width grid with padding instead of margin so
+   background colours bleed edge-to-edge while content stays
+   within the column grid — matching the Figma frame pattern.
+   ═══════════════════════════════════════════════════════════════ */
+
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: var(--grid-gutter);
+  row-gap: var(--grid-row-gap);
+  padding-inline: var(--grid-margin);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   3. LAYOUT CONTAINER
+   Non-grid centred wrapper for sections that do not need the
+   column system but still respect the outer margin and
+   max-width constraint.
+   ═══════════════════════════════════════════════════════════════ */
+
+.layout-container {
+  width: 100%;
+  max-width: var(--screen-x-large);   /* 1920px hard cap */
+  margin-inline: auto;
+  padding-inline: var(--grid-margin);
+  box-sizing: border-box;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   4. COLUMN SPAN UTILITIES  (.col-span-N)
+   Grid children spanning N columns out of 12.
+   ═══════════════════════════════════════════════════════════════ */
+
+.col-span-1  { grid-column: span 1; }
+.col-span-2  { grid-column: span 2; }
+.col-span-3  { grid-column: span 3; }
+.col-span-4  { grid-column: span 4; }
+.col-span-5  { grid-column: span 5; }
+.col-span-6  { grid-column: span 6; }
+.col-span-7  { grid-column: span 7; }
+.col-span-8  { grid-column: span 8; }
+.col-span-9  { grid-column: span 9; }
+.col-span-10 { grid-column: span 10; }
+.col-span-11 { grid-column: span 11; }
+.col-span-12 { grid-column: span 12; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   5. COLUMN START UTILITIES  (.col-start-N)
+   Force a child to begin at a specific column line (1-indexed).
+   Combine with .col-span-N: class="col-start-2 col-span-9"
+   ═══════════════════════════════════════════════════════════════ */
+
+.col-start-1  { grid-column-start: 1; }
+.col-start-2  { grid-column-start: 2; }
+.col-start-3  { grid-column-start: 3; }
+.col-start-4  { grid-column-start: 4; }
+.col-start-5  { grid-column-start: 5; }
+.col-start-6  { grid-column-start: 6; }
+.col-start-7  { grid-column-start: 7; }
+.col-start-8  { grid-column-start: 8; }
+.col-start-9  { grid-column-start: 9; }
+.col-start-10 { grid-column-start: 10; }
+.col-start-11 { grid-column-start: 11; }
+.col-start-12 { grid-column-start: 12; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   6. NAMED SEMANTIC COLUMN SPANS
+   Derived from the Figma work-frame layout at each size.
+   These encode the actual column assignments observed in design,
+   not arbitrary utilities.
+
+   Layout at large / x-large (12 columns):
+     Project info  → cols 2–4  (3 cols, starts col 2)
+     Content body  → cols 5–11 (7 cols, starts col 5)
+     Intro text    → cols 1–11 (11 cols)
+
+   Layout at medium (12 columns):
+     Project info  → cols 2–4  (3 cols, starts col 2)
+     Content body  → cols 5–11 (7 cols, starts col 5)
+     Intro text    → cols 1–11 (11 cols)
+
+   Layout at small (12 columns):
+     Full bleed    → cols 1–12 (12 cols, stacked)
+     Intro text    → cols 1–11 (11 cols)
+
+   Layout at x-small (12 columns):
+     Full bleed    → cols 1–12 (stacked)
+     Intro text    → cols 1–11
+
+   See responsive overrides in section 8.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Full-bleed header / footer bar */
+.col-full {
+  grid-column: 1 / span 12;
+}
+
+/* Intro / hero text block — 11 cols (leaves 1 col breathing room) */
+.col-content {
+  grid-column: 1 / span 11;
+}
+
+/* Work layout: narrow left column (project info) — 3 cols starting at col 2 */
+.col-sidebar {
+  grid-column: 2 / span 3;
+}
+
+/* Work layout: wide right column (content body) — 7 cols starting at col 5 */
+.col-body {
+  grid-column: 5 / span 7;
+}
+
+/* Two-thirds / one-third split helpers */
+.col-two-thirds {
+  grid-column: 1 / span 8;
+}
+
+.col-one-third {
+  grid-column: 9 / span 4;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   7. ROW UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+.row-start-1 { grid-row-start: 1; }
+.row-start-2 { grid-row-start: 2; }
+.row-start-3 { grid-row-start: 3; }
+.row-start-4 { grid-row-start: 4; }
+
+.row-span-2 { grid-row: span 2; }
+.row-span-3 { grid-row: span 3; }
+.row-span-4 { grid-row: span 4; }
+.row-span-6 { grid-row: span 6; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   8. RESPONSIVE OVERRIDES
+   At small and x-small, collapse multi-column layouts to
+   single-column stacks, matching the Figma mobile frames.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── medium: ≤ 1200px ────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  :root {
+    /* paragraph-spacing tracks --typography-display override */
+    --paragraph-spacing: calc(var(--line-height-tight) * var(--typography-display));
+  }
+}
+
+/* ── small: ≤ 768px ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --paragraph-spacing: calc(var(--line-height-tight) * var(--typography-display));
+  }
+
+  /* Collapse sidebar + body into full-width stacked blocks */
+  .col-sidebar,
+  .col-body,
+  .col-content,
+  .col-two-thirds,
+  .col-one-third {
+    grid-column: 1 / span 12;
+  }
+}
+
+/* ── x-small: ≤ 480px ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --paragraph-spacing: calc(var(--line-height-tight) * var(--typography-display));
+  }
+
+  /* Everything full-width at x-small */
+  .col-sidebar,
+  .col-body,
+  .col-content,
+  .col-full,
+  .col-two-thirds,
+  .col-one-third {
+    grid-column: 1 / span 12;
+  }
+}

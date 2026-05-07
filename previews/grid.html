@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grid Test — Luna Borgo</title>
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/grid.css">
+  <style>
+
+    /* ────────────────────────────────────────────────────────────
+       BASE
+    ──────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      background: var(--color-neutral-bg);
+      color: var(--color-neutral-fg);
+      font-family: var(--font-mono);
+      font-size: var(--typography-mono);
+      line-height: var(--line-height-normal);
+    }
+
+
+    /* ────────────────────────────────────────────────────────────
+       COLUMN OVERLAY  (fixed, non-interactive)
+       Mirrors .page-grid exactly; columns rendered as tinted strips.
+    ──────────────────────────────────────────────────────────── */
+    #colOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      pointer-events: none;
+
+      /* exact copy of .page-grid */
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      column-gap: var(--grid-gutter);
+      padding-inline: var(--grid-margin);
+    }
+
+    #colOverlay .oc {
+      background: rgba(85, 67, 228, 0.09);
+      border-inline: 1px solid rgba(85, 67, 228, 0.22);
+    }
+
+    /* margin regions — pseudo-elements flanking the grid */
+    #colOverlay::before,
+    #colOverlay::after {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      width: var(--grid-margin);
+      background: rgba(255, 80, 80, 0.07);
+      border-inline: 1px solid rgba(255, 80, 80, 0.2);
+    }
+    #colOverlay::before { left: 0; }
+    #colOverlay::after  { right: 0; }
+
+
+    /* ────────────────────────────────────────────────────────────
+       HUD  (sticky info bar)
+    ──────────────────────────────────────────────────────────── */
+    #hud {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      background: rgba(9, 7, 13, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--color-neutral-stroke);
+      padding: 7px var(--spacing-margin);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: var(--letter-spacing-mono);
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+    }
+
+    [data-theme="light"] #hud {
+      background: rgba(247, 248, 255, 0.95);
+    }
+
+    .hud-bp {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--color-accent-fg);
+      min-width: 72px;
+    }
+
+    .hud-item { display: flex; gap: 5px; align-items: center; }
+    .hud-lbl  { opacity: 0.45; }
+    .hud-val  { color: var(--color-neutral-fg); font-variant-numeric: tabular-nums; }
+
+    .hud-actions { margin-left: auto; display: flex; gap: 8px; }
+
+    .hud-btn {
+      background: none;
+      border: 1px solid var(--color-neutral-stroke);
+      color: var(--color-neutral-fg-muted);
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      padding: 2px 10px 3px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .hud-btn:hover,
+    .hud-btn.on {
+      background: var(--color-neutral-bg-elevated);
+      color: var(--color-neutral-fg);
+      border-color: var(--color-neutral-stroke);
+    }
+    .hud-btn.on { color: var(--color-accent-fg); border-color: rgba(138,138,255,0.4); }
+
+
+    /* ────────────────────────────────────────────────────────────
+       SECTION SCAFFOLD
+    ──────────────────────────────────────────────────────────── */
+    .section {
+      padding-block: 40px;
+      border-bottom: 1px solid var(--color-neutral-stroke-subtle);
+    }
+
+    .section-head {
+      padding-inline: var(--spacing-margin);
+      margin-bottom: 20px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+    }
+
+    .section-head strong {
+      color: var(--color-neutral-fg);
+      font-weight: 400;
+    }
+
+
+    /* ────────────────────────────────────────────────────────────
+       01  BREAKPOINT RULER
+    ──────────────────────────────────────────────────────────── */
+    .ruler-table {
+      padding-inline: var(--spacing-margin);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ruler-row {
+      display: grid;
+      grid-template-columns: 72px 1fr 64px 160px;
+      align-items: center;
+      gap: 12px;
+      font-size: 10px;
+    }
+
+    .ruler-name {
+      font-family: var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+    }
+
+    .ruler-bar-track {
+      height: 10px;
+      background: var(--color-neutral-stroke-subtle);
+      border-radius: 1px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ruler-bar-fill {
+      position: absolute;
+      inset-block: 0;
+      left: 0;
+      background: rgba(85, 67, 228, 0.3);
+      border-right: 2px solid rgba(138, 138, 255, 0.5);
+      transition: background 0.2s;
+    }
+
+    .ruler-row.is-active .ruler-bar-fill {
+      background: rgba(85, 67, 228, 0.6);
+      border-right-color: #8a8aff;
+    }
+    .ruler-row.is-active .ruler-name { color: var(--color-accent-fg); }
+
+    .ruler-px  { font-variant-numeric: tabular-nums; color: var(--color-neutral-fg-muted); }
+    .ruler-spec {
+      font-size: 9px;
+      color: var(--color-neutral-fg-muted);
+      letter-spacing: 0.06em;
+    }
+    .ruler-spec em { color: #8eff8e; font-style: normal; }
+
+
+    /* ────────────────────────────────────────────────────────────
+       02  MARGIN + GUTTER CALLOUT
+    ──────────────────────────────────────────────────────────── */
+    .callout-strip {
+      position: relative;
+      height: 36px;
+      width: 100%;
+      margin-bottom: 6px;
+    }
+
+    .callout-m {
+      position: absolute;
+      inset-block: 0;
+      background: rgba(255, 80, 80, 0.12);
+      border: 1px solid rgba(255, 80, 80, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255, 120, 120, 0.8);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .callout-m-l { left: 0; width: var(--spacing-margin); }
+    .callout-m-r { right: 0; width: var(--spacing-margin); }
+
+    .callout-content {
+      position: absolute;
+      left: var(--spacing-margin);
+      right: var(--spacing-margin);
+      inset-block: 0;
+      background: rgba(85, 67, 228, 0.07);
+      border-block: 1px solid rgba(85, 67, 228, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(138, 138, 255, 0.6);
+    }
+
+    .gutter-strip {
+      display: flex;
+      align-items: stretch;
+      padding-inline: var(--spacing-margin);
+      height: 36px;
+      margin-bottom: 10px;
+    }
+
+    .gutter-col-box {
+      flex: 1;
+      background: rgba(85, 67, 228, 0.12);
+      border: 1px solid rgba(85, 67, 228, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(138, 138, 255, 0.65);
+    }
+
+    .gutter-box {
+      flex-shrink: 0;
+      width: var(--grid-gutter);
+      background: rgba(255, 200, 40, 0.12);
+      border: 1px solid rgba(255, 200, 40, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: rgba(255, 210, 60, 0.8);
+      writing-mode: horizontal-tb;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .callout-legend {
+      padding-inline: var(--spacing-margin);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+    }
+    .callout-legend span { margin-right: 16px; }
+
+
+    /* ────────────────────────────────────────────────────────────
+       03  12-COLUMN NUMBERED GRID
+    ──────────────────────────────────────────────────────────── */
+    .grid-cell {
+      min-height: 72px;
+      background: var(--color-neutral-bg-elevated);
+      border: 1px solid var(--color-neutral-stroke-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .gc-n {
+      font-size: 20px;
+      color: var(--color-accent-fg);
+      opacity: 0.45;
+      font-family: var(--font-mono);
+      line-height: 1;
+    }
+
+    .gc-w {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+    }
+
+
+    /* ────────────────────────────────────────────────────────────
+       04  SEMANTIC SPANS
+    ──────────────────────────────────────────────────────────── */
+    .demo-cell {
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-inline: 12px;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      gap: 3px;
+    }
+
+    .dc-name { color: inherit; }
+    .dc-sub  { opacity: 0.5; font-size: 9px; }
+
+    .dm-full    { background: rgba(85,67,228,0.14); color: #8a8aff;   border: 1px solid rgba(138,138,255,0.2); }
+    .dm-content { background: rgba(85,67,228,0.08); color: #8a8aff;   border: 1px solid rgba(138,138,255,0.15); }
+    .dm-sidebar { background: rgba(142,255,142,0.1);color: #8eff8e;   border: 1px solid rgba(142,255,142,0.2); }
+    .dm-body    { background: rgba(255,255,255,0.04); color: var(--color-neutral-fg); border: 1px solid var(--color-neutral-stroke-subtle); }
+    .dm-third   { background: rgba(255,200,40,0.08); color: rgba(255,210,80,0.8); border: 1px solid rgba(255,200,40,0.2); }
+
+    .page-grid + .page-grid { margin-top: 4px; }
+
+    .semantic-note {
+      padding-inline: var(--spacing-margin);
+      margin-top: 12px;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+      font-family: var(--font-mono);
+    }
+
+
+    /* ────────────────────────────────────────────────────────────
+       05  SPAN STRESS TEST
+    ──────────────────────────────────────────────────────────── */
+    .stress-cell {
+      min-height: 32px;
+      background: rgba(85,67,228,0.12);
+      border: 1px solid rgba(138,138,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: rgba(138,138,255,0.7);
+      font-family: var(--font-mono);
+    }
+
+
+    /* ────────────────────────────────────────────────────────────
+       06  TYPOGRAPHY SCALE
+    ──────────────────────────────────────────────────────────── */
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 14px var(--spacing-margin);
+      border-bottom: 1px solid var(--color-neutral-stroke-subtle);
+    }
+    .type-row:last-child { border-bottom: none; }
+
+    .type-meta {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+      flex-shrink: 0;
+      min-width: 130px;
+    }
+    .type-meta b { color: var(--color-accent-fg); font-weight: 400; }
+
+    .t-display {
+      font-family: var(--font-serif);
+      font-weight: var(--font-weight-light);
+      font-size: var(--typography-display);
+      line-height: var(--line-height-tight);
+      letter-spacing: var(--letter-spacing-tight);
+      color: var(--color-neutral-fg);
+    }
+    .t-title {
+      font-family: var(--font-serif);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--typography-title);
+      line-height: var(--line-height-tight);
+      letter-spacing: var(--letter-spacing-tight);
+      color: var(--color-neutral-fg);
+    }
+    .t-body {
+      font-family: var(--font-serif);
+      font-weight: var(--font-weight-light);
+      font-size: var(--typography-body);
+      line-height: var(--line-height-normal);
+      color: var(--color-neutral-fg);
+    }
+    .t-body-sm {
+      font-family: var(--font-serif);
+      font-size: var(--typography-body-sm);
+      line-height: var(--line-height-normal);
+      color: var(--color-neutral-fg);
+    }
+    .t-mono {
+      font-family: var(--font-mono);
+      font-size: var(--typography-mono);
+      line-height: var(--line-height-normal);
+      letter-spacing: var(--letter-spacing-mono);
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+    }
+
+
+    /* ────────────────────────────────────────────────────────────
+       07  PARAGRAPH SPACING
+    ──────────────────────────────────────────────────────────── */
+    .para-demo {
+      padding-inline: var(--spacing-margin);
+    }
+    .para-demo p + p {
+      margin-top: var(--paragraph-spacing);
+    }
+    .para-badge {
+      display: inline-block;
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-neutral-fg-muted);
+      border: 1px solid var(--color-neutral-stroke-subtle);
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       BOTTOM SPACER
+    ──────────────────────────────────────────────────────────── */
+    .bottom-pad { height: 120px; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       COLUMN OVERLAY (fixed, always on top)
+  ══════════════════════════════════════════════════════════ -->
+  <div id="colOverlay" aria-hidden="true">
+    <div class="oc"></div><div class="oc"></div><div class="oc"></div>
+    <div class="oc"></div><div class="oc"></div><div class="oc"></div>
+    <div class="oc"></div><div class="oc"></div><div class="oc"></div>
+    <div class="oc"></div><div class="oc"></div><div class="oc"></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       HUD
+  ══════════════════════════════════════════════════════════ -->
+  <header id="hud">
+    <span class="hud-bp" id="hudBp">—</span>
+
+    <span class="hud-item">
+      <span class="hud-lbl">vp</span>
+      <span class="hud-val" id="hudVp">—</span>
+    </span>
+    <span class="hud-item">
+      <span class="hud-lbl">margin</span>
+      <span class="hud-val" id="hudMargin">—</span>
+    </span>
+    <span class="hud-item">
+      <span class="hud-lbl">gutter</span>
+      <span class="hud-val">16px</span>
+    </span>
+    <span class="hud-item">
+      <span class="hud-lbl">col·w</span>
+      <span class="hud-val" id="hudColW">—</span>
+    </span>
+    <span class="hud-item">
+      <span class="hud-lbl">cols</span>
+      <span class="hud-val">12</span>
+    </span>
+    <span class="hud-item">
+      <span class="hud-lbl">display</span>
+      <span class="hud-val" id="hudDisplay">—</span>
+    </span>
+    <span class="hud-item">
+      <span class="hud-lbl">body</span>
+      <span class="hud-val" id="hudBody">—</span>
+    </span>
+
+    <span class="hud-actions">
+      <button class="hud-btn on" id="btnOverlay"  onclick="toggleOverlay()">overlay</button>
+      <button class="hud-btn"    id="btnTheme"    onclick="toggleTheme()">light</button>
+    </span>
+  </header>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       01 — BREAKPOINTS
+  ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <p class="section-head">01 — <strong>Breakpoints</strong> — active row highlights current viewport</p>
+
+    <div class="ruler-table" id="rulerTable">
+
+      <div class="ruler-row" id="row-xl" data-bp="x-large" data-width="1920">
+        <span class="ruler-name">x-large</span>
+        <div class="ruler-bar-track">
+          <div class="ruler-bar-fill" style="width:100%"></div>
+        </div>
+        <span class="ruler-px">1920px</span>
+        <span class="ruler-spec"><em>margin 80px</em> · col 132px</span>
+      </div>
+
+      <div class="ruler-row" id="row-l" data-bp="large" data-width="1440">
+        <span class="ruler-name">large</span>
+        <div class="ruler-bar-track">
+          <div class="ruler-bar-fill" style="width:calc(1440/1920*100%)"></div>
+        </div>
+        <span class="ruler-px">1440px</span>
+        <span class="ruler-spec"><em>margin 80px</em> · col 92px</span>
+      </div>
+
+      <div class="ruler-row" id="row-m" data-bp="medium" data-width="1200">
+        <span class="ruler-name">medium</span>
+        <div class="ruler-bar-track">
+          <div class="ruler-bar-fill" style="width:calc(1200/1920*100%)"></div>
+        </div>
+        <span class="ruler-px">1200px</span>
+        <span class="ruler-spec"><em>margin 40px</em> · col ≈78.7px</span>
+      </div>
+
+      <div class="ruler-row" id="row-s" data-bp="small" data-width="768">
+        <span class="ruler-name">small</span>
+        <div class="ruler-bar-track">
+          <div class="ruler-bar-fill" style="width:calc(768/1920*100%)"></div>
+        </div>
+        <span class="ruler-px">768px</span>
+        <span class="ruler-spec"><em>margin 24px</em> · col ≈45.3px</span>
+      </div>
+
+      <div class="ruler-row" id="row-xs" data-bp="x-small" data-width="480">
+        <span class="ruler-name">x-small</span>
+        <div class="ruler-bar-track">
+          <div class="ruler-bar-fill" style="width:calc(480/1920*100%)"></div>
+        </div>
+        <span class="ruler-px">480px</span>
+        <span class="ruler-spec"><em>margin 24px</em> · col ≈21.3px</span>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       02 — MARGIN + GUTTER CALLOUT
+  ══════════════════════════════════════════════════════════ -->
+  <section class="section" style="padding-block: 28px;">
+    <p class="section-head">02 — <strong>Margin · Gutter</strong></p>
+
+    <!-- full-bleed strip showing margin regions -->
+    <div class="callout-strip">
+      <div class="callout-m callout-m-l" id="mLabelL">margin</div>
+      <div class="callout-content" id="mContent">12-column content area</div>
+      <div class="callout-m callout-m-r" id="mLabelR">margin</div>
+    </div>
+
+    <!-- 3-col strip with visible gutters -->
+    <div class="gutter-strip">
+      <div class="gutter-col-box">col</div>
+      <div class="gutter-box">16px</div>
+      <div class="gutter-col-box">col</div>
+      <div class="gutter-box">16px</div>
+      <div class="gutter-col-box">col</div>
+      <div class="gutter-box">16px</div>
+      <div class="gutter-col-box">col</div>
+    </div>
+
+    <p class="callout-legend">
+      <span style="color:rgba(255,120,120,0.8)">■ red</span> outer margin (responsive, CSS var --spacing-margin) &nbsp;·&nbsp;
+      <span style="color:rgba(255,210,60,0.8)">■ yellow</span> gutter 16px (fixed) &nbsp;·&nbsp;
+      <span style="color:rgba(138,138,255,0.65)">■ purple</span> column 1fr (fluid)
+    </p>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       03 — 12-COLUMN NUMBERED GRID
+  ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <p class="section-head">03 — <strong>12-Column Grid</strong> — column width updates live as you resize</p>
+
+    <div class="page-grid" id="numberedGrid">
+      <div class="grid-cell col-span-1"><span class="gc-n">1</span><span class="gc-w" id="cw">—</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">2</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">3</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">4</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">5</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">6</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">7</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">8</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">9</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">10</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">11</span></div>
+      <div class="grid-cell col-span-1"><span class="gc-n">12</span></div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       04 — SEMANTIC SPANS  (Figma layout patterns)
+  ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <p class="section-head">04 — <strong>Semantic Spans</strong> — column assignments from Figma work frames</p>
+
+    <!-- col-full: header / footer bar -->
+    <div class="page-grid">
+      <div class="demo-cell dm-full col-full">
+        <span class="dc-name">.col-full</span>
+        <span class="dc-sub">cols 1–12 · header / footer bar</span>
+      </div>
+    </div>
+
+    <!-- col-content: intro / hero text (11 cols) -->
+    <div class="page-grid">
+      <div class="demo-cell dm-content col-content">
+        <span class="dc-name">.col-content</span>
+        <span class="dc-sub">cols 1–11 · intro / hero text</span>
+      </div>
+    </div>
+
+    <!-- col-sidebar + col-body: work layout (3 + 7 = col 2→11) -->
+    <div class="page-grid">
+      <div class="demo-cell dm-sidebar col-sidebar">
+        <span class="dc-name">.col-sidebar</span>
+        <span class="dc-sub">cols 2–4 · project info</span>
+      </div>
+      <div class="demo-cell dm-body col-body">
+        <span class="dc-name">.col-body</span>
+        <span class="dc-sub">cols 5–11 · content body</span>
+      </div>
+    </div>
+
+    <!-- two-thirds + one-third -->
+    <div class="page-grid">
+      <div class="demo-cell dm-content col-two-thirds">
+        <span class="dc-name">.col-two-thirds</span>
+        <span class="dc-sub">cols 1–8</span>
+      </div>
+      <div class="demo-cell dm-third col-one-third">
+        <span class="dc-name">.col-one-third</span>
+        <span class="dc-sub">cols 9–12</span>
+      </div>
+    </div>
+
+    <!-- halves -->
+    <div class="page-grid">
+      <div class="demo-cell dm-body col-span-6">
+        <span class="dc-name">.col-span-6</span>
+        <span class="dc-sub">cols 1–6</span>
+      </div>
+      <div class="demo-cell dm-body col-span-6">
+        <span class="dc-name">.col-span-6</span>
+        <span class="dc-sub">cols 7–12</span>
+      </div>
+    </div>
+
+    <!-- Figma exact: col-start-2 col-span-3 + col-start-5 col-span-7 -->
+    <div class="page-grid">
+      <div class="demo-cell dm-sidebar col-start-2 col-span-3">
+        <span class="dc-name">.col-start-2 .col-span-3</span>
+        <span class="dc-sub">Figma exact: cols 2–4</span>
+      </div>
+      <div class="demo-cell dm-body col-start-5 col-span-7">
+        <span class="dc-name">.col-start-5 .col-span-7</span>
+        <span class="dc-sub">Figma exact: cols 5–11</span>
+      </div>
+    </div>
+
+    <p class="semantic-note">At ≤ 768px, .col-sidebar and .col-body collapse to full 12 cols (stacked).</p>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       05 — SPAN STRESS TEST
+       All rows should align to the same left/right edges.
+  ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <p class="section-head">05 — <strong>Span Accumulation</strong> — left / right edges must align across all rows</p>
+
+    <div class="page-grid">
+      <div class="stress-cell col-span-12">12</div>
+    </div>
+    <div class="page-grid" style="margin-top:3px">
+      <div class="stress-cell col-span-6">6</div>
+      <div class="stress-cell col-span-6">6</div>
+    </div>
+    <div class="page-grid" style="margin-top:3px">
+      <div class="stress-cell col-span-4">4</div>
+      <div class="stress-cell col-span-4">4</div>
+      <div class="stress-cell col-span-4">4</div>
+    </div>
+    <div class="page-grid" style="margin-top:3px">
+      <div class="stress-cell col-span-3">3</div>
+      <div class="stress-cell col-span-3">3</div>
+      <div class="stress-cell col-span-3">3</div>
+      <div class="stress-cell col-span-3">3</div>
+    </div>
+    <div class="page-grid" style="margin-top:3px">
+      <div class="stress-cell col-span-2">2</div>
+      <div class="stress-cell col-span-2">2</div>
+      <div class="stress-cell col-span-2">2</div>
+      <div class="stress-cell col-span-2">2</div>
+      <div class="stress-cell col-span-2">2</div>
+      <div class="stress-cell col-span-2">2</div>
+    </div>
+    <div class="page-grid" style="margin-top:3px">
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+      <div class="stress-cell col-span-1">1</div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       06 — TYPOGRAPHY SCALE
+  ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <p class="section-head">06 — <strong>Typography Scale</strong> — sizes update live as you resize</p>
+
+    <div class="type-row">
+      <span class="type-meta">
+        display<br>
+        --typography-display<br>
+        <b id="tdD">40px</b>
+      </span>
+      <span class="t-display">Luna Borgo</span>
+    </div>
+
+    <div class="type-row">
+      <span class="type-meta">
+        title<br>
+        --typography-title<br>
+        <b id="tdT">32px</b>
+      </span>
+      <span class="t-title">Brand &amp; Systems</span>
+    </div>
+
+    <div class="type-row">
+      <span class="type-meta">
+        body<br>
+        --typography-body<br>
+        <b id="tdB">24px</b>
+      </span>
+      <span class="t-body">Scalable digital experiences for teams that need to design at scale.</span>
+    </div>
+
+    <div class="type-row">
+      <span class="type-meta">
+        body sm<br>
+        --typography-body-sm<br>
+        <b id="tdBS">16px</b>
+      </span>
+      <span class="t-body-sm">For over twelve years, I've helped brands turn creative vision into real experiences.</span>
+    </div>
+
+    <div class="type-row">
+      <span class="type-meta">
+        mono<br>
+        --typography-mono<br>
+        <b id="tdM">14px</b>
+      </span>
+      <span class="t-mono">Work · About · 22:00:00 AMS · ◑ W. Crescent</span>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       07 — PARAGRAPH SPACING
+  ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <p class="section-head">
+      07 — <strong>Paragraph Spacing</strong>
+      — --paragraph-spacing = line-height-tight (1.2) × --typography-display
+      = <span id="paraEq" style="color:var(--color-accent-fg)">48px</span>
+    </p>
+
+    <div class="para-demo">
+      <p class="t-display">First paragraph of display text.</p>
+      <p class="t-display">Second paragraph — the gap above equals --paragraph-spacing.</p>
+      <p class="t-display" style="color:var(--color-neutral-fg-muted)">Third paragraph.</p>
+
+      <span class="para-badge" id="paraBadge">--paragraph-spacing: 48px (1.2 × 40px)</span>
+    </div>
+  </section>
+
+
+  <div class="bottom-pad"></div>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       LIVE HUD SCRIPT
+  ══════════════════════════════════════════════════════════ -->
+  <script>
+    const R = document.documentElement;
+
+    function cssVar(name) {
+      return getComputedStyle(R).getPropertyValue(name).trim();
+    }
+
+    function getBp(vw) {
+      if (vw <= 480)  return 'x-small';
+      if (vw <= 768)  return 'small';
+      if (vw <= 1200) return 'medium';
+      if (vw <= 1440) return 'large';
+      return 'x-large';
+    }
+
+    function measureColWidth() {
+      const el = document.querySelector('#numberedGrid .col-span-1');
+      if (!el) return '—';
+      return el.getBoundingClientRect().width.toFixed(1) + 'px';
+    }
+
+    const bpRowMap = {
+      'x-large': 'row-xl',
+      'large':   'row-l',
+      'medium':  'row-m',
+      'small':   'row-s',
+      'x-small': 'row-xs',
+    };
+
+    function update() {
+      const vw  = window.innerWidth;
+      const bp  = getBp(vw);
+      const margin  = cssVar('--spacing-margin');
+      const display = cssVar('--typography-display');
+      const body    = cssVar('--typography-body');
+      const title   = cssVar('--typography-title');
+      const bodySm  = cssVar('--typography-body-sm');
+      const mono    = cssVar('--typography-mono');
+      const colW    = measureColWidth();
+
+      // HUD
+      document.getElementById('hudBp').textContent      = bp;
+      document.getElementById('hudVp').textContent      = vw + 'px';
+      document.getElementById('hudMargin').textContent  = margin;
+      document.getElementById('hudColW').textContent    = colW;
+      document.getElementById('hudDisplay').textContent = display;
+      document.getElementById('hudBody').textContent    = body;
+
+      // column cell label
+      document.getElementById('cw').textContent = colW;
+
+      // ruler highlight
+      document.querySelectorAll('.ruler-row').forEach(r => r.classList.remove('is-active'));
+      const activeRow = document.getElementById(bpRowMap[bp]);
+      if (activeRow) activeRow.classList.add('is-active');
+
+      // typography labels
+      document.getElementById('tdD').textContent  = display;
+      document.getElementById('tdT').textContent  = title;
+      document.getElementById('tdB').textContent  = body;
+      document.getElementById('tdBS').textContent = bodySm;
+      document.getElementById('tdM').textContent  = mono;
+
+      // paragraph spacing
+      const dPx     = parseFloat(display) || 40;
+      const paraPx  = (1.2 * dPx).toFixed(1);
+      document.getElementById('paraEq').textContent    = paraPx + 'px';
+      document.getElementById('paraBadge').textContent =
+        '--paragraph-spacing: ' + paraPx + 'px (1.2 × ' + dPx + 'px)';
+    }
+
+    window.addEventListener('resize', update);
+    update();
+
+    /* ── Overlay toggle ─────────────────────────────────────── */
+    let overlayVisible = true;
+    function toggleOverlay() {
+      overlayVisible = !overlayVisible;
+      document.getElementById('colOverlay').style.display = overlayVisible ? '' : 'none';
+      const btn = document.getElementById('btnOverlay');
+      btn.textContent = overlayVisible ? 'overlay' : 'overlay off';
+      btn.classList.toggle('on', overlayVisible);
+    }
+
+    /* ── Theme toggle ───────────────────────────────────────── */
+    function toggleTheme() {
+      const isLight = R.hasAttribute('data-theme');
+      if (isLight) {
+        R.removeAttribute('data-theme');
+        document.getElementById('btnTheme').textContent = 'light';
+      } else {
+        R.setAttribute('data-theme', 'light');
+        document.getElementById('btnTheme').textContent = 'dark';
+      }
+    }
+  </script>
+</body>
+</html>

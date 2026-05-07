@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Navbar preview</title>
+
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/component-navbar.css" />
+
+    <style>
+      body {
+        margin: 0;
+        padding: var(--spacing-margin);
+        background: var(--color-neutral-bg);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- from component-navbar.html -->
+    <header class="navbar" role="banner" aria-label="Site header">
+      <a class="navbar__brand" href="/" aria-label="Home">
+        <span class="navbar__logo-mark" aria-hidden="true">
+          <img
+            src="https://www.figma.com/api/mcp/asset/125f3092-12b0-4b3c-965d-29261cdc779e"
+            alt=""
+          />
+        </span>
+        <span class="navbar__logo-type">
+          luna<br />
+          borgo
+        </span>
+      </a>
+
+      <nav class="navbar__nav" aria-label="Primary">
+        <ul class="navbar__nav-list">
+          <li><a class="navbar__link" href="#work">work</a></li>
+          <li><a class="navbar__link" href="#about">about</a></li>
+        </ul>
+      </nav>
+    </header>
+  </body>
+</html>
+

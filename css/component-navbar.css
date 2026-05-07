@@ -1,0 +1,91 @@
+/*
+  component-navbar.css
+  Depends on: css/tokens.css
+*/
+
+.navbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  /* Width follows fixed inset parents — equals viewport − 2×--spacing-margin at each breakpoint */
+}
+
+.navbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1); /* 4px */
+  color: var(--color-neutral-fg);
+  text-decoration: none;
+}
+
+.navbar__logo-mark {
+  width: var(--space-6);  /* 24px */
+  height: var(--space-6); /* 24px */
+  flex: 0 0 auto;
+  display: block;
+}
+
+.navbar__logo-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.navbar__logo-type {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: 12px;   /* logo uses 12px in Figma; no token exists */
+  line-height: 11px; /* logo uses 11px in Figma; no token exists */
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-neutral-fg);
+}
+
+.navbar__nav {
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__nav-list {
+  list-style: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6); /* 24px */
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: var(--space-1); /* 4px */
+  gap: var(--space-2); /* 8px (reserved for optional icon) */
+  height: var(--space-6); /* 24px — matches Figma Header button instances */
+
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono); /* 14px default */
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+
+  color: var(--color-neutral-fg);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.navbar__brand:focus-visible {
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+.navbar__link:focus-visible {
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Button preview</title>
+
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/component-button.css" />
+
+    <style>
+      body {
+        margin: 0;
+        padding: var(--spacing-margin);
+        background: var(--color-neutral-bg);
+        display: flex;
+        gap: var(--space-6);
+        align-items: center;
+        flex-wrap: wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="button" type="button">contact</button>
+    <button class="button" type="button">
+      <span class="button__indicator" aria-hidden="true"></span>
+      contact
+    </button>
+    <button class="button button--accent" type="button">contact</button>
+    <button class="button button--hover" type="button">contact</button>
+  </body>
+</html>
+
