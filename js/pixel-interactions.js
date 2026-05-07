@@ -212,12 +212,50 @@
     return grid;
   }
 
+  const STORAGE_KEY = "pixelPileGrid";
+
+  function savePileGrid() {
+    if (!pileGrid) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        w:    getGridW(),
+        h:    gridH,
+        data: Array.from(pileGrid),
+      }));
+    } catch (e) {
+      // Ignore quota errors
+    }
+  }
+
   function resizePile() {
-    const w = Math.max(1, Math.round(pileContainer.getBoundingClientRect().width));
+    const w        = Math.max(1, Math.round(pileContainer.getBoundingClientRect().width));
+    const newGridW = Math.ceil(w / DOT_SIZE);
+    const prevGridW = getGridW();
+
     pileCanvas.width  = w;
     pileCanvas.height = PILE_HEIGHT;
     pileCanvas.style.height = PILE_HEIGHT + "px";
-    pileGrid = initPile(Math.ceil(w / DOT_SIZE));
+
+    // Try to restore a saved grid whose dimensions still match
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved && saved.w === newGridW && saved.h === gridH) {
+          pileGrid = new Uint8Array(saved.data);
+          return;
+        }
+      }
+    } catch (e) {
+      // Ignore parse errors
+    }
+
+    // Width changed — saved state is no longer valid
+    if (prevGridW !== 0 && prevGridW !== newGridW) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    pileGrid = initPile(newGridW);
   }
 
   resizePile();
@@ -226,6 +264,9 @@
   const ro = new ResizeObserver(resizePile);
   ro.observe(pileContainer);
   window.addEventListener("resize", resizePile);
+
+  // Persist the grid every 5 s (saving every frame would be too expensive)
+  setInterval(savePileGrid, 5000);
 
   // ── Hover interaction ──────────────────────────────────────────────────────────
 
