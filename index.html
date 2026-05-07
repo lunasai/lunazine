@@ -25,9 +25,9 @@
     <!-- ── Fixed header: inset var(--spacing-margin) from top/left/right ── -->
     <div class="site-header">
       <header class="navbar" role="banner" aria-label="Site header">
-        <a class="navbar__brand" href="/" aria-label="Home">
+        <a class="navbar__brand" href="./" aria-label="Home">
           <span class="navbar__logo-mark" aria-hidden="true">
-            <img src="https://www.figma.com/api/mcp/asset/125f3092-12b0-4b3c-965d-29261cdc779e" alt="" />
+            <img id="moon-logo" src="./assets/moon-icon/full%20moon.svg" alt="" />
           </span>
           <span class="navbar__logo-type">
             luna<br />
@@ -37,8 +37,8 @@
 
         <nav class="navbar__nav" aria-label="Primary navigation">
           <ul class="navbar__nav-list">
-            <li><a class="navbar__link" href="#work">work</a></li>
-            <li><a class="navbar__link" href="#about">about</a></li>
+            <li><a class="button" href="#work">work</a></li>
+            <li><a class="button" href="#about">about</a></li>
           </ul>
         </nav>
       </header>
@@ -47,10 +47,13 @@
     <!-- ── Fixed footer: inset var(--spacing-margin) from bottom/left/right ── -->
     <div class="site-footer">
       <footer class="bottom" aria-label="Footer status bar">
-        <div class="bottom__moonphase" aria-label="Current moon phase">
-          <span aria-hidden="true">◑</span>
-          <span>w. crescent</span>
-        </div>
+        <button
+          type="button"
+          class="button bottom__contact js-copy-email"
+          data-email="lunaborgo@gmail.com"
+          data-copied-text="email copied"
+          aria-label="Copy email lunaborgo@gmail.com to clipboard"
+        >email me</button>
 
         <time class="bottom__time" datetime="22:00:00">22:00:00 AMS</time>
 
@@ -118,11 +121,11 @@
                 <ul class="work__metrics">
                   <li class="work__detail">
                     <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">235 contributors across 45 countries</span>
+                    <span class="work__detail-text">Community engagement grew 230% in two years, while component health increased to 94% and SUS held at 70 — above the industry standard of 68.</span>
                   </li>
                   <li class="work__detail">
                     <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">metric 2</span>
+                    <span class="work__detail-text">UK, Spain, and Vietnam adopted the system outside the original brief.</span>
                   </li>
                 </ul>
               </div>
@@ -154,11 +157,11 @@
                 <ul class="work__metrics">
                   <li class="work__detail">
                     <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">68% adoption rate</span>
+                    <span class="work__detail-text">40 disconnected regional platforms → 1. Four product lines using the same visual system across digital product and marketing.</span>
                   </li>
                   <li class="work__detail">
                     <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">99+ component score</span>
+                    <span class="work__detail-text">Design Jams became a quarterly team ritual – engagement grew 12× that year.</span>
                   </li>
                 </ul>
               </div>
@@ -190,11 +193,11 @@
                 <ul class="work__metrics">
                   <li class="work__detail">
                     <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">68% adoption rate</span>
+                    <span class="work__detail-text">Recommending socks with shoes had failed before. A UI redesign made it work — <span class="sr-only"> Confidential annual revenue.</span><span class="work__metric-redacted" aria-hidden="true">€<span class="work__metric-redacted__blur">●●.●●</span>M/year</span>.</span>
                   </li>
                   <li class="work__detail">
                     <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">99+ component score</span>
+                    <span class="work__detail-text">10+ scattered recommendation carousels → 1 shared component. Supports 36 variations.</span>
                   </li>
                 </ul>
               </div>
@@ -255,7 +258,7 @@
                 </ul>
 
                 <div class="work__cta">
-                  <a class="button button--accent" href="#"><span aria-hidden="true">&gt;</span> download full cv</a>
+                  <a class="button button--accent" href="brand_ref/docs/LunaBorgo_Designer_CV.pdf" download="LunaBorgo_Designer_CV.pdf"><span aria-hidden="true">&gt;</span> download full cv</a>
                 </div>
               </div>
             </div>
@@ -298,7 +301,15 @@
               <p>ok here's my email if you think you need a cool designer hehe thanks bye ;*</p>
             </div>
             <div class="about__cta">
-              <a class="button button--accent" href="mailto:lunaborgo@gmail.com"><span aria-hidden="true">&gt;</span> lunaborgo@gmail.com</a>
+              <button
+                type="button"
+                class="button button--accent js-copy-email"
+                data-email="lunaborgo@gmail.com"
+                aria-label="Copy email lunaborgo@gmail.com to clipboard"
+              >
+                <span aria-hidden="true">&gt;</span> lunaborgo@gmail.com
+              </button>
+              <p class="about__copy-feedback" role="status" aria-live="polite"></p>
             </div>
           </div>
         </div>
@@ -308,6 +319,9 @@
     </main>
 
     <script src="./js/work-slides.js" defer></script>
+    <script src="./js/bottom-clock.js" defer></script>
+    <script src="./js/about-email-copy.js" defer></script>
+    <script src="./js/moon-phase.js" defer></script>
 
     <script>
       (function () {

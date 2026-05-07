@@ -356,6 +356,19 @@ body {
   gap: var(--space-2); /* 8px between rows */
 }
 
+/* Adidas: keep €X.XXM/year shape without exposing the figure */
+.work__metric-redacted {
+  white-space: nowrap;
+}
+
+.work__metric-redacted__blur {
+  display: inline-block;
+  filter: blur(5px);
+  user-select: none;
+  letter-spacing: 0.12em;
+  margin-inline: 0.06em;
+}
+
 /* ─── Job experience list (work section #4) ─────────────────── */
 
 .work__experience {
@@ -467,13 +480,13 @@ body {
 }
 
 /* Lower content block */
-/* Figma "about me" (368:13286): flex-col gap-[12px] pb-[80px] */
+/* Figma "about me" (368:13286): flex-col gap-[12px]; pb loosened +50% vs Figma for scroll breathing room */
 .about__content {
   display: flex;
   flex-direction: column;
   gap: var(--space-3); /* 12px */
   padding-top: var(--grid-row-gap); /* 16px row-gap from hero */
-  padding-bottom: 80px;
+  padding-bottom: 120px;
   box-sizing: border-box;
 }
 
@@ -506,8 +519,44 @@ body {
 
 .about__cta {
   margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
 }
 
+.about__copy-feedback {
+  margin: 0;
+  min-height: 1lh;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-footnote);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  color: var(--color-neutral-fg-muted);
+}
+
+.about__copy-feedback:empty {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+
+/* ─── Pixel pile footer ──────────────────────────────────────────
+   Full-width canvas block that lives at the bottom of .about__scroll.
+   The JS inserts a <canvas> as a first child and runs the sand sim.
+   ──────────────────────────────────────────────────────────────── */
+
+.pixel-pile-footer {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  flex-shrink: 0; /* don't collapse inside flex containers */
+}
 
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE OVERRIDES
