@@ -231,9 +231,10 @@
 
   function handleHover(clientX, clientY) {
     if (reducedMotion || !pileGrid) return;
-    const rect  = pileContainer.getBoundingClientRect();
-    const x     = clientX - rect.left;
-    const y     = clientY - rect.top;
+    const rect     = pileContainer.getBoundingClientRect();
+    const canvasTop = rect.bottom - PILE_HEIGHT;
+    const x        = clientX - rect.left;
+    const y        = clientY - canvasTop;
     const gridW = getGridW();
     const color = getTrailColor();
 
@@ -272,9 +273,28 @@
     }
   }
 
-  pileContainer.addEventListener("mousemove",  (e) => handleHover(e.clientX, e.clientY));
-  pileContainer.addEventListener("touchmove",  (e) => {
-    if (e.touches[0]) handleHover(e.touches[0].clientX, e.touches[0].clientY);
+  window.addEventListener("mousemove", (e) => {
+    const rect      = pileContainer.getBoundingClientRect();
+    const canvasTop = rect.bottom - PILE_HEIGHT;
+    if (
+      e.clientX >= rect.left && e.clientX <= rect.right &&
+      e.clientY >= canvasTop && e.clientY <= rect.bottom
+    ) {
+      handleHover(e.clientX, e.clientY);
+    }
+  });
+
+  window.addEventListener("touchmove", (e) => {
+    if (!e.touches[0]) return;
+    const { clientX, clientY } = e.touches[0];
+    const rect      = pileContainer.getBoundingClientRect();
+    const canvasTop = rect.bottom - PILE_HEIGHT;
+    if (
+      clientX >= rect.left && clientX <= rect.right &&
+      clientY >= canvasTop && clientY <= rect.bottom
+    ) {
+      handleHover(clientX, clientY);
+    }
   });
 
   // ── Particle handover from trail ───────────────────────────────────────────────
@@ -285,7 +305,7 @@
     const rect = pileContainer.getBoundingClientRect();
     pileParticles.push({
       trueX:    p.trueX - rect.left,
-      trueY:    Math.max(0, p.trueY - rect.top),
+      trueY:    Math.max(0, p.trueY - (rect.bottom - PILE_HEIGHT)),
       vx:       p.vx,
       vy:       p.vy,
       age:      0,
