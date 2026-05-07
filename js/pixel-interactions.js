@@ -167,7 +167,7 @@
   const MAX_PILE_PARTICLES = 2000;
   const HOVER_RADIUS     = 40;
   const HOVER_PROBABILITY = 0.08;
-  const PEAK_RATIO       = 0.25; // starting dome: 25% of grid height
+  const PEAK_RATIO       = 0.03; // starting dome: barely visible bump at center
 
   const gridH = Math.ceil(PILE_HEIGHT / DOT_SIZE);
 
