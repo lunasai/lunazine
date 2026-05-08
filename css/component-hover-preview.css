@@ -1,0 +1,105 @@
+/*
+  css/component-hover-preview.css
+  Hover-preview links: wavy accent underline + floating image card on hover.
+
+  Visual language:
+    · Underline: wavy, var(--color-accent-fg) (#8a8aff)
+    · Card: borderless, sharp corners (--radius-sm), dark surface
+    · Motion: scale + fade in, slight tilt entry, cursor-tracking
+    · Reduced motion: fade only, no transform
+*/
+
+/* ── Hover-preview link: inline wavy underline ─────────────────── */
+
+.hover-preview-link {
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: var(--color-accent-fg);
+  text-underline-offset: 0.25em; /* approx. Figma decoration-[8.5%] at body size */
+  text-decoration-thickness: 1px;
+  cursor: crosshair;
+  transition: text-decoration-color 150ms ease;
+}
+
+/* Keeps decoration visible in both themes */
+[data-theme="light"] .hover-preview-link {
+  text-decoration-color: var(--color-accent-fg);
+}
+
+/* ── Focus state (keyboard navigation) ─────────────────────────── */
+
+.hover-preview-link:focus-visible {
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Floating preview card ──────────────────────────────────────── */
+
+.hover-preview-card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 400;                  /* above content, below fixed chrome (100 isn't relevant here) */
+  pointer-events: none;
+  user-select: none;
+
+  /* Wrap the image in its original aspect ratio */
+  width: fit-content;
+  height: fit-content;
+  max-width: min(390px, calc(100vw - (var(--spacing-margin) * 2)));
+  max-height: min(270px, calc(100vh - (var(--spacing-margin) * 2)));
+
+  background: var(--color-neutral-bg);
+  border: 1px solid var(--color-neutral-stroke);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+
+  /* entry: invisible, slightly scaled down, tilted */
+  opacity: 0;
+  transform: translate(var(--hp-x, 0px), var(--hp-y, 0px))
+             scale(0.88)
+             rotate(-2deg);
+  transition:
+    opacity  160ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.hover-preview-card.is-visible {
+  opacity: 1;
+  transform: translate(var(--hp-x, 0px), var(--hp-y, 0px))
+             scale(1)
+             rotate(0deg);
+}
+
+.hover-preview-card img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-preview-card {
+    transition: opacity 100ms ease;
+    transform: translate(var(--hp-x, 0px), var(--hp-y, 0px));
+  }
+
+  .hover-preview-card.is-visible {
+    transform: translate(var(--hp-x, 0px), var(--hp-y, 0px));
+  }
+}
+
+/* ── Mobile: disable card (touch devices don't hover) ───────────── */
+
+@media (hover: none) {
+  .hover-preview-card {
+    display: none;
+  }
+}
