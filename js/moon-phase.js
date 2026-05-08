@@ -1,8 +1,10 @@
 /**
  * moon-phase.js
  * Computes the current lunar phase and updates the navbar logo mark
- * (#moon-logo) to the matching SVG icon from assets/moon-icon/.
- * No external dependencies — uses a Julian date anchor formula.
+ * (#moon-logo) and the SVG favicon (#favicon-svg) to the matching SVG icon
+ * from assets/moon-icon/. No external dependencies — uses a Julian date
+ * anchor formula. Browsers without SVG favicon support fall back to the
+ * static raster icons declared in index.html.
  */
 (function () {
   "use strict";
@@ -28,13 +30,30 @@
     return             { file: "waning crescent.svg",  label: "Waning Crescent" };
   }
 
+  var phase   = getPhase(getLunarAge(new Date()));
+  var iconSrc = "./assets/moon-icon/" + encodeURIComponent(phase.file);
+
   var img = document.getElementById("moon-logo");
-  if (!img) return;
+  if (img) {
+    img.src = iconSrc;
+    var logoMark = img.parentElement;
+    if (logoMark) logoMark.dataset.tooltip = phase.label;
+  }
 
-  var phase     = getPhase(getLunarAge(new Date()));
-  var logoMark  = img.parentElement;
-
-  img.src = "./assets/moon-icon/" + encodeURIComponent(phase.file);
-
-  if (logoMark) logoMark.dataset.tooltip = phase.label;
+  /* Chromium browsers don't reliably refetch an SVG favicon when you only
+   * mutate the existing <link>'s href attribute, so replace the element. */
+  function setSvgFavicon(href) {
+    var existing = document.getElementById("favicon-svg");
+    var link = document.createElement("link");
+    link.id   = "favicon-svg";
+    link.rel  = "icon";
+    link.type = "image/svg+xml";
+    link.href = href;
+    if (existing && existing.parentNode) {
+      existing.parentNode.replaceChild(link, existing);
+    } else {
+      document.head.appendChild(link);
+    }
+  }
+  setSvgFavicon(iconSrc);
 })();

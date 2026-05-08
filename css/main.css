@@ -129,7 +129,7 @@ body {
 
 /* ─── Progress bar ───────────────────────────────────────────
    Fixed left edge. Fill scales from top via transform:scaleY.
-   Updates on slide change (driven by JS), not raw scroll delta.
+   Driven by raw scroll position for a continuous feel.
    ────────────────────────────────────────────────────────── */
 
 .progress-bar {
@@ -137,7 +137,7 @@ body {
   left: 0;
   top: 0;
   height: 100%;
-  width: 2px;
+  width: 4px;
   z-index: 50;          /* above content; below fixed chrome (100) */
   pointer-events: none;
 }
@@ -148,7 +148,7 @@ body {
   background: var(--color-accent-fg);
   transform: scaleY(0);
   transform-origin: top;
-  transition: transform 200ms ease-out;
+  transition: transform 80ms linear;
 }
 
 @media (prefers-reduced-motion: reduce) {

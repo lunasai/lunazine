@@ -7,13 +7,16 @@
   "scripts": {
     "dev": "vite",
     "build": "node ./scripts/build.mjs",
+    "favicons": "node ./scripts/generate-favicons.mjs",
     "preview": "serve dist -p 4173"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "png-to-ico": "^3.0.1",
     "serve": "^14.2.4",
+    "sharp": "^0.34.5",
     "vite": "^6.3.5"
   }
 }

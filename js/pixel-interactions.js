@@ -17,12 +17,17 @@
   const DOT_SIZE = 3;
 
   // ─── Color ────────────────────────────────────────────────────────────────────
+  // Reads --color-accent-fg from the CSS token so pixels and the progress bar
+  // always share exactly the same color, including across theme switches.
 
   function getTrailColor() {
-    const isDark = document.documentElement.getAttribute("data-theme") !== "light";
-    return isDark
-      ? { r: 138, g: 171, b: 255 }   // lavender
-      : { r: 85,  g: 67,  b: 228 };  // purple
+    const hex = getComputedStyle(document.documentElement)
+      .getPropertyValue("--color-accent-fg").trim();
+    return {
+      r: parseInt(hex.slice(1, 3), 16),
+      g: parseInt(hex.slice(3, 5), 16),
+      b: parseInt(hex.slice(5, 7), 16),
+    };
   }
 
   // ─── Reduced-motion gate ──────────────────────────────────────────────────────
@@ -104,18 +109,99 @@
     }
   }
 
-  window.addEventListener("mousemove", (e) => {
-    if (reducedMotion || !isPressed) return;
-    spawnParticles(e.clientX, e.clientY);
-  });
+  function isInteractiveTarget(target) {
+    if (!(target instanceof Element)) return false;
+    return Boolean(
+      target.closest(
+        "a,button,input,textarea,select,summary,[role='button'],[role='link'],[data-no-pixels]"
+      )
+    );
+  }
 
-  window.addEventListener("mousedown", (e) => {
-    isPressed = true;
+  function setPressed(next) {
+    isPressed = next;
+  }
+
+  function onPressLikeStart(clientX, clientY, target) {
     if (reducedMotion) return;
-    spawnParticles(e.clientX, e.clientY);
-  });
+    if (isInteractiveTarget(target)) return;
+    spawnParticles(clientX, clientY);
+  }
 
-  window.addEventListener("mouseup", () => { isPressed = false; });
+  function onPressLikeMove(clientX, clientY, target) {
+    if (reducedMotion || !isPressed) return;
+    if (isInteractiveTarget(target)) return;
+    spawnParticles(clientX, clientY);
+  }
+
+  // Prefer Pointer Events (covers mouse + touch + pen)
+  if ("PointerEvent" in window) {
+    window.addEventListener(
+      "pointerdown",
+      (e) => {
+        if (!e.isPrimary) return;
+        setPressed(true);
+        onPressLikeStart(e.clientX, e.clientY, e.target);
+      },
+      { passive: true }
+    );
+
+    window.addEventListener(
+      "pointermove",
+      (e) => {
+        if (!e.isPrimary) return;
+        onPressLikeMove(e.clientX, e.clientY, e.target);
+      },
+      { passive: true }
+    );
+
+    window.addEventListener("pointerup", () => setPressed(false), { passive: true });
+    window.addEventListener("pointercancel", () => setPressed(false), { passive: true });
+  } else {
+    // Fallback for older browsers: mouse + touch
+    window.addEventListener(
+      "mousedown",
+      (e) => {
+        setPressed(true);
+        onPressLikeStart(e.clientX, e.clientY, e.target);
+      },
+      { passive: true }
+    );
+
+    window.addEventListener(
+      "mousemove",
+      (e) => {
+        onPressLikeMove(e.clientX, e.clientY, e.target);
+      },
+      { passive: true }
+    );
+
+    window.addEventListener("mouseup", () => setPressed(false), { passive: true });
+
+    window.addEventListener(
+      "touchstart",
+      (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        setPressed(true);
+        onPressLikeStart(t.clientX, t.clientY, e.target);
+      },
+      { passive: true }
+    );
+
+    window.addEventListener(
+      "touchmove",
+      (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        onPressLikeMove(t.clientX, t.clientY, e.target);
+      },
+      { passive: true }
+    );
+
+    window.addEventListener("touchend", () => setPressed(false), { passive: true });
+    window.addEventListener("touchcancel", () => setPressed(false), { passive: true });
+  }
 
   function trailTick() {
     trailCtx.clearRect(0, 0, trailW, trailH);

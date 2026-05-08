@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Luna Borgo</title>
 
+    <link rel="icon" type="image/svg+xml" href="./assets/moon-icon/full%20moon.svg" id="favicon-svg" />
+    <link rel="alternate icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
+    <link rel="alternate icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
+    <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Montagu+Slab:opsz,wght@16..144,300;16..144,400;16..144,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -54,9 +60,10 @@
           data-email="lunaborgo@gmail.com"
           data-copied-text="email copied"
           aria-label="Copy email lunaborgo@gmail.com to clipboard"
+          data-tooltip="tap to copy"
         >email me</button>
 
-        <time class="bottom__time" datetime="22:00:00">22:00:00 AMS</time>
+        <time class="bottom__time" datetime="22:00:00" data-tooltip="luna's current timezone">22:00:00 AMS</time>
 
         <div class="bottom__mode" aria-label="Theme toggle">
           <button class="button" type="button" aria-pressed="false" id="theme-light" aria-label="Switch to light mode">light</button>
@@ -109,15 +116,15 @@
                   </li>
                   <li class="work__detail">
                     <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">2022–Present</span>
+                    <span class="work__detail-text">2024–Present</span>
                   </li>
                 </ul>
               </div>
 
               <div class="col-body">
                 <div class="work__body">
-                  <p>I am a founding member of <span class="hover-preview-link" data-preview="./assets/previews/crate-design-system.png" tabindex="0">Crate</span>, Heineken's global design system that powers eazle, a unified B2B platform merging over 40 regional platforms into one scalable ecosystem.</p>
-                  <p>I built Crate from scratch — from <span class="hover-preview-link" data-preview="./assets/previews/crate-tokens.png" tabindex="0">tokens</span>, components and workflows to, most recently, AI automations — working closely with engineers and a growing community of contributors.</p>
+                  <p>I am a founding member of <span class="hover-preview-link" data-preview="./assets/previews/crate-design-system.png" tabindex="0">Crate</span>, Heineken's global B2B design system. I built everything from <span class="hover-preview-link" data-preview="./assets/previews/crate-tokens.png" tabindex="0">tokens</span> and components to workflows and, most recently, AI automations - collaborating closely with engineers and a growing community of contributors.</p>
+                  <p>I laid the foundation that now supports 235 contributors across 8 global product teams and OpCos. <span class="hover-preview-link" data-preview="./assets/previews/crate-design-system.png" tabindex="0">Crate</span> has become the connective tissue for Heineken's digital product organization.</p>
                 </div>
                 <ul class="work__metrics">
                   <li class="work__detail">
@@ -145,7 +152,7 @@
                   </li>
                   <li class="work__detail">
                     <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">2022–Present</span>
+                    <span class="work__detail-text">2022–2024</span>
                   </li>
                 </ul>
               </div>
@@ -177,24 +184,24 @@
                 <ul class="work__details">
                   <li class="work__detail">
                     <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text"><span class="hover-preview-link" data-preview="./assets/previews/adidas-recommendations.png" tabindex="0">Product recommendations framework</span></span>
+                    <span class="work__detail-text">Product recommendations framework</span>
                   </li>
                   <li class="work__detail">
                     <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">2023–2024</span>
+                    <span class="work__detail-text">2021–2022</span>
                   </li>
                 </ul>
               </div>
 
               <div class="col-body">
                 <div class="work__body">
-                  <p>Working closely with designers, data science, and engineering, I led the concept and design of a unified recommendations framework that delivers the right products to the right customers across homepage, PDP, cart, and checkout.</p>
+                  <p>Working closely with designers, data science, and engineering, I led the concept and design of a <span class="hover-preview-link" data-preview="./assets/previews/adidas-recommendations.png" tabindex="0">unified framework</span> that delivers the right products to the right customers across homepage, PDP, cart, and checkout.</p>
                   <p>The process started with rapid experimentation and evolved to a collaboration with the design system team to build a shared recommendation component: reusable, consistent, and built to last. The result is a system that balances algorithmic intelligence with editorial control.</p>
                 </div>
                 <ul class="work__metrics">
                   <li class="work__detail">
                     <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">Recommending socks with shoes had failed before. A UI redesign made it work — <span class="sr-only"> Confidential annual revenue.</span><span class="work__metric-redacted" aria-hidden="true">€<span class="work__metric-redacted__blur">●●.●●</span>M/year</span>.</span>
+                    <span class="work__detail-text">Redesigned a previously tested experiment and the UI update made it work – <span class="sr-only"> Confidential annual revenue.</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">€€</span>M/year</span>.</span>
                   </li>
                   <li class="work__detail">
                     <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
@@ -256,6 +263,12 @@
                       <p>Atabix</p>
                     </div>
                   </li>
+                  <li class="work__experience-row">
+                    <span class="work__experience-year"></span>
+                    <div class="work__experience-role">
+                      <p>and a couple more...</p>
+                    </div>
+                  </li>
                 </ul>
 
                 <div class="work__cta">
@@ -293,7 +306,7 @@
 
           <!-- Lower: about me text + CTA -->
           <div class="col-about about__content">
-            <h2 class="about__label">About me</h2>
+            <h2 class="about__label">About <span class="hover-preview-link" data-preview="./assets/previews/me.jpeg" tabindex="0">me</span></h2>
             <div class="about__body">
               <p>Design has been part of my life long before it became my career. Back when computers were still a three-piece setup, a passion for reading and writing led me to start a blog – only to become completely obsessed with how it looked... and with all the gifs I wanted to make.</p>
               <p>Twelve years later, my obsession with pixels hasn't gone anywhere. Today, I channel it into making design more sustainable – and more fun. With a systems mindset and a passion for craft, I move fluidly between strategy and hands-on, making sure what we imagine is actually something we can ship.</p>

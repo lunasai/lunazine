@@ -15,12 +15,7 @@
 (function () {
   'use strict';
 
-  /* ── Bail out on touch / coarse-pointer devices ───────────────── */
-
-  if (
-    window.matchMedia('(hover: none)').matches ||
-    window.matchMedia('(pointer: coarse)').matches
-  ) return;
+  var isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 
   /* ── Positioning offsets ─────────────────────────────────────── */
 
@@ -44,16 +39,21 @@
   var rafId        = null;
   var pendingX     = 0;
   var pendingY     = 0;
+  var lastX        = 0;
+  var lastY        = 0;
 
   /* ── Position helpers ─────────────────────────────────────────── */
 
   function positionCard(mouseX, mouseY) {
     var vw = window.innerWidth;
     var vh = window.innerHeight;
-    var rect = card.getBoundingClientRect();
-    var cardW = rect.width || 0;
-    var cardH = rect.height || 0;
-    var PAD = 8;
+    /*
+      Use layout size (offsetWidth/offsetHeight) so we don't get tripped
+      up by the entry transform (scale/rotate) which affects getBoundingClientRect().
+    */
+    var cardW = card.offsetWidth || 0;
+    var cardH = card.offsetHeight || 0;
+    var PAD = 12;
 
     /* Default: card appears to the right and slightly below cursor */
     var x = mouseX + OFFSET_X;
@@ -80,6 +80,8 @@
   /* ── Throttle position updates via rAF ───────────────────────── */
 
   function schedulePosition(x, y) {
+    lastX = x;
+    lastY = y;
     pendingX = x;
     pendingY = y;
     if (rafId) return;
@@ -91,20 +93,51 @@
 
   /* ── Event handlers ───────────────────────────────────────────── */
 
-  function onEnter(e) {
-    var link = e.currentTarget;
-    var src  = link.getAttribute('data-preview');
+  function showForLink(link, clientX, clientY) {
+    var src = link.getAttribute('data-preview');
     if (!src) return;
 
     activeLink = link;
+    lastX = clientX;
+    lastY = clientY;
 
     /* Swap image source only when it changes */
     if (cardImg.getAttribute('src') !== src) {
       cardImg.src = src;
     }
 
-    positionCard(e.clientX, e.clientY);
+    /*
+      Position immediately, then re-position once the image loads/decodes
+      (important for large PNG/JPEGs so the card doesn't clip).
+    */
+    positionCard(lastX, lastY);
     card.classList.add('is-visible');
+    requestAnimationFrame(function () {
+      if (!activeLink) return;
+      positionCard(lastX, lastY);
+    });
+
+    if (typeof cardImg.decode === 'function') {
+      cardImg.decode().catch(function () {}).then(function () {
+        if (!activeLink) return;
+        positionCard(lastX, lastY);
+      });
+    } else {
+      cardImg.onload = function () {
+        if (!activeLink) return;
+        positionCard(lastX, lastY);
+      };
+    }
+  }
+
+  function hide() {
+    activeLink = null;
+    card.classList.remove('is-visible');
+  }
+
+  function onEnter(e) {
+    var link = e.currentTarget;
+    showForLink(link, e.clientX, e.clientY);
   }
 
   function onMove(e) {
@@ -113,8 +146,27 @@
   }
 
   function onLeave() {
-    activeLink = null;
-    card.classList.remove('is-visible');
+    hide();
+  }
+
+  function onTap(e) {
+    var link = e.currentTarget;
+    var isTouch = e.pointerType === 'touch';
+
+    if (isTouch) {
+      /*
+        Prevent text selection / double-tap zoom quirks on iOS while
+        still allowing scroll (we only prevent default on the target).
+      */
+      e.preventDefault();
+    }
+
+    if (activeLink === link) {
+      hide();
+      return;
+    }
+
+    showForLink(link, e.clientX, e.clientY);
   }
 
   /* ── Bind to all hover-preview links ─────────────────────────── */
@@ -122,14 +174,32 @@
   var links = document.querySelectorAll('.hover-preview-link[data-preview]');
 
   links.forEach(function (link) {
-    link.addEventListener('mouseenter', onEnter);
-    link.addEventListener('mouseleave', onLeave);
+    if (!isCoarsePointer) {
+      link.addEventListener('mouseenter', onEnter);
+      link.addEventListener('mouseleave', onLeave);
+    }
+    link.addEventListener('pointerdown', onTap);
   });
 
   /*
     mousemove is on document so the card tracks even when the cursor
     moves faster than the link boundary fires.
   */
-  document.addEventListener('mousemove', onMove);
+  if (!isCoarsePointer) {
+    document.addEventListener('mousemove', onMove);
+  }
+
+  /* Tap/click anywhere else closes the preview */
+  document.addEventListener('pointerdown', function (e) {
+    if (!activeLink) return;
+    if (e.target && e.target.closest && e.target.closest('.hover-preview-link[data-preview]')) return;
+    hide();
+  }, { capture: true });
+
+  /* Scrolling should close it on mobile to avoid awkward overlays */
+  window.addEventListener('scroll', function () {
+    if (!activeLink) return;
+    hide();
+  }, { passive: true });
 
 }());

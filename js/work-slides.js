@@ -9,7 +9,9 @@
   This file's only jobs:
     1. Toggle .is-active on the slide currently in the viewport
        (drives CSS @keyframes fade-up animations).
-    2. Update the progress bar fill on slide change.
+    2. Update the progress bar continuously from raw scroll position
+       so the fill is proportional to how far down the full page
+       you are — reaching 100% only at the very bottom.
     3. Fade in the about section once on first entry.
 */
 
@@ -19,11 +21,32 @@
   /* ── Elements ───────────────────────────────────────────────── */
 
   var slides       = Array.from(document.querySelectorAll('.section--work'));
+  var aboutSection = document.querySelector('.section--about');
   var progressFill = document.querySelector('.progress-bar__fill');
 
   if (!slides.length || !progressFill) return;
 
-  var numSlides = slides.length;
+  /* ── Progress bar: continuous scroll position ───────────────────
+     Reads scrollY / (scrollHeight - innerHeight) on every scroll
+     event via rAF so the fill tracks actual page position rather
+     than discrete section steps.
+  */
+  var rafId = null;
+
+  function updateProgress() {
+    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    var ratio     = maxScroll > 0 ? scrollTop / maxScroll : 0;
+    progressFill.style.transform = 'scaleY(' + ratio + ')';
+    rafId = null;
+  }
+
+  window.addEventListener('scroll', function () {
+    if (!rafId) rafId = requestAnimationFrame(updateProgress);
+  }, { passive: true });
+
+  /* Seed the bar on load (e.g. back-navigation restores scroll position) */
+  updateProgress();
 
   /* ── Slide visibility: IntersectionObserver ─────────────────── */
 
@@ -37,14 +60,7 @@
   */
   var slideObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
-      var slide = entry.target;
-      var idx   = slides.indexOf(slide);
-
-      slide.classList.toggle('is-active', entry.isIntersecting);
-
-      if (entry.isIntersecting && idx >= 0) {
-        progressFill.style.transform = 'scaleY(' + (idx + 1) / numSlides + ')';
-      }
+      entry.target.classList.toggle('is-active', entry.isIntersecting);
     });
   }, { threshold: 0.5 });
 
@@ -57,8 +73,6 @@
     fully visible without JS. .is-visible is added once by IO then
     the observer disconnects.
   */
-  var aboutSection = document.querySelector('.section--about');
-
   if (aboutSection) {
     aboutSection.classList.add('will-animate');
 
