@@ -269,10 +269,10 @@
    ┌──────────────────────┬────────┬───────┬────────┬───────┬─────────┐
    │ Token                │ x-lrg  │ large │ medium │ small │ x-small │
    ├──────────────────────┼────────┼───────┼────────┼───────┼─────────┤
-   │ --typography-display │  40    │  40   │  32    │  28   │  28     │
-   │ --typography-title   │  32    │  32   │  24    │  24   │  24     │
-   │ --typography-body    │  24    │  24   │  20    │  20   │  18     │
-   │ --typography-body-sm │  16    │  16   │  14    │  14   │  14     │
+   │ --typography-display │  40    │  40   │  32    │  28   │  24     │
+   │ --typography-title   │  32    │  32   │  24    │  24   │  20     │
+   │ --typography-body    │  24    │  24   │  20    │  20   │  14     │
+   │ --typography-body-sm │  16    │  16   │  14    │  14   │  12     │
    │ --typography-mono    │  14    │  14   │  14    │  12   │  12     │
    │ --typography-inline- │  20    │  20   │  20    │  20   │  20     │
    │   link               │ (fixed across all breakpoints)            │
@@ -300,7 +300,7 @@
    large    1201–1919 →  40px
    medium   > 768px   →  40px
    small    > 480px   →  24px
-   x-small  ≤ 480px   →  24px
+   x-small  ≤ 480px   →  16px
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
@@ -361,6 +361,7 @@
     /* --typography-body    stays 20px */
     /* --typography-body-sm stays 14px */
     --typography-mono:    12px;
+    --typography-footnote: 10px;
     --spacing-margin:     24px;
   }
 }
@@ -368,10 +369,13 @@
 /* ── x-small: ≤ 480px ────────────────────────────────────────── */
 @media (max-width: 480px) {
   :root {
-    /* --typography-display stays 28px */
-    --typography-body:    18px;
-    /* --typography-body-sm stays 14px */
+    --typography-display: 24px;
+    --typography-title:   20px;
+    --typography-body:    12px;
+    --typography-body-sm: 12px;
     /* --typography-mono    stays 12px */
+    /* --typography-footnote stays 10px */
+    --spacing-margin:     16px;
   }
 }
 
