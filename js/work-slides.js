@@ -62,7 +62,7 @@
     entries.forEach(function (entry) {
       entry.target.classList.toggle('is-active', entry.isIntersecting);
     });
-  }, { threshold: 0.5 });
+  }, { threshold: 0.3 });
 
   slides.forEach(function (slide) { slideObserver.observe(slide); });
 

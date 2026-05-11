@@ -4,15 +4,13 @@
   Depends on: css/tokens.css, css/grid.css, component css files.
 */
 
-/* ─── Document scroll: snap-based navigation ───────────────
-   Mandatory snap ensures the viewport always rests on a defined
-   snap point. scroll-snap-stop: always on each slide prevents
-   skipping. scroll-padding-top offsets for the fixed header so
-   snap targets land below the navbar, not behind it.
+/* ─── Document scroll ──────────────────────────────────────
+   Native smooth scroll. Sections use min-height: 100svh so
+   they fill the viewport and grow with content as needed.
+   Soft snapping with custom easing is handled by scroll-snap.js.
    ────────────────────────────────────────────────────────── */
 
 html {
-  scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
 }
 
@@ -108,24 +106,21 @@ body {
 
 /* ─── Sections ──────────────────────────────────────────────── */
 
-/* Intro: full viewport, snap point */
+/* Intro: at least full viewport tall; grows with content */
 .section--intro {
-  height: 100vh;
-  scroll-snap-align: start;
+  min-height: 100svh;
 }
 
-/* Work slides: each occupies exactly one viewport.
-   scroll-snap-stop: always forces a hard pause at every slide —
-   the browser cannot skip a slide regardless of gesture speed.
-   Flex centers the .page-grid child vertically within the 100vh slide. */
+/* Work slides: at least full viewport tall; grows with content.
+   Flex centers the .page-grid child vertically when content is
+   shorter than the viewport. */
 .section--work {
-  height: 100vh;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  min-height: 100svh;
   position: relative;
   display: flex;
   align-items: center;
 }
+
 
 /* ─── Progress bar ───────────────────────────────────────────
    Fixed left edge. Fill scales from top via transform:scaleY.
@@ -239,9 +234,20 @@ body {
 
 /* ─── Intro ─────────────────────────────────────────────────── */
 
-/* y=226.67 in 1440 long-scroll design */
-.intro__content {
-  padding-top: 227px;
+/* Desktop/tablet intro: center copy in the viewport while preserving the grid columns. */
+@media (min-width: 769px) {
+  .section--intro {
+    display: flex;
+    align-items: center;
+  }
+
+  .section--intro > .page-grid {
+    width: 100%;
+  }
+
+  .intro__content {
+    padding-top: 0;
+  }
 }
 
 /* ─── Intro entrance: staggered fade-up on page load ─────────
@@ -431,17 +437,9 @@ body {
 
 /* ─── About section ──────────────────────────────────────────── */
 
-/* Full-viewport snap point. Content scrolls inside .about__scroll
-   so the section remains exactly 100vh for snap purposes. */
+/* At least full viewport tall; grows to contain all about content. */
 .section--about {
-  height: 100vh;
-  scroll-snap-align: start;
-  overflow: hidden;
-}
-
-.about__scroll {
-  height: 100%;
-  overflow-y: auto;
+  min-height: 100svh;
 }
 
 /* Col 3-10 span (matches x=269.33, w=901.33 at 1440px) */
@@ -668,13 +666,7 @@ body {
 /* ─── x-large ≥ 1920px (Figma section 357:12793) ───────────────────
    MCP `get_variable_defs` intro 357:12908: spacing/margins = 80.
    Work frame 357:12794: height 1024; Project Info y ≈ 386.67.
-   Intro hero text `357:12911`: y ≈ 253.33 vs long-scroll 226.67 → +26.67px offset.
    About frame 357:12898: height 1024 (long-scroll about uses 1185 — applies below 1920).
+   Intro centering is handled by the desktop/tablet flex rule above.
    ─────────────────────────────────────────────────────────────── */
-
-@media (min-width: 1920px) {
-  .intro__content {
-    padding-top: 254px;
-  }
-}
 
