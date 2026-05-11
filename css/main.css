@@ -337,6 +337,33 @@ body {
   line-height: inherit;
 }
 
+.svg-symbol-sprite {
+  display: none;
+}
+
+.work__metric-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 24px; /* Figma: 24px — no exact token */
+  block-size: 28px; /* Figma: 28px — no exact token */
+  padding: var(--space-1) 2px; /* Figma: 4px/2px — no exact 2px token */
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background: var(--color-accent-bg);
+  color: var(--color-neutral-fg-on-accent);
+  border-radius: 17px; /* Figma: 17px — no exact token */
+  corner-shape: squircle;
+  clip-path: path("M12 0C21.07 0 24 2.93 24 14C24 25.07 21.07 28 12 28C2.93 28 0 25.07 0 14C0 2.93 2.93 0 12 0Z");
+}
+
+.work__metric-badge-icon {
+  display: block;
+  inline-size: 16px;
+  block-size: 16px;
+  fill: currentColor;
+}
+
 .work__detail-text {
   color: var(--color-neutral-fg);
   min-width: 0;

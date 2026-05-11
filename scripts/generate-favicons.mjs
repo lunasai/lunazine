@@ -1,9 +1,8 @@
 /**
- * Generates raster favicon fallbacks (PNG + multi-size ICO) from the full moon
- * SVG used by the navbar logo. Modern browsers use the SVG favicon directly
- * (and js/moon-phase.js swaps it to the current lunar phase at runtime); these
- * raster files are the fallback for older browsers and platforms that don't
- * support SVG favicons (e.g. iOS home screens, some legacy contexts).
+ * Generates raster favicon fallbacks (PNG + multi-size ICO) from the
+ * waxing-crescent SVG. The site favicon is static — modern browsers load the
+ * SVG declared in index.html, older browsers and iOS home screens use these
+ * raster files. Re-run after changing the source SVG.
  *
  * Run:  npm run favicons
  */
@@ -15,7 +14,7 @@ import pngToIco from "png-to-ico";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
-const sourceSvg = join(root, "assets", "moon-icon", "full moon.svg");
+const sourceSvg = join(root, "assets", "moon-icon", "waxing crescent.svg");
 const outDir = join(root, "assets", "favicon");
 
 /* PNG sizes. ICO bundles the small sizes; apple-touch-icon is the iOS spec. */

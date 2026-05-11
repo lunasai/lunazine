@@ -26,3 +26,6 @@ Thumbs.db
 # Build output
 dist/
 build/
+
+# Generated optimized preview images (rebuilt from asset-sources/ by npm run assets:optimize)
+assets/previews/generated/

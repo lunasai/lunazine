@@ -6,7 +6,8 @@
   "description": "Luna Borgo portfolio — static HTML, CSS, and JavaScript",
   "scripts": {
     "dev": "vite",
-    "build": "node ./scripts/build.mjs",
+    "assets:optimize": "node ./scripts/optimize-assets.mjs",
+    "build": "npm run assets:optimize && node ./scripts/build.mjs",
     "favicons": "node ./scripts/generate-favicons.mjs",
     "preview": "serve dist -p 4173"
   },

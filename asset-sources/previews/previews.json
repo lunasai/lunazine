@@ -1,0 +1,26 @@
+{
+  "crate-design-system": {
+    "source": "crate-design-system.png",
+    "alt": "Crate design system interface preview"
+  },
+  "crate-tokens": {
+    "source": "crate-tokens.png",
+    "alt": "Crate token workflow preview"
+  },
+  "eazle": {
+    "source": "eazle.png",
+    "alt": "Eazle platform preview"
+  },
+  "eazle-brand": {
+    "source": "eazle-brand.png",
+    "alt": "Eazle brand application preview"
+  },
+  "adidas-recommendations": {
+    "source": "adidas-recommendations.png",
+    "alt": "Adidas recommendations framework preview"
+  },
+  "me": {
+    "source": "me.jpeg",
+    "alt": "Portrait of Luna Borgo"
+  }
+}

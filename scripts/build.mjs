@@ -1,6 +1,9 @@
 /**
  * Copies deployable static files into dist/. Matches paths used by index.html
  * and runtime JS (e.g. moon-phase.js loading assets/moon-icon/*.svg).
+ *
+ * assets/previews/generated/ (git-ignored) must already exist before running
+ * this script. Run `npm run assets:optimize` first if building from clean.
  */
 import { cp, mkdir, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";

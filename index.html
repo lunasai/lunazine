@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Luna Borgo</title>
 
-    <link rel="icon" type="image/svg+xml" href="./assets/moon-icon/full%20moon.svg" id="favicon-svg" />
-    <link rel="alternate icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
-    <link rel="alternate icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
+    <link rel="icon" type="image/svg+xml" href="./assets/moon-icon/waxing%20crescent.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
     <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
 
@@ -27,6 +27,12 @@
     <link rel="stylesheet" href="./css/main.css" />
   </head>
   <body>
+    <svg class="svg-symbol-sprite" aria-hidden="true" focusable="false" width="0" height="0">
+      <symbol id="metric-badge-star" viewBox="0 0 20 20">
+        <path d="M9.824 16.288C9.70667 15.5947 9.39733 14.848 8.896 14.048C8.39467 13.2373 7.68 12.4853 6.752 11.792C5.83467 11.0987 4.91733 10.656 4 10.464V9.792C4.90667 9.57867 5.776 9.184 6.608 8.608C7.45067 8.02133 8.15467 7.31733 8.72 6.496C9.296 5.65333 9.664 4.82133 9.824 4H10.496C10.592 4.53333 10.784 5.08267 11.072 5.648C11.36 6.20267 11.728 6.736 12.176 7.248C12.6347 7.74933 13.1467 8.20267 13.712 8.608C14.5547 9.20533 15.4133 9.6 16.288 9.792V10.464C15.7013 10.5813 15.0933 10.8213 14.464 11.184C13.8453 11.5467 13.2693 11.9787 12.736 12.48C12.2027 12.9707 11.7653 13.488 11.424 14.032C10.9227 14.832 10.6133 15.584 10.496 16.288H9.824Z" />
+      </symbol>
+    </svg>
+
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <!-- ── Fixed header: inset var(--spacing-margin) from top/left/right ── -->
@@ -104,107 +110,60 @@
            per gesture — the browser handles the "pause" natively.
            ──────────────────────────────────────────────────────── -->
 
-      <!-- SLIDE 1: Heineken / Crate Design System -->
-      <section class="section section--work" id="work" aria-label="Work – Heineken, Crate Design System">
+      <!-- SLIDE 1: Heineken / Design system and product -->
+      <section class="section section--work" id="work" aria-label="Work – Heineken, Design system and product">
             <div class="page-grid work__row">
               <div class="col-sidebar">
                 <h2 class="work__title">Heineken</h2>
-                <ul class="work__details">
-                  <li class="work__detail">
-                    <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">Crate Design System</span>
-                  </li>
-                  <li class="work__detail">
-                    <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">2024–Present</span>
-                  </li>
-                </ul>
               </div>
 
               <div class="col-body">
                 <div class="work__body">
-                  <p>I am a founding member of <span class="hover-preview-link" data-preview="./assets/previews/crate-design-system.png" tabindex="0">Crate</span>, Heineken's global B2B design system. I built everything from <span class="hover-preview-link" data-preview="./assets/previews/crate-tokens.png" tabindex="0">tokens</span> and components to workflows and, most recently, AI automations - collaborating closely with engineers and a growing community of contributors.</p>
-                  <p>I laid the foundation that now supports 235 contributors across 8 global product teams and OpCos. <span class="hover-preview-link" data-preview="./assets/previews/crate-design-system.png" tabindex="0">Crate</span> has become the connective tissue for Heineken's digital product organization.</p>
+                  <p>I am a founding member of <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">Crate</span>, Heineken's global B2B design system. I built everything from <span class="hover-preview-link" data-preview-id="crate-tokens" tabindex="0">tokens</span> and components to workflows and, most recently, AI automations. With over 235 contributors in 8 global product teams, and organic adoption by OpCos, Crate has become the vital link within Heineken's digital product network.</p>
+                  <p>Next to Crate, I also led the creation of the brand framework and team culture that launched <span class="hover-preview-link" data-preview-id="eazle" tabindex="0">Eazle</span>, Heineken's global B2B platform consolidating 40 fragmented regional platforms into one cohesive product.</p>
+                  <p>I established the design principles and visual language guidance for the <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">brand application</span>, and built collaboration rituals that enabled rapid scaling while keeping a strong design culture.</p>
                 </div>
                 <ul class="work__metrics">
                   <li class="work__detail">
-                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">Community engagement grew 230% in two years, while component health increased to 94% and SUS held at 70 — above the industry standard of 68.</span>
-                  </li>
-                  <li class="work__detail">
-                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">UK, Spain, and Vietnam adopted the system outside the original brief.</span>
+                    <span class="work__metric-badge" aria-hidden="true">
+                      <svg class="work__metric-badge-icon" viewBox="0 0 20 20" focusable="false">
+                        <use href="#metric-badge-star"></use>
+                      </svg>
+                    </span>
+                    <span class="work__detail-text">Community engagement up 230% in two years; component health hit 94%, and SUS stayed at 70, above the 68 industry standard.</span>
                   </li>
                 </ul>
               </div>
             </div>
           </section>
 
-      <!-- SLIDE 2: Heineken / Eazle brand-product framework -->
-      <section class="section section--work" aria-label="Work – Heineken, Eazle">
-            <div class="page-grid work__row">
-              <div class="col-sidebar">
-                <h2 class="work__title">Heineken</h2>
-                <ul class="work__details">
-                  <li class="work__detail">
-                    <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">Eazle brand-product framework</span>
-                  </li>
-                  <li class="work__detail">
-                    <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">2022–2024</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div class="col-body">
-                <div class="work__body">
-                  <p>Next to Crate, I also led the creation of the brand framework and team culture that launched <span class="hover-preview-link" data-preview="./assets/previews/eazle.png" tabindex="0">Eazle</span>, Heineken's B2B platform connecting sales reps and customers across five markets.</p>
-                  <p>I established the design principles and visual language guidance for the <span class="hover-preview-link" data-preview="./assets/previews/eazle-brand.png" tabindex="0">brand application</span>, and built collaboration rituals that enabled rapid scaling while keeping a strong design culture.</p>
-                </div>
-                <ul class="work__metrics">
-                  <li class="work__detail">
-                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">40 disconnected regional platforms → 1. Four product lines using the same visual system across digital product and marketing.</span>
-                  </li>
-                  <li class="work__detail">
-                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
-                    <span class="work__detail-text">Design Jams became a quarterly team ritual – engagement grew 12× that year.</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-      <!-- SLIDE 3: Adidas / Product recommendations framework -->
+      <!-- SLIDE 2: Adidas / Product recommendations framework -->
       <section class="section section--work" aria-label="Work – Adidas">
             <div class="page-grid work__row">
               <div class="col-sidebar">
                 <h2 class="work__title">Adidas</h2>
-                <ul class="work__details">
-                  <li class="work__detail">
-                    <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">Product recommendations framework</span>
-                  </li>
-                  <li class="work__detail">
-                    <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">2021–2022</span>
-                  </li>
-                </ul>
               </div>
 
               <div class="col-body">
                 <div class="work__body">
-                  <p>Working closely with designers, data science, and engineering, I led the concept and design of a <span class="hover-preview-link" data-preview="./assets/previews/adidas-recommendations.png" tabindex="0">unified framework</span> that delivers the right products to the right customers across homepage, PDP, cart, and checkout.</p>
+                  <p>Working closely with designers, data science, and engineering, I led the concept and design of a <span class="hover-preview-link" data-preview-id="adidas-recommendations" tabindex="0">unified framework</span> that delivers the right products to the right customers across homepage, PDP, cart, and checkout.</p>
                   <p>The process started with rapid experimentation and evolved to a collaboration with the design system team to build a shared recommendation component: reusable, consistent, and built to last. The result is a system that balances algorithmic intelligence with editorial control.</p>
                 </div>
                 <ul class="work__metrics">
                   <li class="work__detail">
-                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
+                    <span class="work__metric-badge" aria-hidden="true">
+                      <svg class="work__metric-badge-icon" viewBox="0 0 20 20" focusable="false">
+                        <use href="#metric-badge-star"></use>
+                      </svg>
+                    </span>
                     <span class="work__detail-text">Redesigned a previously tested experiment and the UI update made it work – <span class="sr-only"> Confidential annual revenue.</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">€€</span>M/year</span>.</span>
                   </li>
                   <li class="work__detail">
-                    <span class="work__detail-arrow work__detail-arrow--metric" aria-hidden="true">=</span>
+                    <span class="work__metric-badge" aria-hidden="true">
+                      <svg class="work__metric-badge-icon" viewBox="0 0 20 20" focusable="false">
+                        <use href="#metric-badge-star"></use>
+                      </svg>
+                    </span>
                     <span class="work__detail-text">10+ scattered recommendation carousels → 1 shared component. Supports 36 variations.</span>
                   </li>
                 </ul>
@@ -212,21 +171,11 @@
             </div>
           </section>
 
-      <!-- SLIDE 4: Before that / job experience + CV -->
+      <!-- SLIDE 3: Before that / job experience + CV -->
       <section class="section section--work" aria-label="Work – Experience">
             <div class="page-grid work__row">
               <div class="col-sidebar">
                 <h2 class="work__title">Before that</h2>
-                <ul class="work__details">
-                  <li class="work__detail">
-                    <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">Netherlands, Brazil</span>
-                  </li>
-                  <li class="work__detail">
-                    <span class="work__detail-arrow" aria-hidden="true">→</span>
-                    <span class="work__detail-text">Designing since 2017</span>
-                  </li>
-                </ul>
               </div>
 
               <div class="col-body">
@@ -306,7 +255,7 @@
 
           <!-- Lower: about me text + CTA -->
           <div class="col-about about__content">
-            <h2 class="about__label">About <span class="hover-preview-link" data-preview="./assets/previews/me.jpeg" tabindex="0">me</span></h2>
+            <h2 class="about__label">About <span class="hover-preview-link" data-preview-id="me" tabindex="0">me</span></h2>
             <div class="about__body">
               <p>Design has been part of my life long before it became my career. Back when computers were still a three-piece setup, a passion for reading and writing led me to start a blog – only to become completely obsessed with how it looked... and with all the gifs I wanted to make.</p>
               <p>Twelve years later, my obsession with pixels hasn't gone anywhere. Today, I channel it into making design more sustainable – and more fun. With a systems mindset and a passion for craft, I move fluidly between strategy and hands-on, making sure what we imagine is actually something we can ship.</p>

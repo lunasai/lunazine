@@ -1,0 +1,56 @@
+{
+  "crate-design-system": {
+    "alt": "Crate design system interface preview",
+    "sources": {
+      "avif": "./assets/previews/generated/crate-design-system-390w.avif 390w, ./assets/previews/generated/crate-design-system-780w.avif 780w",
+      "webp": "./assets/previews/generated/crate-design-system-390w.webp 390w, ./assets/previews/generated/crate-design-system-780w.webp 780w",
+      "png": "./assets/previews/generated/crate-design-system-390w.png 390w, ./assets/previews/generated/crate-design-system-780w.png 780w"
+    },
+    "src": "./assets/previews/generated/crate-design-system-390w.png"
+  },
+  "crate-tokens": {
+    "alt": "Crate token workflow preview",
+    "sources": {
+      "avif": "./assets/previews/generated/crate-tokens-390w.avif 390w, ./assets/previews/generated/crate-tokens-780w.avif 780w",
+      "webp": "./assets/previews/generated/crate-tokens-390w.webp 390w, ./assets/previews/generated/crate-tokens-780w.webp 780w",
+      "png": "./assets/previews/generated/crate-tokens-390w.png 390w, ./assets/previews/generated/crate-tokens-780w.png 780w"
+    },
+    "src": "./assets/previews/generated/crate-tokens-390w.png"
+  },
+  "eazle": {
+    "alt": "Eazle platform preview",
+    "sources": {
+      "avif": "./assets/previews/generated/eazle-390w.avif 390w, ./assets/previews/generated/eazle-780w.avif 780w",
+      "webp": "./assets/previews/generated/eazle-390w.webp 390w, ./assets/previews/generated/eazle-780w.webp 780w",
+      "png": "./assets/previews/generated/eazle-390w.png 390w, ./assets/previews/generated/eazle-780w.png 780w"
+    },
+    "src": "./assets/previews/generated/eazle-390w.png"
+  },
+  "eazle-brand": {
+    "alt": "Eazle brand application preview",
+    "sources": {
+      "avif": "./assets/previews/generated/eazle-brand-390w.avif 390w, ./assets/previews/generated/eazle-brand-780w.avif 780w",
+      "webp": "./assets/previews/generated/eazle-brand-390w.webp 390w, ./assets/previews/generated/eazle-brand-780w.webp 780w",
+      "png": "./assets/previews/generated/eazle-brand-390w.png 390w, ./assets/previews/generated/eazle-brand-780w.png 780w"
+    },
+    "src": "./assets/previews/generated/eazle-brand-390w.png"
+  },
+  "adidas-recommendations": {
+    "alt": "Adidas recommendations framework preview",
+    "sources": {
+      "avif": "./assets/previews/generated/adidas-recommendations-390w.avif 390w, ./assets/previews/generated/adidas-recommendations-780w.avif 780w",
+      "webp": "./assets/previews/generated/adidas-recommendations-390w.webp 390w, ./assets/previews/generated/adidas-recommendations-780w.webp 780w",
+      "png": "./assets/previews/generated/adidas-recommendations-390w.png 390w, ./assets/previews/generated/adidas-recommendations-780w.png 780w"
+    },
+    "src": "./assets/previews/generated/adidas-recommendations-390w.png"
+  },
+  "me": {
+    "alt": "Portrait of Luna Borgo",
+    "sources": {
+      "avif": "./assets/previews/generated/me-390w.avif 390w",
+      "webp": "./assets/previews/generated/me-390w.webp 390w",
+      "jpg": "./assets/previews/generated/me-390w.jpg 390w"
+    },
+    "src": "./assets/previews/generated/me-390w.jpg"
+  }
+}
