@@ -219,15 +219,15 @@
      @font-face / @import lives in base.css or equivalent.
   ────────────────────────────────────────────────────────────── */
   --font-serif: 'Montagu Slab', Georgia, serif;
+  --font-serif-glyph: 'Noto Serif JP', 'Noto Serif', Georgia, serif;
   --font-mono:  'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   /* Figma node 368:13282 — ASCII art uses DM Mono Light */
   --font-mono-ascii: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* ── Font weights ────────────────────────────────────────────
-     display / body / inline-link = 300 (Light)
-     body-sm                      = 200 (Extra Light)
-     title                        = 500 (Medium)
-     mono                         = 400 (Regular)
+     display / body-lg / body-md / body-sm = 300 (Light)
+     title                                 = 500 (Medium)
+     mono / UI caps                        = 400 (Regular)
   ────────────────────────────────────────────────────────────── */
   --font-weight-extra-light: 200;
   --font-weight-light:       300;
@@ -237,16 +237,24 @@
   /* ── Line heights ────────────────────────────────────────────
      Figma unitless multipliers.
   ────────────────────────────────────────────────────────────── */
-  --line-height-tight:  1.2;    /* display, title                    */
-  --line-height-normal: 1.38;   /* body, body-sm, mono, inline-link  */
+  --line-height-tight:  1.2;    /* display                                */
+  --line-height-title:  1.0;    /* title — 100 %                          */
+  --line-height-body-lg: 1.4;   /* body-lg                               */
+  --line-height-normal:  1.38;  /* body-md, body-sm, mono                */
 
-  /* ── Letter spacing ──────────────────────────────────────────
-     Figma "4" for mono = 4% of font-size = 0.04em.
+  /* ── Letter spacing (Figma % → em: value / 100) ──────────────
+     display  −1 % → −0.01em
+     title    −1 % → −0.01em
+     body-lg  −3 % → −0.03em
+     body-md  −3 % → −0.03em
+     body-sm   0 % →  0em
+     mono      4 % →  0.04em
   ────────────────────────────────────────────────────────────── */
-  /* Figma display/title: letterSpacing -1 → −1 % of font-size (see MCP: tracking-[-0.4px] at 40 px) */
-  --letter-spacing-tight: -0.01em; /* display, title   */
-  --letter-spacing-body:   0em;    /* body, inline-link */
-  --letter-spacing-mono:   0.04em; /* Space Mono        */
+  --letter-spacing-tight:   -0.01em; /* display, title              */
+  --letter-spacing-body-lg: -0.03em; /* body-lg                     */
+  --letter-spacing-body-md: -0.03em; /* body-md                     */
+  --letter-spacing-body:     0em;    /* body-sm, link                */
+  --letter-spacing-mono:     0.04em; /* Space Mono                  */
 }
 
 
@@ -260,33 +268,39 @@
    ─────────────────────────────────────────────────
    typography/display         → --typography-display
    typography/title           → --typography-title
-   typography/body            → --typography-body
+   typography/body lg         → --typography-body-lg
+   typography/body md         → --typography-body-md
    typography/body sm         → --typography-body-sm
    typography/mono            → --typography-mono
+   typography/footnote        → --typography-footnote
    Inline_Link                → --typography-inline-link  (fixed)
 
    Per-breakpoint values (px):
-   ┌──────────────────────┬────────┬───────┬────────┬───────┬─────────┐
-   │ Token                │ x-lrg  │ large │ medium │ small │ x-small │
-   ├──────────────────────┼────────┼───────┼────────┼───────┼─────────┤
-   │ --typography-display │  40    │  40   │  32    │  28   │  24     │
-   │ --typography-title   │  32    │  32   │  24    │  24   │  20     │
-   │ --typography-body    │  24    │  24   │  20    │  20   │  14     │
-   │ --typography-body-sm │  16    │  16   │  14    │  14   │  12     │
-   │ --typography-mono    │  14    │  14   │  14    │  12   │  12     │
-   │ --typography-inline- │  20    │  20   │  20    │  20   │  20     │
-   │   link               │ (fixed across all breakpoints)            │
-   └──────────────────────┴────────┴───────┴────────┴───────┴─────────┘
+   ┌─────────────────────────┬────────┬───────┬────────┬───────┬─────────┐
+   │ Token                   │ x-lrg  │ large │ medium │ small │ x-small │
+   ├─────────────────────────┼────────┼───────┼────────┼───────┼─────────┤
+   │ --typography-display    │  88    │  88   │  80    │  64   │  48     │
+   │ --typography-title      │  80    │  80   │  72    │  56   │  32     │
+   │ --typography-body-lg    │  32    │  40   │  24    │  24   │  24     │
+   │ --typography-body-md    │  24    │  24   │  20    │  20   │  20     │
+   │ --typography-body-sm    │  20    │  20   │  14    │  14   │  14     │
+   │ --typography-mono       │  14    │  14   │  14    │  14   │  14     │
+   │ --typography-footnote   │  14    │  12   │  12    │  10   │  10     │
+   │ --typography-inline-link│  20    │  20   │  20    │  20   │  20     │
+   │                         │ (fixed across all breakpoints)           │
+   └─────────────────────────┴────────┴───────┴────────┴───────┴─────────┘
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --typography-display:     40px;
-  --typography-title:       32px;
-  --typography-body:        24px;
-  --typography-body-sm:     16px;
-  --typography-mono:        14px;
-  --typography-inline-link: 20px;
-  --typography-footnote:    12px; /* Figma typography/footnote — ASCII art (node 368:13282) */
+  --typography-display:      88px;
+  --typography-title:        80px;
+  --typography-body-lg:      40px;
+  --typography-body:         var(--typography-body-lg); /* backward-compat alias */
+  --typography-body-md:      24px;
+  --typography-body-sm:      20px;
+  --typography-mono:         14px;
+  --typography-inline-link:  20px;
+  --typography-footnote:     12px; /* 12px large/medium; 14px at ≥1920px (x-large) */
 }
 
 
@@ -344,44 +358,49 @@
 /* ── medium: 769px – 1200px ──────────────────────────────────── */
 @media (max-width: 1200px) {
   :root {
-    --typography-display: 32px;
-    --typography-title:   24px;
-    --typography-body:    20px;
-    --typography-body-sm: 14px;
+    --typography-display:  80px;
+    --typography-title:    72px;
+    --typography-body-lg:  24px;
+    --typography-body-md:  20px;
+    --typography-body-sm:  14px;
     /* --typography-mono stays 14px */
-    --spacing-margin:     40px;
+    --spacing-margin:      40px;
   }
 }
 
 /* ── small: 481px – 768px ────────────────────────────────────── */
 @media (max-width: 768px) {
   :root {
-    --typography-display: 28px;
-    /* --typography-title   stays 24px */
-    /* --typography-body    stays 20px */
-    /* --typography-body-sm stays 14px */
-    --typography-mono:    12px;
-    --typography-footnote: 10px;
-    --spacing-margin:     24px;
+    --typography-display:   64px;
+    --typography-title:     56px;
+    /* --typography-body-lg  stays 24px */
+    /* --typography-body-md  stays 20px */
+    /* --typography-body-sm  stays 14px */
+    /* --typography-mono     stays 14px */
+    --typography-footnote:  10px;
+    --spacing-margin:       24px;
   }
 }
 
 /* ── x-small: ≤ 480px ────────────────────────────────────────── */
 @media (max-width: 480px) {
   :root {
-    --typography-display: 24px;
-    --typography-title:   20px;
-    --typography-body:    12px;
-    --typography-body-sm: 12px;
-    /* --typography-mono    stays 12px */
+    --typography-display:   48px;
+    --typography-title:     32px;
+    /* --typography-body-lg  stays 24px */
+    /* --typography-body-md  stays 20px */
+    /* --typography-body-sm  stays 14px */
+    /* --typography-mono     stays 14px */
     /* --typography-footnote stays 10px */
-    --spacing-margin:     16px;
+    --spacing-margin:       16px;
   }
 }
 
 /* ── expanded desktop: Figma mode screen/max-width 1920 (see variables on intro 357:12908) ── */
 @media (min-width: 1920px) {
   :root {
-    --spacing-margin: 80px;
+    --typography-body-lg:  32px; /* x-large: body-lg drops from 40 to 32 */
+    --typography-footnote: 14px;
+    --spacing-margin:      80px;
   }
 }

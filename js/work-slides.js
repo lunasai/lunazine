@@ -1,89 +1,97 @@
 /*
   js/work-slides.js
-  Work section: progress bar + slide animations.
+  Progress bar + unified scroll-reveal.
 
-  Scroll navigation is now handled entirely by the browser via CSS:
-    html { scroll-snap-type: y mandatory }
-    .section--work { scroll-snap-stop: always }
+  Pattern (applied to work, experience, and about):
+    1. JS adds will-animate to each container (opt-in: content fully
+       readable without JS).
+    2. A single IntersectionObserver adds in-view to each animated
+       element when it crosses the threshold, then unobserves it.
+    3. CSS keyframes + animation-fill-mode:both keep opacity:1 forever.
+    4. Under prefers-reduced-motion, in-view is applied immediately to
+       all targets — no animation runs, nothing stays hidden.
 
-  This file's only jobs:
-    1. Toggle .is-active on the slide currently in the viewport
-       (drives CSS @keyframes fade-up animations).
-    2. Update the progress bar continuously from raw scroll position
-       so the fill is proportional to how far down the full page
-       you are — reaching 100% only at the very bottom.
-    3. Fade in the about section once on first entry.
+  Intro is CSS-only (fires on page load) and is not touched here.
 */
 
 (function () {
   'use strict';
 
-  /* ── Elements ───────────────────────────────────────────────── */
-
-  var slides       = Array.from(document.querySelectorAll('.section--work'));
-  var aboutSection = document.querySelector('.section--about');
+  /* ── Progress bar ───────────────────────────────────────────────
+     Maps scrollY / (scrollHeight - innerHeight) to scaleY on the
+     fill element. Uses rAF to avoid layout thrash on scroll.
+  */
   var progressFill = document.querySelector('.progress-bar__fill');
 
-  if (!slides.length || !progressFill) return;
+  if (progressFill) {
+    var rafId = null;
 
-  /* ── Progress bar: continuous scroll position ───────────────────
-     Reads scrollY / (scrollHeight - innerHeight) on every scroll
-     event via rAF so the fill tracks actual page position rather
-     than discrete section steps.
-  */
-  var rafId = null;
+    function updateProgress() {
+      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      var ratio     = maxScroll > 0 ? scrollTop / maxScroll : 0;
+      progressFill.style.transform = 'scaleY(' + ratio + ')';
+      rafId = null;
+    }
 
-  function updateProgress() {
-    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    var ratio     = maxScroll > 0 ? scrollTop / maxScroll : 0;
-    progressFill.style.transform = 'scaleY(' + ratio + ')';
-    rafId = null;
+    window.addEventListener('scroll', function () {
+      if (!rafId) rafId = requestAnimationFrame(updateProgress);
+    }, { passive: true });
+
+    updateProgress();
   }
 
-  window.addEventListener('scroll', function () {
-    if (!rafId) rafId = requestAnimationFrame(updateProgress);
-  }, { passive: true });
+  /* ── Scroll reveal ──────────────────────────────────────────────
+     Each entry declares a container selector and the child elements
+     to observe inside it. Sections not present in the DOM are
+     silently skipped.
 
-  /* Seed the bar on load (e.g. back-navigation restores scroll position) */
-  updateProgress();
-
-  /* ── Slide visibility: IntersectionObserver ─────────────────── */
-
-  /*
-    threshold: 0.5 — a slide is "active" when more than half of it
-    is in the viewport. With scroll-snap this aligns cleanly with
-    the snap position.
-
-    is-active is toggled (added on entry, removed on exit) so the
-    CSS @keyframes animation re-fires each time the slide enters.
+     Threshold 0.2: reveal when 20% of the element is in view.
+     rootMargin bottom -5%: small buffer so elements don't pop in
+     right at the very edge of the viewport.
   */
-  var slideObserver = new IntersectionObserver(function (entries) {
+  var revealSections = [
+    {
+      container: '#work',
+      items: '.work__title, .work__projects .work__body p, .work__projects .work__metrics'
+    },
+    {
+      container: '.section--experience',
+      items: '.work__title, .work__body p, .mini-panel'
+    },
+    {
+      container: '.section--about',
+      items: '.about__tagline, .about__label, .about__body p, .about__cta'
+    }
+  ];
+
+  var allRevealItems = [];
+
+  revealSections.forEach(function (def) {
+    var el = document.querySelector(def.container);
+    if (!el) return;
+    el.classList.add('will-animate');
+    var items = Array.from(el.querySelectorAll(def.items));
+    allRevealItems = allRevealItems.concat(items);
+  });
+
+  if (!allRevealItems.length) return;
+
+  /* Reduced motion: reveal everything immediately, skip observer */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    allRevealItems.forEach(function (el) { el.classList.add('in-view'); });
+    return;
+  }
+
+  var revealObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
-      entry.target.classList.toggle('is-active', entry.isIntersecting);
-    });
-  }, { threshold: 0.3 });
-
-  slides.forEach(function (slide) { slideObserver.observe(slide); });
-
-  /* ── About section: fade-up on first entry ──────────────────── */
-
-  /*
-    Opt-in pattern: .will-animate is added by JS so the section is
-    fully visible without JS. .is-visible is added once by IO then
-    the observer disconnects.
-  */
-  if (aboutSection) {
-    aboutSection.classList.add('will-animate');
-
-    var aboutObserver = new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) {
-        aboutSection.classList.add('is-visible');
-        aboutObserver.disconnect();
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        revealObserver.unobserve(entry.target);
       }
-    }, { threshold: 0.12 });
+    });
+  }, { threshold: 0.2, rootMargin: '0px 0px -5% 0px' });
 
-    aboutObserver.observe(aboutSection);
-  }
+  allRevealItems.forEach(function (el) { revealObserver.observe(el); });
 
 }());

@@ -1,0 +1,127 @@
+<!-- component-rotating-metric.html -->
+<!--
+  Rotating metric ticker — full-width horizontal looping band.
+
+  Requires:
+    css/tokens.css
+    css/component-rotating-metric.css
+    js/rotating-metric.js
+
+  Symbol dependency:
+    <use href="#metric-badge-star"> resolves against the inline SVG sprite in index.html
+    (see lines 30–34). Preview pages must include that <symbol> independently — see
+    previews/rotating-metric.html for an example.
+-->
+
+<div class="rotating-metric" role="region" aria-labelledby="rotating-metric-label">
+
+  <!-- Accessible label for the landmark region -->
+  <span id="rotating-metric-label" class="sr-only">Key design system metrics</span>
+
+  <!-- Screen-reader readable copy — not duplicated, not animated -->
+  <ul class="sr-only" aria-label="Metrics">
+    <li>Community engagement up 230% in two years</li>
+    <li>Component health hit 94%</li>
+    <li>SUS at 70, above the industry standard of 68</li>
+  </ul>
+
+  <!-- Visual ticker track — hidden from assistive technology -->
+  <div class="rotating-metric__viewport" aria-hidden="true">
+    <div class="rotating-metric__track">
+
+      <!-- ── First copy ───────────────────────────────────────────────── -->
+      <div class="rotating-metric__items">
+
+        <span class="rotating-metric__sep">
+          <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+            <use href="#metric-badge-star"></use>
+          </svg>
+        </span>
+
+        <span class="rotating-metric__phrase">
+          <span class="rotating-metric__label">Community engagement up</span>
+          <span class="rotating-metric__badge">230%</span>
+          <span class="rotating-metric__label">in two years</span>
+        </span>
+
+        <span class="rotating-metric__sep">
+          <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+            <use href="#metric-badge-star"></use>
+          </svg>
+        </span>
+
+        <span class="rotating-metric__phrase">
+          <span class="rotating-metric__label">Component health hit</span>
+          <span class="rotating-metric__badge">94%</span>
+        </span>
+
+        <span class="rotating-metric__sep">
+          <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+            <use href="#metric-badge-star"></use>
+          </svg>
+        </span>
+
+        <span class="rotating-metric__phrase">
+          <span class="rotating-metric__label">SUS at</span>
+          <span class="rotating-metric__badge">70</span>
+          <span class="rotating-metric__label">above the industry standard of 68</span>
+        </span>
+
+      </div>
+
+      <!-- ── Second copy (seamless loop — identical to first) ─────────── -->
+      <div class="rotating-metric__items">
+
+        <span class="rotating-metric__sep">
+          <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+            <use href="#metric-badge-star"></use>
+          </svg>
+        </span>
+
+        <span class="rotating-metric__phrase">
+          <span class="rotating-metric__label">Community engagement up</span>
+          <span class="rotating-metric__badge">230%</span>
+          <span class="rotating-metric__label">in two years</span>
+        </span>
+
+        <span class="rotating-metric__sep">
+          <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+            <use href="#metric-badge-star"></use>
+          </svg>
+        </span>
+
+        <span class="rotating-metric__phrase">
+          <span class="rotating-metric__label">Component health hit</span>
+          <span class="rotating-metric__badge">94%</span>
+        </span>
+
+        <span class="rotating-metric__sep">
+          <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+            <use href="#metric-badge-star"></use>
+          </svg>
+        </span>
+
+        <span class="rotating-metric__phrase">
+          <span class="rotating-metric__label">SUS at</span>
+          <span class="rotating-metric__badge">70</span>
+          <span class="rotating-metric__label">above the industry standard of 68</span>
+        </span>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Pause/play toggle: WCAG 2.2.2 — mechanism to stop auto-moving content -->
+  <!-- aria-pressed and aria-label updated by js/rotating-metric.js          -->
+  <button type="button" class="rotating-metric__pause" aria-pressed="false" aria-label="Pause metrics ticker">
+    <svg class="rotating-metric__pause-icon" viewBox="0 0 12 12" focusable="false" aria-hidden="true">
+      <!-- Pause: two vertical bars -->
+      <rect class="rotating-metric__icon-pause" x="1.5" y="1.5" width="3.5" height="9" rx="0.5"/>
+      <rect class="rotating-metric__icon-pause" x="7"   y="1.5" width="3.5" height="9" rx="0.5"/>
+      <!-- Play: right-pointing triangle -->
+      <polygon class="rotating-metric__icon-play" points="2,1.5 11,6 2,10.5"/>
+    </svg>
+  </button>
+
+</div>

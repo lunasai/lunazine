@@ -73,6 +73,27 @@ body {
   top: var(--spacing-margin);
 }
 
+/* ─── Tag component ─────────────────────────────────────────── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 2px 6px; /* Figma: 2px/6px — no exact token */
+  border: 1px solid var(--color-accent-bg);
+  border-radius: 17px; /* Figma: 17px — no exact token */
+  color: var(--color-accent-fg);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  font-feature-settings: "case" 1;
+  white-space: nowrap;
+}
+
 /* ─── Fixed chrome ──────────────────────────────────────────────
    Both bars sit exactly --spacing-margin (40px large) from the
    viewport edge, matching the Figma frame inset. Left/right
@@ -109,16 +130,26 @@ body {
 /* Intro: at least full viewport tall; grows with content */
 .section--intro {
   min-height: 100svh;
+  display: flex;
+  align-items: stretch;
+  padding-block: calc(var(--spacing-margin) + var(--space-12));
+  box-sizing: border-box;
 }
 
-/* Work slides: at least full viewport tall; grows with content.
-   Flex centers the .page-grid child vertically when content is
-   shorter than the viewport. */
+/* Work section: at least full viewport tall; grows with content.
+   Vertical padding clears the fixed chrome and adds breathing room. */
 .section--work {
   min-height: 100svh;
   position: relative;
-  display: flex;
-  align-items: center;
+  padding-top: 120px;
+  padding-bottom: 120px;
+  box-sizing: border-box;
+}
+
+/* Compact older-roles panel: content-sized so it does not create dead scroll space. */
+.section--experience {
+  min-height: auto;
+  padding-block: calc(var(--space-12) * 2);
 }
 
 
@@ -152,57 +183,64 @@ body {
   }
 }
 
-/* ─── Slide content: fade-up on entry ────────────────────────
-   Default opacity: 0 prevents the backwards-fill glitch:
-   when .is-active is toggled, animation-fill-mode:both applies
-   the "from" values (opacity:0) immediately during the delay.
-   Since the default is already 0, there is no visible jump.
+/* ─── Scroll reveal: unified per-element fade-up ──────────────
+   Applies to work (#work), experience (.section--experience), and
+   about (.section--about). JS adds will-animate to each container
+   (opt-in) and in-view to each element on first intersection.
+   fill-mode:both keeps opacity:1 after play — no separate lock.
 
-   90ms settle delay: snap completes before content arrives.
-   Stagger: title +0ms → details +90ms → col-body +180ms.
+   Intro is CSS-only (load animation) and not included here.
    ────────────────────────────────────────────────────────── */
 
-@keyframes work-fade-up {
+@keyframes fade-up {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0);    }
 }
 
-.section--work .work__title,
-.section--work .work__details,
-.section--work .col-body {
+/* Hidden state: scoped so only elements inside will-animate
+   containers are hidden, and only while not yet revealed. */
+#work.will-animate .work__title:not(.in-view),
+#work.will-animate .work__projects .work__body p:not(.in-view),
+#work.will-animate .work__projects .work__metrics:not(.in-view),
+.section--experience.will-animate .work__title:not(.in-view),
+.section--experience.will-animate .work__body p:not(.in-view),
+.section--experience.will-animate .mini-panel:not(.in-view),
+.section--about.will-animate .about__tagline:not(.in-view),
+.section--about.will-animate .about__label:not(.in-view),
+.section--about.will-animate .about__body p:not(.in-view),
+.section--about.will-animate .about__cta:not(.in-view) {
   opacity: 0;
 }
 
-.section--work.is-active .work__title {
-  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1)  90ms both;
+/* Revealed state: all share the same animation at 0ms delay by default.
+   Sections whose elements all enter the viewport simultaneously (experience,
+   about label+tagline) use explicit delays to create a visible sequence. */
+#work.will-animate .work__title.in-view,
+#work.will-animate .work__projects .work__body p.in-view,
+#work.will-animate .work__projects .work__metrics.in-view,
+.section--experience.will-animate .work__title.in-view,
+.section--experience.will-animate .work__body p.in-view,
+.section--experience.will-animate .mini-panel.in-view,
+.section--about.will-animate .about__tagline.in-view,
+.section--about.will-animate .about__label.in-view,
+.section--about.will-animate .about__body p.in-view,
+.section--about.will-animate .about__cta.in-view {
+  animation: fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.section--work.is-active .work__details {
-  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
-}
+/* ── Experience section stagger ───────────────────────────────
+   Short section: heading, paragraph, and panel enter the viewport
+   simultaneously. Explicit delays make the sequence legible even
+   when all three get in-view at the same moment. */
+.section--experience.will-animate .work__title.in-view    { animation-delay:   0ms; }
+.section--experience.will-animate .work__body p.in-view   { animation-delay: 120ms; }
+.section--experience.will-animate .mini-panel.in-view     { animation-delay: 240ms; }
 
-.section--work.is-active .col-body {
-  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) 270ms both;
-}
-
-/* ─── About section: fade-up on scroll entry ──────────────────
-   .will-animate is set immediately by JS (opt-in pattern).
-   Without JS the section is fully visible at all times.
-   .is-visible is added by IntersectionObserver — one-shot.
-   ────────────────────────────────────────────────────────── */
-
-.section--about.will-animate {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity   500ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.section--about.is-visible {
-  opacity: 1;
-  transform: none;
-}
+/* ── About top stagger ────────────────────────────────────────
+   Tagline and label are both above the fold when section enters;
+   stagger them so they don't appear as a single simultaneous flash. */
+.section--about.will-animate .about__tagline.in-view { animation-delay:   0ms; }
+.section--about.will-animate .about__label.in-view   { animation-delay: 100ms; }
 
 /* ─── Reduced motion overrides ────────────────────────────────
    Disable transform movement; keep fast opacity transitions so
@@ -214,40 +252,34 @@ body {
    ────────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .section--work.is-active .work__title,
-  .section--work.is-active .work__details,
-  .section--work.is-active .col-body {
-    animation: none;
-    opacity: 1;
+  /* Scroll-reveal items: JS adds in-view immediately for RM users,
+     so ensure no animation plays and opacity is fully on. */
+  .in-view {
+    animation: none !important;
+    opacity: 1 !important;
   }
 
-  .intro__text p:first-child,
-  .intro__text p:last-child {
+  .intro__title,
+  .intro__body {
     animation: none;
-  }
-
-  .section--about.will-animate {
-    transform: none;
-    transition: opacity 200ms ease;
   }
 }
 
 /* ─── Intro ─────────────────────────────────────────────────── */
 
-/* Desktop/tablet intro: center copy in the viewport while preserving the grid columns. */
-@media (min-width: 769px) {
-  .section--intro {
-    display: flex;
-    align-items: center;
-  }
+/* Intro content is centered inside the safe area between fixed chrome. */
+.section--intro > .page-grid {
+  width: 100%;
+  min-height: calc(100svh - var(--spacing-margin) - var(--space-12) - var(--spacing-margin) - var(--space-12));
+  align-items: center;
+}
 
-  .section--intro > .page-grid {
-    width: 100%;
-  }
+.section--intro .col-content {
+  grid-column: 1 / span 12;
+}
 
-  .intro__content {
-    padding-top: 0;
-  }
+.intro__content {
+  min-width: 0;
 }
 
 /* ─── Intro entrance: staggered fade-up on page load ─────────
@@ -262,61 +294,93 @@ body {
   to   { opacity: 1; transform: translateY(0);    }
 }
 
-.intro__text p:first-child {
+.intro__title {
   animation: intro-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
 }
 
-.intro__text p:last-child {
+.intro__body {
   animation: intro-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
 }
 
 .intro__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  color: var(--color-neutral-fg);
+}
+
+.intro__title {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-tight);
+  margin: 0;
+}
+
+.intro__glyph {
+  font-family: var(--font-serif-glyph);
+  font-weight: var(--font-weight-medium);
+}
+
+.intro__body {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
-  font-size: var(--typography-display);
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
-  color: var(--color-neutral-fg);
+  font-size: var(--typography-body-lg);
+  line-height: var(--line-height-body-lg);
+  letter-spacing: var(--letter-spacing-body-lg);
+  margin: 0;
 }
 
 .intro__text p {
   margin: 0;
 }
 
-.intro__text p + p {
-  margin-top: var(--paragraph-spacing);
-}
-
-/* Figma intro body text accent span (368:13140): semantic highlight fg #8eff8e */
+/* Intro accent text uses the default accent foreground. */
 .intro__text .accent {
-  color: var(--color-highlight-fg);
+  color: var(--color-accent-fg);
 }
 
 /* ─── Work sections ──────────────────────────────────────────── */
 
-/* Content row — no padding-top needed; section flex-centers it */
-.work__row {
-  padding-top: 0;
+/* Content column: cols 3–10 on desktop, expands on mobile */
+.col-work-content {
+  grid-column: 3 / span 8;
 }
 
-/* Left column: project title + detail rows */
+@media (max-width: 768px) {
+  .col-work-content {
+    grid-column: 2 / span 10;
+  }
+}
+
+/* Section heading above project copy / experience list */
 .work__title {
+  margin: 0 0 var(--space-6) 0;
   font-family: var(--font-serif);
   font-weight: var(--font-weight-medium);
-  font-size: var(--typography-title); /* 32px */
-  line-height: var(--line-height-tight);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
-  margin: 0;
 }
 
-.work__details {
-  list-style: none;
-  padding: 0;
-  margin: var(--space-2) 0 0 0; /* 8px gap below title */
+#work > .page-grid .col-work-content > .work__title {
+  margin-bottom: var(--space-10);
+}
+
+/* Vertical stack of project subsections */
+.work__projects {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2); /* 8px between rows */
+  gap: 88px;
+}
+
+/* Single project: body + metrics */
+.work__project {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
 .work__detail {
@@ -370,12 +434,13 @@ body {
   flex: 1 1 auto;
 }
 
-/* Right column: body text + metrics */
+/* Project copy: body type scale (not section headings) */
 .work__body {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
   font-size: var(--typography-body);
   line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
   color: var(--color-neutral-fg);
 }
 
@@ -384,13 +449,13 @@ body {
 }
 
 .work__body p + p {
-  margin-top: var(--space-4); /* 16px — from Figma mb-[16px] */
+  margin-top: var(--space-6); /* 24px between paragraphs */
 }
 
 .work__metrics {
   list-style: none;
   padding: 0;
-  margin: var(--space-6) 0 0 0; /* 24px gap below body text */
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-2); /* 8px between rows */
@@ -403,7 +468,7 @@ body {
 
 .work__metric-redacted__blur {
   display: inline-block;
-  filter: blur(5px);
+  filter: blur(3px);
   user-select: none;
   letter-spacing: 0.12em;
   margin-inline: 0.06em;
@@ -476,13 +541,13 @@ body {
 
 /* Upper hero block: full-width, vertically centred content */
 .about__hero {
-  min-height: 591px; /* Figma Project Info height */
+  min-height: 50svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-6); /* 24px gap between ASCII and tagline */
-  padding-top: calc(var(--spacing-margin) + 24px); /* clear fixed header */
+  padding-top: 0;
   overflow-x: auto; /* protect layout if art is wider than viewport */
 }
 
@@ -523,19 +588,17 @@ body {
 }
 
 .about__label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-mono);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
   color: var(--color-neutral-fg);
   margin: 0;
 }
 
 .about__body {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-extra-light);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-body-sm);
   line-height: var(--line-height-normal);
   color: var(--color-neutral-fg);
@@ -605,9 +668,15 @@ body {
      · About hero inset doubles to 80px (matches Figma y=80 for Project Info)
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 1200px) {
-  /* Project Info moves from y=40 to y=80 in medium frames */
-  .about__hero {
-    padding-top: 80px;
+  .section--experience {
+    padding-block: calc(var(--space-10) * 2);
+  }
+
+  /* Medium follows the mobile About reading order: text first, ASCII sign-off after. */
+  .about__hero   { order: 1; }
+  .about__content {
+    order: 0;
+    padding-bottom: var(--space-10);
   }
 }
 
@@ -615,43 +684,23 @@ body {
 /* ─── small: ≤ 768px ────────────────────────────────────────────
    Canvas 768px · margin 24px · col ≈ 45.3px
    Key changes vs medium:
-     · Intro text row sits at y = 216px (from 227px)
-     · Work layout STACKS: project info (col 2/span 10) above
-       body text (col 3/span 10, 1-col indent)
-     · Work content row padding-top resets to 216px
+     · Intro uses the shared fixed-chrome safe area
+     · Work col-work-content expands to cols 2–11
      · About hero inset drops to 64px (Figma Project Info y=64)
      · col-about narrows to col 2/span 10 (was col 3/span 8)
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  /* Intro: text row at y=216 */
-  .intro__content {
-    padding-top: 216px;
+  .section--experience {
+    padding-block: calc(var(--space-8) * 2);
   }
 
-  /* Work: increase vertical distance between stacked blocks (≈40px) */
-  .work__row {
-    row-gap: var(--space-10); /* 40px */
-    padding-top: 0;
-  }
-
-  /* Work: stacked layout.
-     col-sidebar occupies cols 2–11 (span 10).
-     col-body occupies cols 3–12 (span 10, 1-col indent).
-     Because the ranges overlap, CSS Grid auto-placement pushes
-     col-body into the next row — no explicit row assignment needed.
-     These selectors beat the grid.css collapse (1/span 12) because
-     they are more specific (.section--work .col-*). */
-  .section--work .col-sidebar {
-    grid-column: 2 / span 10;
-  }
-
-  .section--work .col-body {
-    grid-column: 3 / span 10;
-  }
-
-  /* About: hero top inset from Figma Project Info y=64 */
   .about__hero {
-    padding-top: 64px;
+    min-height: auto;
+    padding-block: var(--space-12) var(--space-8);
+  }
+
+  .about__content {
+    padding-bottom: var(--space-8);
   }
 
   /* About-me block: col 2–11 (span 10) at small */
@@ -663,30 +712,38 @@ body {
 
 /* ─── x-small: ≤ 480px ──────────────────────────────────────────
    Canvas 480px · margin 16px · col ≈ 21.3px
-   Column assignments and y-offsets are identical to small.
    Typography scale adjustments handled entirely by tokens.css
-   (--typography-mono drops to 12px, display/body shrink further).
-   No additional layout overrides required.
+   (title shrinks further; body-lg remains 24px).
+   Intro uses the shared fixed-chrome safe area.
+   Work layout unchanged — col-work-content stays at cols 2–11 (≤768px breakpoint).
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  /* Intro: vertically center the hero copy on x-small viewports */
-  .section--intro {
-    display: flex;
-    align-items: center;
+  .section--experience {
+    padding-block: var(--space-12);
   }
 
-  .intro__content {
-    padding-top: 0;
+  .about__hero {
+    padding-block: var(--space-10) var(--space-6);
   }
 
-  /* Work: reduce indent so body starts 1 column earlier (align w/ sidebar) */
-  .section--work .col-body {
-    grid-column: 2 / span 10;
+  .about__content {
+    padding-bottom: var(--space-6);
   }
 
-  /* Work: tighter vertical spacing between sidebar and body */
-  .work__row {
-    row-gap: var(--space-4); /* 16px */
+}
+
+/* ─── large ≥ 1440px ────────────────────────────────────────────────
+   Work section two-column split: skip col 1, text cols 2–8 (7 cols),
+   skip col 9, mini-panel cols 10–12 (3 cols).
+   Scoped to .section--work so base utilities stay unchanged.
+   ─────────────────────────────────────────────────────────────── */
+@media (min-width: 1440px) {
+  .section--work .col-two-thirds {
+    grid-column: 2 / span 7;
+  }
+
+  .section--work .col-one-third {
+    grid-column: 10 / span 3;
   }
 }
 
@@ -696,4 +753,13 @@ body {
    About frame 357:12898: height 1024 (long-scroll about uses 1185 — applies below 1920).
    Intro centering is handled by the desktop/tablet flex rule above.
    ─────────────────────────────────────────────────────────────── */
+@media (min-width: 1920px) {
+  .section--work .col-two-thirds {
+    grid-column: 2 / span 7;
+  }
+
+  .section--work .col-one-third {
+    grid-column: 10 / span 3;
+  }
+}
 

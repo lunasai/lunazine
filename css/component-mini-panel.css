@@ -1,0 +1,198 @@
+/*
+ * Luna Borgo — New Site
+ * css/component-mini-panel.css
+ *
+ * Credential sidebar panel: pixel icon + employment timeline + CV download.
+ * Figma source: node 458:3392 "mini panel"
+ * Requires: css/tokens.css, css/component-button.css
+ *
+ * BEM:
+ *   .mini-panel              — outer flex column container
+ *   .mini-panel__icon-stage  — accent-tinted box, 290px tall, centers the pixel icon
+ *   .mini-panel__icon        — 80×80 SVG icon (uses currentColor = --color-accent-fg)
+ *   .mini-panel__timeline    — stacked employment rows
+ *   .mini-panel__row         — one bordered row: label left + value right
+ *   .mini-panel__row--cta    — last row variant: "and more" + download button
+ *   .mini-panel__row-label   — left-aligned text
+ *   .mini-panel__row-value   — right-aligned text
+ *
+ * Scroll-reveal: the whole .mini-panel block is observed by the unified
+ *   IntersectionObserver in work-slides.js. in-view is added by the parent
+ *   system; no per-child reveal logic here.
+ */
+
+
+/* ── 1. Outer container ──────────────────────────────────────────────────── */
+
+.mini-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Align the panel column to the top of the grid row (prevent stretch) */
+.section--work:has(.mini-panel) .page-grid {
+  align-items: start;
+}
+
+
+/* ── 2. Icon stage ───────────────────────────────────────────────────────── */
+
+@keyframes scanline-drift {
+  from { transform: translateY(0); }
+  to   { transform: translateY(4px); } /* one pattern unit — seamless loop */
+}
+
+.mini-panel__icon-stage {
+  height: 290px; /* Figma: h-[290px] — no token */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden; /* clips .mini-panel__bg within border-radius */
+}
+
+/*
+ * Distortion target layer — receives the SVG heatwave filter.
+ * Separating bg + scanlines onto their own element means the filter
+ * warps them while the icon above stays crisp.
+ * #mini-panel-heatwave is defined in the SVG sprite (index.html / preview sprite).
+ */
+.mini-panel__bg {
+  position: absolute;
+  inset: 0;
+  background-color: color-mix(in srgb, var(--color-accent-bg) 6%, transparent);
+  border-radius: inherit;
+  filter: url(#mini-panel-heatwave);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* CRT scanline overlay — lives on .mini-panel__bg so it warps with the filter */
+.mini-panel__bg::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0 0 0; /* -4px top overhang ensures seamless top-of-loop */
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent                                                 0px,
+    transparent                                                 2px,
+    color-mix(in srgb, var(--color-accent-fg) 8%, transparent) 2px,
+    color-mix(in srgb, var(--color-accent-fg) 8%, transparent) 4px
+  );
+  animation: scanline-drift 8s linear infinite;
+}
+
+
+
+/* ── 3. Icon image / SVG ─────────────────────────────────────────────────── */
+
+.mini-panel__icon {
+  width: 80px; /* Figma: 80×80 — no token */
+  height: 80px;
+  display: block;
+  color: var(--color-accent-fg);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1; /* above scanline ::after layer */
+  /* Smooth scale on icon-stage hover */
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Chromatic aberration glitch — fires once on hover-enter.
+ * Splits the icon into warm (magenta-pink) and cool (indigo-blue) ghosts at ±3px,
+ * then decays back to none. Optical effect; no semantic token exists for R/G/B
+ * channel colors — raw rgb() values intentional.
+ */
+@keyframes icon-glitch {
+  0%   { filter: none; }
+  15%  { filter: drop-shadow(-3px 0 0 rgb(255 60 160 / 0.70))
+                 drop-shadow( 3px 0 0 rgb(60 100 255 / 0.70)); }
+  40%  { filter: drop-shadow( 2px 0 0 rgb(255 60 160 / 0.40))
+                 drop-shadow(-2px 0 0 rgb(60 100 255 / 0.40)); }
+  70%  { filter: drop-shadow(-1px 0 0 rgb(255 60 160 / 0.15))
+                 drop-shadow( 1px 0 0 rgb(60 100 255 / 0.15)); }
+  100% { filter: none; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mini-panel__icon-stage:hover .mini-panel__icon {
+    transform: scale(1.04);
+    animation: icon-glitch 220ms ease-out;
+  }
+}
+
+
+/* ── 4. Timeline list ────────────────────────────────────────────────────── */
+
+.mini-panel__timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ── 5. Timeline row ─────────────────────────────────────────────────────── */
+
+.mini-panel__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2); /* 8px — Figma: p-[8px] */
+  border-top:    1px solid var(--color-accent-fg);
+  border-bottom: 1px solid var(--color-accent-fg);
+  margin-bottom: -1px; /* collapse adjacent borders — no token */
+
+  font-family:    var(--font-mono);
+  font-weight:    var(--font-weight-regular);
+  font-size:      var(--typography-mono);
+  line-height:    var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  font-feature-settings: 'case' 1;
+  color: var(--color-accent-fg);
+}
+
+
+/* ── 6. Row text atoms ───────────────────────────────────────────────────── */
+
+.mini-panel__row-label {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.mini-panel__row-value {
+  text-align: right;
+  white-space: nowrap;
+}
+
+
+/* ── 7. Row hover — fine pointer only ───────────────────────────────────── */
+
+@media (hover: hover) and (pointer: fine) {
+  .mini-panel__row {
+    transition: background-color 200ms ease;
+  }
+
+  .mini-panel__row:hover {
+    background-color: var(--color-neutral-bg-elevated);
+  }
+}
+
+
+/* ── 8. Reduced motion ───────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-panel__icon {
+    transition: none;
+    animation: none; /* no glitch under reduced motion */
+  }
+
+  /* Keep static scanline texture but stop the drift */
+  .mini-panel__bg::after {
+    animation: none;
+  }
+}

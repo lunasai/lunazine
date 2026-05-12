@@ -5,10 +5,13 @@
   How it works:
     1. After the user stops scrolling (100ms debounce), find the section
        whose centre is closest to the viewport centre.
-    2. If that section is within the snap zone (±40% of viewport height
-       from centre) but not already well-centred (>8px offset), animate
-       to it using a custom ease-out-quart curve over 1000ms.
-    3. A guard flag blocks re-triggering while the animation is running.
+    2. If that section fits in the viewport, is within the snap zone
+       (±60% of viewport height from centre), and is not already
+       well-centred (>8px offset), animate to it using a custom
+       ease-out-quart curve over 1000ms.
+    3. Never animate upward. If the landing point would be above the
+       current scroll position, let native scroll rest where it is.
+    4. A guard flag blocks re-triggering while the animation is running.
 
   Easing — ease-out-quart:
     Fast initial movement that decelerates sharply into the landing point.
@@ -17,8 +20,8 @@
   Tuning:
     DEBOUNCE_MS   — how long after the last scroll event to wait before snapping.
     DURATION_MS   — animation duration. Higher = more dramatic deceleration.
-    SNAP_ZONE     — fraction of viewport height. 0.4 = snaps when section
-                    centre is within 40% of viewport height from screen centre.
+    SNAP_ZONE     — fraction of viewport height. 0.6 = snaps when section
+                    centre is within 60% of viewport height from screen centre.
     DEAD_ZONE_PX  — skip animation if already this close (avoids micro-jitter).
 */
 
@@ -27,7 +30,7 @@
 
   var DEBOUNCE_MS  = 100;
   var DURATION_MS  = 1000;
-  var SNAP_ZONE    = 0.4;   /* fraction of viewport height */
+  var SNAP_ZONE    = 0.6;   /* fraction of viewport height */
   var DEAD_ZONE_PX = 8;
 
   var sections = Array.from(
@@ -35,6 +38,7 @@
   );
 
   if (!sections.length) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   var scrollTimer = null;
   var animId      = null;
@@ -117,20 +121,15 @@
       var nearest = findNearest();
       if (!nearest) return;
 
-      /* Target: scroll position that centres the section in the viewport.
-         For sections taller than the viewport, align the top so the user
-         sees the beginning — a centred snap would hide the header area. */
+      /* Tall sections are reading surfaces. Do not magnetise them:
+         users must be able to stop anywhere without being pulled back. */
       var rect      = nearest.section.getBoundingClientRect();
-      var targetY;
+      if (rect.height > window.innerHeight) return;
 
-      if (nearest.section.classList.contains('section--about') ||
-          rect.height > window.innerHeight * 1.1) {
-        /* Tall section: snap top into view */
-        targetY = window.scrollY + rect.top;
-      } else {
-        /* Normal section: centre in viewport */
-        targetY = window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
-      }
+      /* Compact sections: centre in viewport, but only if that means
+         moving down. Never pull the user upward into a previous position. */
+      var targetY = window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
+      if (targetY <= window.scrollY) return;
 
       animateTo(Math.max(0, targetY));
     }, DEBOUNCE_MS);

@@ -99,3 +99,47 @@ a.button.button--accent:visited {
   border-radius: var(--radius-md);
 }
 
+/* ── Bold / filled variant: accent-background CTA button ─────────────────── */
+/*    Figma: node 458:3410 "bold button" — filled accent bg, on-accent text   */
+
+.button--bold {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-accent-bg);
+  color: var(--color-neutral-fg-on-accent);
+  border-radius: var(--radius-sm);
+  height: 25px;
+  padding-inline: var(--space-2);
+  box-sizing: border-box;
+}
+
+/* Hover: white-tint overlay via pseudo-element (token-safe, opacity-only transition) */
+.button--bold::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-neutral-bg-elevated);
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button--bold:hover::after {
+    opacity: 1;
+  }
+}
+
+.button--bold:focus-visible {
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+a.button--bold,
+a.button--bold:visited {
+  color: var(--color-neutral-fg-on-accent);
+  text-decoration: none;
+}
+

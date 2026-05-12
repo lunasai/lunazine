@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini panel — preview</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/component-button.css" />
+    <link rel="stylesheet" href="../css/component-mini-panel.css" />
+
+    <style>
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      body {
+        margin: 0;
+        background: var(--color-neutral-bg);
+        color: var(--color-neutral-fg);
+        font-family: var(--font-mono);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: var(--space-10) var(--spacing-margin);
+        box-sizing: border-box;
+        min-height: 100vh;
+      }
+
+      .preview-label {
+        width: 320px;
+        padding-bottom: var(--space-4);
+        font-size: var(--typography-mono);
+        line-height: var(--line-height-normal);
+        letter-spacing: var(--letter-spacing-mono);
+        text-transform: uppercase;
+        color: var(--color-neutral-fg-muted);
+      }
+
+      .preview-frame {
+        width: 320px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!--
+      #pixel-icon-archive-books is defined inline in index.html for the full site.
+      In this standalone preview we include a local copy so <use> resolves
+      without the main document.
+      Streamline Pixel: content-files-archive-books-1 (CC BY 4.0 — streamlinehq.com)
+    -->
+    <svg aria-hidden="true" focusable="false" width="0" height="0" style="display:none">
+      <filter id="mini-panel-heatwave" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.018 0.025" numOctaves="3" seed="4" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <symbol id="pixel-icon-archive-books" viewBox="0 0 80 80">
+        <path d="M72.4 15.25V0H34.3V3.8H19.05V7.625H7.625V34.3H3.825V41.9H0V80H80V15.25H72.4ZM19.05 76.2H3.825V53.325H19.05V76.2ZM19.05 49.525H11.45V11.425H19.05V49.525ZM22.875 7.625H34.3V11.425H26.675V49.525H22.875V7.625ZM34.3 15.25V49.525H30.5V15.25H34.3ZM38.1 76.2H22.875V53.325H38.1V76.2ZM76.2 76.2H41.925V49.525H38.1V3.8H68.575V15.25H57.15V19.05H76.2V76.2Z" fill="currentColor"/>
+        <path d="M64.775 53.325H68.575V57.15H64.775V53.325ZM64.775 45.725H68.575V49.525H64.775V45.725ZM57.15 57.15H64.775V60.95H57.15V57.15ZM53.35 53.325H57.15V57.15H53.35V53.325ZM53.35 45.725H57.15V49.525H53.35V45.725ZM53.35 19.05H57.15V26.675H53.35V19.05ZM49.525 26.675H53.35V34.3H49.525V26.675ZM45.725 34.3H49.525V41.9H45.725V34.3ZM45.725 7.625H49.525V11.425H45.725V7.625ZM41.925 41.9H45.725V49.525H41.925V41.9ZM26.675 60.95H34.3V68.575H26.675V60.95ZM7.625 60.95H15.25V68.575H7.625V60.95Z" fill="currentColor"/>
+      </symbol>
+    </svg>
+
+    <p class="preview-label">Mini panel — credential sidebar</p>
+
+    <div class="preview-frame">
+      <aside class="mini-panel" aria-label="Career timeline">
+
+        <div class="mini-panel__icon-stage is-visible" aria-hidden="true">
+          <div class="mini-panel__bg"></div>
+          <svg class="mini-panel__icon" viewBox="0 0 80 80" focusable="false" aria-hidden="true">
+            <use href="#pixel-icon-archive-books"></use>
+          </svg>
+        </div>
+
+        <div class="mini-panel__timeline" role="list" aria-label="Employment history">
+
+          <div class="mini-panel__row is-visible" role="listitem">
+            <span class="mini-panel__row-label">Heineken</span>
+            <span class="mini-panel__row-value">S/2022</span>
+          </div>
+
+          <div class="mini-panel__row is-visible" role="listitem">
+            <span class="mini-panel__row-label">Adidas</span>
+            <span class="mini-panel__row-value">2019–2022</span>
+          </div>
+
+          <div class="mini-panel__row is-visible" role="listitem">
+            <span class="mini-panel__row-label">Aegon/HCL</span>
+            <span class="mini-panel__row-value">2016–2019</span>
+          </div>
+
+          <div class="mini-panel__row mini-panel__row--cta is-visible" role="listitem">
+            <span class="mini-panel__row-label">and more</span>
+            <a
+              class="button button--bold"
+              href="../brand_ref/docs/LunaBorgo_Designer_CV.pdf"
+              download="LunaBorgo_Designer_CV.pdf"
+              aria-label="Download CV as PDF"
+            >download cv</a>
+          </div>
+
+        </div>
+
+      </aside>
+    </div>
+
+    <script src="../js/mini-panel.js"></script>
+  </body>
+</html>

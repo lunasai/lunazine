@@ -41,29 +41,38 @@ Use `--color-*` **semantic tokens** in all component and layout CSS.
 
 ## Typography
 
-| Text is… | `font-family` | `font-size` |
-|---|---|---|
-| `text-transform: uppercase` | `var(--font-mono)` | `var(--typography-mono)` |
-| Heading / display | `var(--font-serif)` | `var(--typography-display)` or `var(--typography-title)` |
-| Body / intro copy | `var(--font-serif)` | `var(--typography-body)` |
-| Supporting copy / caption | `var(--font-serif)` | `var(--typography-body-sm)` |
-| ASCII art only | `var(--font-mono-ascii)` | `var(--typography-footnote)` |
+| Text is… | `font-family` | `font-size` | `font-weight` |
+|---|---|---|---|
+| `text-transform: uppercase` | `var(--font-mono)` | `var(--typography-mono)` | 400 |
+| Heading / display | `var(--font-serif)` | `var(--typography-display)` | 300 Light |
+| Title / section header | `var(--font-serif)` | `var(--typography-title)` | 500 Medium |
+| Large body / intro | `var(--font-serif)` | `var(--typography-body-lg)` | 300 Light |
+| Body copy | `var(--font-serif)` | `var(--typography-body-md)` | 300 Light |
+| Supporting / caption | `var(--font-serif)` | `var(--typography-body-sm)` | 300 Light |
+| ASCII art only | `var(--font-mono-ascii)` | `var(--typography-footnote)` | — |
 
 **Responsive scale** (tokens update automatically via `tokens.css` breakpoints):
 
-| Token | ≥1440px | 1200–1439px | ≤768px |
-|---|---|---|---|
-| `--typography-display` | 40px | 32px | 28px |
-| `--typography-title` | 32px | 24px | 24px |
-| `--typography-body` | 24px | 20px | 18px |
-| `--typography-body-sm` | 16px | 14px | 14px |
-| `--typography-mono` | 14px | 14px | 12px |
-| `--typography-footnote` | 12px | 12px | 12px |
+| Token | x-large | large | medium | small | x-small |
+|---|---|---|---|---|---|
+| `--typography-display` | 88px | 88px | 80px | 64px | 48px |
+| `--typography-title` | 80px | 80px | 72px | 56px | 32px |
+| `--typography-body-lg` | 32px | 40px | 24px | 24px | 24px |
+| `--typography-body-md` | 24px | 24px | 20px | 20px | 20px |
+| `--typography-body-sm` | 20px | 20px | 14px | 14px | 14px |
+| `--typography-mono` | 14px | 14px | 14px | 14px | 14px |
+| `--typography-footnote` | 14px | 12px | 12px | 10px | 10px |
+
+`--typography-body` is a backward-compat alias for `--typography-body-lg`; use `--typography-body-lg` in new code.
 
 **Rules:**
-- Display/body/inline-link: `font-weight: var(--font-weight-light)` (300); body-sm: `var(--font-weight-extra-light)` (200); title: `var(--font-weight-medium)` (500).
+- `--typography-display`: `font-weight: var(--font-weight-light)` (300); `line-height: var(--line-height-tight)` (1.2); `letter-spacing: var(--letter-spacing-tight)` (−0.01em).
+- `--typography-title`: `font-weight: var(--font-weight-medium)` (500); `line-height: var(--line-height-title)` (1.0); `letter-spacing: var(--letter-spacing-tight)` (−0.01em).
+- `--typography-body-lg`: `font-weight: var(--font-weight-light)` (300); `line-height: var(--line-height-body-lg)` (1.4); `letter-spacing: var(--letter-spacing-body-lg)` (-0.03em).
+- `--typography-body-md`: `font-weight: var(--font-weight-light)` (300); `line-height: var(--line-height-normal)` (1.38); `letter-spacing: var(--letter-spacing-body-md)` (−0.03em).
+- `--typography-body-sm`: `font-weight: var(--font-weight-light)` (300); `line-height: var(--line-height-normal)` (1.38); `letter-spacing: var(--letter-spacing-body)` (0em).
 - Mono: always `text-transform: uppercase`; `letter-spacing: var(--letter-spacing-mono)` (0.04em).
-- Minimum font size anywhere: **11px**.
+- Minimum font size anywhere: **10px**.
 - No hardcoded `font-family` strings — use tokens only.
 
 ---

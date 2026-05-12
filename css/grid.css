@@ -186,9 +186,9 @@
   grid-column: 2 / span 3;
 }
 
-/* Work layout: wide right column (content body) — 7 cols starting at col 5 */
+/* Work layout: central content column — 10 cols, col 2–11 */
 .col-body {
-  grid-column: 5 / span 7;
+  grid-column: 2 / span 10;
 }
 
 /* Two-thirds / one-third split helpers */
