@@ -33,7 +33,7 @@
 :root {
   --screen-x-small:  480px;   /* phone compact    ≤ 480px  */
   --screen-small:    768px;   /* mobile           ≤ 768px  */
-  --screen-medium:  1200px;   /* compact desktop  ≤ 1200px */
+  --screen-medium:  1024px;   /* compact desktop  ≤ 1024px */
   --screen-large:   1440px;   /* standard desktop ≤ 1440px */
   --screen-x-large: 1920px;   /* expanded desktop ≤ 1920px */
 }
@@ -110,6 +110,7 @@
   /* ── Accent ──────────────────────────────────────────────────*/
   --color-accent-bg:                  #5543e4;   /* blue-900  */
   --color-accent-fg:                  #8a8aff;   /* blue-1100 */
+  --color-accent-bg-subtle:           color-mix(in srgb, var(--color-accent-bg) 10%, transparent);
 
   /* ── Highlight ───────────────────────────────────────────────*/
   --color-highlight-bg:               #8eff8e;   /* green-900 */
@@ -124,6 +125,7 @@
   --color-neutral-bg:                 #121426;   /* blue-100              */
   --color-neutral-bg-elevated:        #ffffff1f; /* alpha-invert-100      */
   --color-neutral-fg:                 #ffffffcc; /* alpha-invert-800      */
+  --color-neutral-fg-strong:          #ffffff;   /* base-white — fully opaque; use for mask fills */
   --color-neutral-fg-muted:           #ffffff9e; /* alpha-invert-600      */
   --color-neutral-fg-on-accent:       #ffffffcc; /* alpha-invert-800      */
   --color-neutral-opacity-strong:     #09070dcc; /* alpha-800             */
@@ -189,6 +191,7 @@
   /* ── Semantic overrides ──────────────────────────────────────*/
   --color-accent-bg:                  #5543e4;   /* same purple accent           */
   --color-accent-fg:                  #5543e4;   /* solid (no lavender in light) */
+  --color-accent-bg-subtle:           color-mix(in srgb, var(--color-accent-bg) 10%, transparent);
 
   --color-highlight-bg:               #5543e4;   /* purple replaces green        */
   --color-highlight-fg:               #5543e4;
@@ -200,6 +203,7 @@
   --color-neutral-bg:                 #f7f8ff;   /* warm off-white               */
   --color-neutral-bg-elevated:        #09070d1f;
   --color-neutral-fg:                 #09070dcc;
+  --color-neutral-fg-strong:          #09070d;   /* base-gray-1200 — fully opaque; use for mask fills */
   --color-neutral-fg-muted:           #09070d9e;
   --color-neutral-fg-on-accent:       #ffffff;
   --color-neutral-opacity-strong:     #ffffff9e;
@@ -219,7 +223,8 @@
      @font-face / @import lives in base.css or equivalent.
   ────────────────────────────────────────────────────────────── */
   --font-serif: 'Montagu Slab', Georgia, serif;
-  --font-serif-glyph: 'Noto Serif JP', 'Noto Serif', Georgia, serif;
+  --font-glyph-jp: 'Noto Sans JP', sans-serif;
+  --font-glyph-arrow: 'Noto Sans Math', sans-serif;
   --font-mono:  'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   /* Figma node 368:13282 — ASCII art uses DM Mono Light */
   --font-mono-ascii: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -261,7 +266,7 @@
 /* ═══════════════════════════════════════════════════════════════
    6. TYPOGRAPHY — RESPONSIVE SIZE SCALE
    Figma "responsive" collection, typography group.
-   :root holds large / x-large values (≥ 1201px).
+   :root holds large values (1025px–1919px).
    Overridden per breakpoint in section 9.
 
    Figma variable name        → CSS custom property
@@ -279,9 +284,9 @@
    ┌─────────────────────────┬────────┬───────┬────────┬───────┬─────────┐
    │ Token                   │ x-lrg  │ large │ medium │ small │ x-small │
    ├─────────────────────────┼────────┼───────┼────────┼───────┼─────────┤
-   │ --typography-display    │  88    │  88   │  80    │  64   │  48     │
-   │ --typography-title      │  80    │  80   │  72    │  56   │  32     │
-   │ --typography-body-lg    │  32    │  40   │  24    │  24   │  24     │
+   │ --typography-display    │  88    │  80   │  72    │  64   │  48     │
+   │ --typography-title      │  80    │  64   │  56    │  48   │  32     │
+   │ --typography-body-lg    │  32    │  32   │  24    │  24   │  24     │
    │ --typography-body-md    │  24    │  24   │  20    │  20   │  20     │
    │ --typography-body-sm    │  20    │  20   │  14    │  14   │  14     │
    │ --typography-mono       │  14    │  14   │  14    │  14   │  14     │
@@ -292,9 +297,9 @@
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --typography-display:      88px;
-  --typography-title:        80px;
-  --typography-body-lg:      40px;
+  --typography-display:      80px;
+  --typography-title:        64px;
+  --typography-body-lg:      32px;
   --typography-body:         var(--typography-body-lg); /* backward-compat alias */
   --typography-body-md:      24px;
   --typography-body-sm:      20px;
@@ -307,12 +312,12 @@
 /* ═══════════════════════════════════════════════════════════════
    7. LAYOUT — SPACING MARGIN
    Figma "responsive" collection — spacing/margins token.
-   :root = large desktop default (1201px–1919px viewport).
+   :root = large desktop default (1025px–1919px viewport).
    Overridden per breakpoint in section 9.
 
    x-large  ≥ 1920px  →  80px   (`get_variable_defs` intro 357:12908)
-   large    1201–1919 →  40px
-   medium   > 768px   →  40px
+   large    1025–1919 →  40px
+   medium   769–1024  →  40px
    small    > 480px   →  24px
    x-small  ≤ 480px   →  16px
    ═══════════════════════════════════════════════════════════════ */
@@ -351,15 +356,15 @@
 
 /* ═══════════════════════════════════════════════════════════════
    9. RESPONSIVE OVERRIDES
-   Desktop-first: :root holds large/x-large defaults.
+   Desktop-first: :root holds large defaults.
    Each @media block narrows the scale for smaller viewports.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── medium: 769px – 1200px ──────────────────────────────────── */
-@media (max-width: 1200px) {
+/* ── medium: 769px – 1024px ──────────────────────────────────── */
+@media (max-width: 1024px) {
   :root {
-    --typography-display:  80px;
-    --typography-title:    72px;
+    --typography-display:  72px;
+    --typography-title:    56px;
     --typography-body-lg:  24px;
     --typography-body-md:  20px;
     --typography-body-sm:  14px;
@@ -372,7 +377,7 @@
 @media (max-width: 768px) {
   :root {
     --typography-display:   64px;
-    --typography-title:     56px;
+    --typography-title:     48px;
     /* --typography-body-lg  stays 24px */
     /* --typography-body-md  stays 20px */
     /* --typography-body-sm  stays 14px */
@@ -399,7 +404,8 @@
 /* ── expanded desktop: Figma mode screen/max-width 1920 (see variables on intro 357:12908) ── */
 @media (min-width: 1920px) {
   :root {
-    --typography-body-lg:  32px; /* x-large: body-lg drops from 40 to 32 */
+    --typography-display:  88px;
+    --typography-title:    80px;
     --typography-footnote: 14px;
     --spacing-margin:      80px;
   }

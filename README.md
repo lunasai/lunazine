@@ -98,4 +98,4 @@ This runs `assets:optimize` first, then copies everything to `dist/`.
 
 ## QA Docs
 
-Responsive and accessibility QA reports are in `docs/qa/`, covering breakpoints 480px, 768px, 1200px, 1440px, and 1920px.
+Responsive and accessibility QA reports are in `docs/qa/`, covering breakpoints 480px, 768px, 1024px, 1440px, and 1920px.

@@ -1,30 +1,34 @@
 /*
   css/component-hover-preview.css
-  Hover-preview links: wavy accent underline + floating image card on hover.
+  Hover-preview links: dashed pseudo-element underline + floating image card on hover.
 
   Visual language:
-    · Underline: wavy, var(--color-accent-fg) (#8a8aff)
+    · Underline: dashed ::after pseudo-element, draws left-to-right once on scroll-in
     · Card: borderless, sharp corners (--radius-sm), dark surface
     · Motion: scale + fade in, slight tilt entry, cursor-tracking
-    · Reduced motion: fade only, no transform
+    · Affordance: underline-draw fires once when link scrolls into view
+    · Reduced motion: line shown immediately, no draw animation
 */
 
-/* ── Hover-preview link: inline wavy underline ─────────────────── */
+/* ── Hover-preview link ─────────────────────────────────────────── */
 
 .hover-preview-link {
-  text-decoration: underline;
-  text-decoration-style: wavy;
-  text-decoration-color: var(--color-accent-fg);
-  text-underline-offset: 0.25em; /* approx. Figma decoration-[8.5%] at body size */
-  text-decoration-thickness: 1px;
+  position: relative;
+  text-decoration: none;
   cursor: crosshair;
-  transition: text-decoration-color 150ms ease;
   touch-action: manipulation;
 }
 
-/* Keeps decoration visible in both themes */
-[data-theme="light"] .hover-preview-link {
-  text-decoration-color: var(--color-accent-fg);
+.hover-preview-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  border-bottom: 1px dashed var(--color-neutral-fg);
+  transform: scaleX(0);
+  transform-origin: left center;
 }
 
 /* ── Focus state (keyboard navigation) ─────────────────────────── */
@@ -33,6 +37,35 @@
   outline: 2px solid var(--color-accent-fg);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
+}
+
+/* ── Hover state: keep line visible before .in-view fires ──────── */
+
+@media (hover: hover) and (pointer: fine) {
+  .hover-preview-link:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ── Underline draw: fires once as link scrolls into view ──────── */
+/*    .in-view is added to parent <p> elements by work-slides.js    */
+
+@keyframes underline-draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.in-view .hover-preview-link::after {
+  animation: underline-draw 0.5s ease 0.15s 1 forwards;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-preview-link::after {
+    animation: none;
+    transform: scaleX(1);
+  }
 }
 
 /* ── Floating preview card ──────────────────────────────────────── */

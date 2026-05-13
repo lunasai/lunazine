@@ -2,7 +2,7 @@
   js/work-slides.js
   Progress bar + unified scroll-reveal.
 
-  Pattern (applied to work, experience, and about):
+  Pattern (applied to work, feedback, and about):
     1. JS adds will-animate to each container (opt-in: content fully
        readable without JS).
     2. A single IntersectionObserver adds in-view to each animated
@@ -56,8 +56,8 @@
       items: '.work__title, .work__projects .work__body p, .work__projects .work__metrics'
     },
     {
-      container: '.section--experience',
-      items: '.work__title, .work__body p, .mini-panel'
+      container: '.section--feedback',
+      items: '.feedback__title, .feedback-card'
     },
     {
       container: '.section--about',

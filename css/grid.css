@@ -16,11 +16,11 @@
  * ┌─────────┬────────────┬─────────┬───────┬──────────────────────────────┐
  * │ Mode    │ Canvas(px) │ Margin  │ Gutter│ Col width (1fr, for ref only) │
  * ├─────────┼────────────┼─────────┼───────┼──────────────────────────────┤
- * │ x-large │   1920     │  40px   │  16px │  (1920- 80-176)/12 = 138.7px │
+ * │ x-large │   1920     │  80px   │  16px │  (1920-160-176)/12 = 132.0px │
  * │ large   │   1440     │  40px   │  16px │  (1440- 80-176)/12 =  98.7px │
- * │ medium  │   1200     │  40px   │  16px │  (1200- 80-176)/12 ≈  78.7px │
+ * │ medium  │   1024     │  40px   │  16px │  (1024- 80-176)/12 =  64.0px │
  * │ small   │    768     │  24px   │  16px │  ( 768- 48-176)/12 ≈  45.3px │
- * │ x-small │    480     │  24px   │  16px │  ( 480- 48-176)/12 ≈  21.3px │
+ * │ x-small │    480     │  16px   │  16px │  ( 480- 32-176)/12 ≈  22.7px │
  * └─────────┴────────────┴─────────┴───────┴──────────────────────────────┘
  *
  * Paragraph spacing: display text uses 1 blank line (leading-tight × font-size)
@@ -59,7 +59,7 @@
      because margin is a custom property and calc() inside
      repeat() is not supported cross-browser. Use 1fr instead.
   ────────────────────────────────────────────────────────────── */
-  /* x-large: 132px | large: 92px | medium: ~78.7px | small: ~45.3px | x-small: ~21.3px */
+  /* x-large: 132px | large: ~98.7px | medium: 64px | small: ~45.3px | x-small: ~22.7px */
 
   /* ── Paragraph spacing ───────────────────────────────────────
      One blank display line as used in Figma text blocks.
@@ -67,7 +67,7 @@
      Applied as margin-block-end on display-size paragraphs.
   ────────────────────────────────────────────────────────────── */
   --paragraph-spacing: calc(var(--line-height-tight) * var(--typography-display));
-  /* x-large: 1.2 × 40px = 48px | medium: 1.2 × 32px = 38.4px | x-small: 1.2 × 28px = 33.6px */
+  /* x-large: 1.2 × 88px = 105.6px | medium: 1.2 × 72px = 86.4px | x-small: 1.2 × 48px = 57.6px */
 }
 
 
@@ -222,8 +222,8 @@
    single-column stacks, matching the Figma mobile frames.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── medium: ≤ 1200px ────────────────────────────────────────── */
-@media (max-width: 1200px) {
+/* ── medium: ≤ 1024px ────────────────────────────────────────── */
+@media (max-width: 1024px) {
   :root {
     /* paragraph-spacing tracks --typography-display override */
     --paragraph-spacing: calc(var(--line-height-tight) * var(--typography-display));

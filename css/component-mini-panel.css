@@ -2,23 +2,24 @@
  * Luna Borgo — New Site
  * css/component-mini-panel.css
  *
- * Credential sidebar panel: pixel icon + employment timeline + CV download.
- * Figma source: node 458:3392 "mini panel"
+ * Experience mini panel: title/copy + pixel icon + timeline + CV download.
+ * Figma source: node 501:17320 "mini panel"
  * Requires: css/tokens.css, css/component-button.css
  *
  * BEM:
  *   .mini-panel              — outer flex column container
- *   .mini-panel__icon-stage  — accent-tinted box, 290px tall, centers the pixel icon
+ *   .mini-panel__container   — panel shell; plain fill via .mini-panel__bg
+ *     (experience: shell bleeds to viewport; copy uses grid margin as padding)
+ *   .mini-panel__icon-row    — top row, right-aligned pixel icon
+ *   .mini-panel__content     — title + body copy inside the container
  *   .mini-panel__icon        — 80×80 SVG icon (uses currentColor = --color-accent-fg)
  *   .mini-panel__timeline    — stacked employment rows
- *   .mini-panel__row         — one bordered row: label left + value right
+ *   .mini-panel__row         — one bordered row: label left + value right (no inline padding)
  *   .mini-panel__row--cta    — last row variant: "and more" + download button
  *   .mini-panel__row-label   — left-aligned text
  *   .mini-panel__row-value   — right-aligned text
  *
- * Scroll-reveal: the whole .mini-panel block is observed by the unified
- *   IntersectionObserver in work-slides.js. in-view is added by the parent
- *   system; no per-child reveal logic here.
+ * Static panel: no CRT, heatwave, scanlines, hover motion, or mini-panel scroll-reveal.
  */
 
 
@@ -27,7 +28,7 @@
 .mini-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 15px; /* no token — Figma panel stack gap */
 }
 
 /* Align the panel column to the top of the grid row (prevent stretch) */
@@ -36,58 +37,98 @@
 }
 
 
-/* ── 2. Icon stage ───────────────────────────────────────────────────────── */
+/* ── 2. Panel container ──────────────────────────────────────────────────── */
 
-@keyframes scanline-drift {
-  from { transform: translateY(0); }
-  to   { transform: translateY(4px); } /* one pattern unit — seamless loop */
-}
-
-.mini-panel__icon-stage {
-  height: 290px; /* Figma: h-[290px] — no token */
+.mini-panel__container {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: var(--space-10);
+  min-height: 626px; /* no token — Figma large container height */
+  padding: var(--spacing-margin);
   border-radius: var(--radius-sm);
   position: relative;
   overflow: hidden; /* clips .mini-panel__bg within border-radius */
+  box-sizing: border-box;
 }
 
-/*
- * Distortion target layer — receives the SVG heatwave filter.
- * Separating bg + scanlines onto their own element means the filter
- * warps them while the icon above stays crisp.
- * #mini-panel-heatwave is defined in the SVG sprite (index.html / preview sprite).
- */
+/* Plain surface fill (no filter, scanlines, or animation) */
 .mini-panel__bg {
   position: absolute;
   inset: 0;
-  background-color: color-mix(in srgb, var(--color-accent-bg) 6%, transparent);
+  background-color: var(--color-accent-bg-subtle);
   border-radius: inherit;
-  filter: url(#mini-panel-heatwave);
   pointer-events: none;
   z-index: 0;
 }
 
-/* CRT scanline overlay — lives on .mini-panel__bg so it warps with the filter */
-.mini-panel__bg::after {
-  content: '';
-  position: absolute;
-  inset: -4px 0 0 0; /* -4px top overhang ensures seamless top-of-loop */
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent                                                 0px,
-    transparent                                                 2px,
-    color-mix(in srgb, var(--color-accent-fg) 8%, transparent) 2px,
-    color-mix(in srgb, var(--color-accent-fg) 8%, transparent) 4px
-  );
-  animation: scanline-drift 8s linear infinite;
+.mini-panel__icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  box-sizing: border-box;
 }
 
+.mini-panel__content {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-6);
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  z-index: 1;
+  box-sizing: border-box;
+}
 
+.mini-panel__content .work__title {
+  margin: 0;
+  color: var(--color-accent-fg);
+}
 
-/* ── 3. Icon image / SVG ─────────────────────────────────────────────────── */
+.mini-panel__content .work__body {
+  color: var(--color-accent-fg);
+  font-size: var(--typography-body-md);
+  letter-spacing: var(--letter-spacing-body-md);
+}
+
+.mini-panel__content .work__body p {
+  margin: 0;
+}
+
+/* Experience: panel shell spans viewport; text/icon align with .page-grid content */
+.section--experience .mini-panel__container {
+  --mini-panel-page-gutter: var(--grid-margin, var(--spacing-margin));
+
+  margin-inline: calc(-1 * var(--mini-panel-page-gutter));
+  width: calc(100% + 2 * var(--mini-panel-page-gutter));
+  max-width: none;
+  box-sizing: border-box;
+  padding-inline: 0;
+  padding-block: var(--spacing-margin);
+}
+
+.section--experience .mini-panel__icon-row,
+.section--experience .mini-panel__content {
+  padding-inline: var(--mini-panel-page-gutter);
+}
+
+/* Body copy uses full width between gutters (padding counted inside width). */
+.section--experience .mini-panel__content .work__body {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.section--experience .mini-panel__content .work__body p {
+  max-width: 100%;
+  box-sizing: border-box;
+}
 
 .mini-panel__icon {
   width: 80px; /* Figma: 80×80 — no token */
@@ -96,33 +137,7 @@
   color: var(--color-accent-fg);
   flex-shrink: 0;
   position: relative;
-  z-index: 1; /* above scanline ::after layer */
-  /* Smooth scale on icon-stage hover */
-  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/*
- * Chromatic aberration glitch — fires once on hover-enter.
- * Splits the icon into warm (magenta-pink) and cool (indigo-blue) ghosts at ±3px,
- * then decays back to none. Optical effect; no semantic token exists for R/G/B
- * channel colors — raw rgb() values intentional.
- */
-@keyframes icon-glitch {
-  0%   { filter: none; }
-  15%  { filter: drop-shadow(-3px 0 0 rgb(255 60 160 / 0.70))
-                 drop-shadow( 3px 0 0 rgb(60 100 255 / 0.70)); }
-  40%  { filter: drop-shadow( 2px 0 0 rgb(255 60 160 / 0.40))
-                 drop-shadow(-2px 0 0 rgb(60 100 255 / 0.40)); }
-  70%  { filter: drop-shadow(-1px 0 0 rgb(255 60 160 / 0.15))
-                 drop-shadow( 1px 0 0 rgb(60 100 255 / 0.15)); }
-  100% { filter: none; }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .mini-panel__icon-stage:hover .mini-panel__icon {
-    transform: scale(1.04);
-    animation: icon-glitch 220ms ease-out;
-  }
+  z-index: 1;
 }
 
 
@@ -141,10 +156,9 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-2); /* 8px — Figma: p-[8px] */
-  border-top:    1px solid var(--color-accent-fg);
-  border-bottom: 1px solid var(--color-accent-fg);
-  margin-bottom: -1px; /* collapse adjacent borders — no token */
+  padding-block: var(--space-2); /* 8px — Figma vertical rhythm */
+  padding-inline: 0;
+  border-bottom: 2px solid var(--color-accent-fg);
 
   font-family:    var(--font-mono);
   font-weight:    var(--font-weight-regular);
@@ -156,6 +170,22 @@
   color: var(--color-accent-fg);
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .mini-panel__row {
+    transition: background-color 200ms ease;
+  }
+
+  .mini-panel__row:hover {
+    background-color: var(--color-accent-bg-subtle);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-panel__row {
+    transition: none;
+  }
+}
+
 
 /* ── 6. Row text atoms ───────────────────────────────────────────────────── */
 
@@ -165,34 +195,29 @@
 }
 
 .mini-panel__row-value {
+  flex: 1 0 0;
+  min-width: 0;
   text-align: right;
   white-space: nowrap;
 }
 
 
-/* ── 7. Row hover — fine pointer only ───────────────────────────────────── */
-
-@media (hover: hover) and (pointer: fine) {
-  .mini-panel__row {
-    transition: background-color 200ms ease;
+@media (max-width: 480px) {
+  .mini-panel__container {
+    min-height: 706px; /* no token — Figma small container height */
+    padding-inline: var(--space-10);
+    padding-block: var(--space-10);
   }
 
-  .mini-panel__row:hover {
-    background-color: var(--color-neutral-bg-elevated);
-  }
-}
-
-
-/* ── 8. Reduced motion ───────────────────────────────────────────────────── */
-
-@media (prefers-reduced-motion: reduce) {
-  .mini-panel__icon {
-    transition: none;
-    animation: none; /* no glitch under reduced motion */
+  .section--experience .mini-panel__container {
+    margin-inline: calc(-1 * var(--mini-panel-page-gutter));
+    width: calc(100% + 2 * var(--mini-panel-page-gutter));
+    padding-inline: 0;
+    padding-block: var(--space-10);
   }
 
-  /* Keep static scanline texture but stop the drift */
-  .mini-panel__bg::after {
-    animation: none;
+  .section--experience .mini-panel__icon-row,
+  .section--experience .mini-panel__content {
+    padding-inline: var(--mini-panel-page-gutter);
   }
 }

@@ -7,7 +7,7 @@ This document describes how scroll and section animations work on the site, and 
 
 | Area                                             | Primary files                               |
 | ------------------------------------------------ | ------------------------------------------- |
-| Scroll-entry work (#work) + about + progress bar | `[js/work-slides.js](../js/work-slides.js)` |
+| Scroll-entry work (#work), feedback, about + progress bar | `[js/work-slides.js](../js/work-slides.js)` |
 | All visual timing, keyframes, reduced motion     | `[css/main.css](../css/main.css)`           |
 | Soft scroll snap (not content motion)            | `[js/scroll-snap.js](../js/scroll-snap.js)` |
 
@@ -33,10 +33,10 @@ This document describes how scroll and section animations work on the site, and 
 
 1. JS adds `will-animate` on load (opt-in hide).
 2. `IntersectionObserver` fires when the target intersects.
-3. JS adds a **permanent** marker on that target (`work-item-visible` per node for work, or `is-visible` on the about section) and **stops observing** that target (unobserve / disconnect).
+3. JS adds a **permanent** marker on that target (`in-view`) and **stops observing** that target (`unobserve`).
 
-**Work (#work):** `work-item-visible` on each animated child (tag, each `<p>`, each `.work__metrics`), one observer with `unobserve` after reveal — scroll order replaces a single long stagger.  
-**About:** `is-visible` on the section once.
+**Work (#work):** `in-view` on each animated child (title, each `<p>`, each `.work__metrics`), one observer with `unobserve` after reveal — scroll order replaces a single long stagger.
+**Feedback / About:** same `in-view` class on their selected child elements.
 
 ### 3. CSS mechanics: keyframes vs transitions
 
@@ -44,8 +44,10 @@ This document describes how scroll and section animations work on the site, and 
 | Section          | Mechanism                                                                 | Why                                                                                                         |
 | ---------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **Intro (hero)** | `@keyframes` + `animation` with `**animation-fill-mode: both`**           | Runs on page load; no JS. `both` holds the “before” state during the delay, then the “after” state forever. |
-| **Work (#work)** | Same: `@keyframes work-fade-up` + `both` when `.work-item-visible` is set | Each block animates when scrolled into view; fill mode keeps final state without a separate lock rule.      |
-| **About**        | `transition` on `opacity` / `transform` when `is-visible` is added        | Single block animates as one unit; no per-child stagger.                                                    |
+| **Work (#work)** | Shared `fade-up` reveal when `.in-view` is set; metric cards add component-level choreography | Each block animates when scrolled into view; metric cards use the same trigger but sequence card → icon → body internally. |
+| **Experience**   | None (static mini-panel)                                                  | No `will-animate` / `fade-up`; panel uses a plain fill in `[css/component-mini-panel.css](../css/component-mini-panel.css)`. |
+| **Feedback**     | Shared `fade-up` reveal when `.in-view` is set                            | Quote cards stagger via `animation-delay` on `.feedback-card` children. |
+| **About**        | Shared `fade-up` reveal when `.in-view` is set                            | About copy uses the same per-element reveal language as Work.                                           |
 
 
 When adding new scroll-triggered motion inside a **tall** block, prefer **per-element** observers (work pattern) so users do not miss off-screen delays.
@@ -56,8 +58,8 @@ When adding new scroll-triggered motion inside a **tall** block, prefer **per-el
 
 When adding a new subsection inside `#work`, either:
 
-- Reuse the same selectors / observer list in `[js/work-slides.js](../js/work-slides.js)` if the new nodes match (e.g. another `.work__body p`), or  
-- Extend the `querySelectorAll` list and add matching rules under `.work-item-visible` in `[css/main.css](../css/main.css)`.
+- Reuse the same selectors / observer list in `[js/work-slides.js](../js/work-slides.js)` if the new nodes match (e.g. another `.work__body p`), or
+- Extend the reveal list and add matching rules under `.in-view` in `[css/main.css](../css/main.css)`.
 
 ---
 
@@ -71,22 +73,34 @@ When adding a new subsection inside `#work`, either:
 
 ### Work merged portfolio block (`#work`)
 
-- **Trigger:** Per element — `.work__tag`, every `.work__projects .work__body p`, and each `.work__projects .work__metrics`. Shared `IntersectionObserver` with `threshold: 0.2` and `rootMargin: 0px 0px -5% 0px` (tune in `[js/work-slides.js](../js/work-slides.js)`).
-- **JS:** Adds `will-animate` to `#work`. On intersect for a node, adds `work-item-visible` and `unobserve`s that node only.
-- **CSS:** `[css/main.css](../css/main.css)` — unrevealed nodes use `:not(.work-item-visible)` under `.will-animate` for `opacity: 0`; revealed nodes get one `work-fade-up` animation (no CSS delay list — scroll order is the stagger).
-- **Reduced motion:** JS adds `work-item-visible` to **all** work items immediately so nothing stays hidden; CSS clears animation.
+- **Trigger:** Per element — `.work__title`, every `.work__projects .work__body p`, and each `.work__projects .work__metrics`. Shared `IntersectionObserver` with `threshold: 0.2` and `rootMargin: 0px 0px -5% 0px` (tune in `[js/work-slides.js](../js/work-slides.js)`).
+- **JS:** Adds `will-animate` to `#work`. On intersect for a node, adds `in-view` and `unobserve`s that node only.
+- **CSS:** `[css/main.css](../css/main.css)` — unrevealed nodes use `:not(.in-view)` under `.will-animate` for `opacity: 0`; revealed text nodes get the shared `fade-up` animation.
+- **Metric cards:** `[css/component-lightup-metric.css](../css/component-lightup-metric.css)` uses the parent `.work__metrics.in-view` trigger to sequence card scale/fade, icon scale, and body fade.
+- **Reduced motion:** JS adds `in-view` to **all** reveal items immediately so nothing stays hidden; CSS clears animation.
 - **Important:** If you add or remove paragraphs, the observer uses `querySelectorAll` — no CSS per-`nth-child` updates required. New block types (e.g. a figure) need the selector list and a matching CSS line.
+
+### Experience (`section--experience`)
+
+- **Trigger:** None — not listed in `[js/work-slides.js](../js/work-slides.js)` reveal sections.
+- **JS / CSS:** No scroll-entry. Mini-panel: plain background only (`component-mini-panel.css`); no CRT, heatwave, scanlines, hover effects, or `mini-panel.js`.
 
 ### About (`section--about`)
 
-- **Trigger:** First intersection; threshold **0.12**.
-- **JS:** Adds `will-animate`; on intersect, adds `is-visible` and disconnects.
-- **CSS:** Transition from hidden state to `opacity: 1` / `transform: none`.
+- **Trigger:** Per element — `.about__tagline`, `.about__label`, every `.about__body p`, and `.about__cta`.
+- **JS:** Adds `will-animate` to `.section--about`. On intersect for each target, adds `in-view` and unobserves that target.
+- **CSS:** Uses the same shared `fade-up` reveal as Work and feedback.
+
+### Feedback (`section--feedback`)
+
+- **Trigger:** Per element — `.feedback__title` and each `.feedback-card`.
+- **JS:** Adds `will-animate` to `.section--feedback`. On intersect for each target, adds `in-view` and unobserves that target.
+- **CSS:** Same shared `fade-up` as Work; staggered delays on `.feedback-card:nth-child(n).in-view` in `[css/main.css](../css/main.css)`.
 
 ### Progress bar
 
 - **Not** keyed to section classes. `[js/work-slides.js](../js/work-slides.js)` maps `scrollY / (scrollHeight - innerHeight)` to `scaleY` on `.progress-bar__fill`.
-- **Note:** The IIFE **returns early** if `.progress-bar__fill` is missing. In that case work/about observers in the same file **do not run**. If you split or refactor this file, avoid tying unrelated observers to that guard unless intentional.
+- **Note:** The IIFE **returns early** if `.progress-bar__fill` is missing. In that case scroll-reveal observers in the same file **do not run**. If you split or refactor this file, avoid tying unrelated observers to that guard unless intentional.
 
 ---
 
@@ -95,7 +109,7 @@ When adding a new subsection inside `#work`, either:
 Global: `[css/main.css](../css/main.css)` — `html { scroll-behavior: auto; }`, progress bar transition removed.
 
 - **Intro:** Animations disabled on hero paragraphs (content remains visible by default).
-- **Work:** Elements with `.work-item-visible`: `animation: none` and `opacity: 1` (and RM users get that class on all items at init).
+- **Work:** Elements with `.in-view`: `animation: none` and `opacity: 1` (and RM users get that class on all items at init). Component-level metric card motion is also disabled.
 - **About:** Transforms disabled; shorter opacity-only transition.
 
 When adding animations, **always** add a reduced-motion branch: disable motion and ensure text and interactive targets meet contrast and visibility requirements (see project design-system skill for opacity floors and focus styles).
@@ -115,7 +129,7 @@ When adding animations, **always** add a reduced-motion branch: disable motion a
 3. **Keep** `will-animate` (or equivalent) as the gate for “hidden until animated”; document new class names here.
 4. **Align** easing with existing curves: `cubic-bezier(0.22, 1, 0.36, 1)` for primary motions unless design specifies otherwise.
 5. **Test** with reduced motion enabled in the OS/browser.
-6. **Test** with JS disabled: hero may still animate (CSS-only intro); work/about must be fully readable if you rely on opt-in classes correctly.
+6. **Test** with JS disabled: hero may still animate (CSS-only intro); work, feedback, and about must be fully readable if you rely on opt-in classes correctly.
 
 ---
 
@@ -124,7 +138,7 @@ When adding animations, **always** add a reduced-motion branch: disable motion a
 When implementing or refactoring animations:
 
 1. Read `[js/work-slides.js](../js/work-slides.js)` and the animation blocks in `[css/main.css](../css/main.css)` before changing behaviour.
-2. For `#work`, keep **per-element** reveals (`work-item-visible` + shared `IntersectionObserver` + `unobserve`). For a single full-section reveal, use `will-animate` + `is-visible` + `transition` like About.
+2. For `#work`, keep **per-element** reveals (`in-view` + shared `IntersectionObserver` + `unobserve`). If a component needs an internal sequence, trigger it from the parent `.in-view` state inside the component CSS.
 3. Do not reintroduce `**is-active` toggling** on sections for entrance animations; that pattern caused invisible content when scrolling away.
 4. Scope new rules narrowly (e.g. `#work` or `.work__projects`) so secondary `.section--work` layouts are unaffected.
 5. After edits, grep for `opacity: 0` on content that is not under an opt-in class.

@@ -1,6 +1,6 @@
 /*
   css/main.css
-  Full responsive layout: large (1440) → medium (1200) → small (768) → x-small (480).
+  Full responsive layout: large (1440) → medium (1024) → small (768) → x-small (480).
   Depends on: css/tokens.css, css/grid.css, component css files.
 */
 
@@ -123,6 +123,8 @@ body {
 
 .site {
   padding: 0;
+  position: relative;
+  z-index: 0;
 }
 
 /* ─── Sections ──────────────────────────────────────────────── */
@@ -136,6 +138,20 @@ body {
   box-sizing: border-box;
 }
 
+/* Intro: normal flow (scroll stacking is work → experience only). */
+#intro.section--intro {
+  position: relative;
+  z-index: 0;
+}
+
+.section--experience,
+.section--feedback,
+.section--about {
+  position: relative;
+  z-index: 2;
+  background-color: var(--color-neutral-bg);
+}
+
 /* Work section: at least full viewport tall; grows with content.
    Vertical padding clears the fixed chrome and adds breathing room. */
 .section--work {
@@ -146,12 +162,29 @@ body {
   box-sizing: border-box;
 }
 
+/* Bounds work + experience overlap region. */
+.work-experience-stack {
+  position: relative;
+}
+
+/* Work layer that ScrollTrigger pins during work → experience transition. */
+#work.section--work {
+  position: relative;
+  z-index: 1;
+  background-color: var(--color-neutral-bg);
+}
+
 /* Compact older-roles panel: content-sized so it does not create dead scroll space. */
 .section--experience {
   min-height: auto;
-  padding-block: calc(var(--space-12) * 2);
+  padding-top: 0;
+  padding-bottom: calc(var(--space-12) * 2);
 }
 
+/* #experience also has .section--work (shared work styles); keep top flush under #work. */
+section#experience.section--experience {
+  padding-top: 0;
+}
 
 /* ─── Progress bar ───────────────────────────────────────────
    Fixed left edge. Fill scales from top via transform:scaleY.
@@ -184,8 +217,8 @@ body {
 }
 
 /* ─── Scroll reveal: unified per-element fade-up ──────────────
-   Applies to work (#work), experience (.section--experience), and
-   about (.section--about). JS adds will-animate to each container
+   Applies to work (#work), feedback (.section--feedback), and about (.section--about).
+   JS adds will-animate to each container
    (opt-in) and in-view to each element on first intersection.
    fill-mode:both keeps opacity:1 after play — no separate lock.
 
@@ -202,9 +235,8 @@ body {
 #work.will-animate .work__title:not(.in-view),
 #work.will-animate .work__projects .work__body p:not(.in-view),
 #work.will-animate .work__projects .work__metrics:not(.in-view),
-.section--experience.will-animate .work__title:not(.in-view),
-.section--experience.will-animate .work__body p:not(.in-view),
-.section--experience.will-animate .mini-panel:not(.in-view),
+.section--feedback.will-animate .feedback__title:not(.in-view),
+.section--feedback.will-animate .feedback-card:not(.in-view),
 .section--about.will-animate .about__tagline:not(.in-view),
 .section--about.will-animate .about__label:not(.in-view),
 .section--about.will-animate .about__body p:not(.in-view),
@@ -213,14 +245,12 @@ body {
 }
 
 /* Revealed state: all share the same animation at 0ms delay by default.
-   Sections whose elements all enter the viewport simultaneously (experience,
-   about label+tagline) use explicit delays to create a visible sequence. */
+   Sections whose elements all enter the viewport simultaneously (about
+   label+tagline) use explicit delays to create a visible sequence. */
 #work.will-animate .work__title.in-view,
 #work.will-animate .work__projects .work__body p.in-view,
-#work.will-animate .work__projects .work__metrics.in-view,
-.section--experience.will-animate .work__title.in-view,
-.section--experience.will-animate .work__body p.in-view,
-.section--experience.will-animate .mini-panel.in-view,
+.section--feedback.will-animate .feedback__title.in-view,
+.section--feedback.will-animate .feedback-card.in-view,
 .section--about.will-animate .about__tagline.in-view,
 .section--about.will-animate .about__label.in-view,
 .section--about.will-animate .about__body p.in-view,
@@ -228,13 +258,11 @@ body {
   animation: fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ── Experience section stagger ───────────────────────────────
-   Short section: heading, paragraph, and panel enter the viewport
-   simultaneously. Explicit delays make the sequence legible even
-   when all three get in-view at the same moment. */
-.section--experience.will-animate .work__title.in-view    { animation-delay:   0ms; }
-.section--experience.will-animate .work__body p.in-view   { animation-delay: 120ms; }
-.section--experience.will-animate .mini-panel.in-view     { animation-delay: 240ms; }
+/* ── Feedback stagger ───────────────────────────────────────── */
+.section--feedback.will-animate .feedback__title.in-view                 { animation-delay:   0ms; }
+.section--feedback.will-animate .feedback-card:nth-child(1).in-view      { animation-delay: 120ms; }
+.section--feedback.will-animate .feedback-card:nth-child(2).in-view      { animation-delay: 240ms; }
+.section--feedback.will-animate .feedback-card:nth-child(3).in-view      { animation-delay: 360ms; }
 
 /* ── About top stagger ────────────────────────────────────────
    Tagline and label are both above the fold when section enters;
@@ -309,6 +337,11 @@ body {
   color: var(--color-neutral-fg);
 }
 
+.intro__title,
+.intro__body {
+  text-wrap: pretty;
+}
+
 .intro__title {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-medium);
@@ -319,8 +352,15 @@ body {
 }
 
 .intro__glyph {
-  font-family: var(--font-serif-glyph);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
+}
+
+.intro__glyph--jp {
+  font-family: var(--font-glyph-jp);
+}
+
+.intro__glyph--arrow {
+  font-family: var(--font-glyph-arrow);
 }
 
 .intro__body {
@@ -527,6 +567,95 @@ body {
   margin-top: var(--space-6); /* 24px gap below experience list */
 }
 
+/* ─── Feedback section ───────────────────────────────────────── */
+
+.section--feedback {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-block: calc(var(--space-10) * 2);
+  box-sizing: border-box;
+}
+
+.section--feedback > .page-grid {
+  width: 100%;
+}
+
+.feedback__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.feedback__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-neutral-fg);
+  text-align: right;
+}
+
+.feedback__quotes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-10);
+}
+
+.feedback-card {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-neutral-fg);
+}
+
+.feedback-card__quote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.feedback-card__quote-icon,
+.feedback-card__source-icon {
+  flex: 0 0 auto;
+  width: var(--space-6);
+  height: var(--space-6);
+  color: var(--color-accent-fg);
+}
+
+.feedback-card__quote p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-body-md);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body-md);
+  color: var(--color-neutral-fg);
+}
+
+.feedback-card__source {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  color: var(--color-accent-fg);
+}
+
+.feedback-card__source cite {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: 1.18; /* no token: Figma mono source line height */
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  color: var(--color-accent-fg);
+}
+
 /* ─── About section ──────────────────────────────────────────── */
 
 /* At least full viewport tall; grows to contain all about content. */
@@ -659,16 +788,21 @@ body {
    Column values cross-referenced against Figma node 374:1278.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── medium: ≤ 1200px ─────────────────────────────────────────
-   Canvas 1200px · margin 40px · col ≈ 78.7px
+/* ─── medium: ≤ 1024px ─────────────────────────────────────────
+   Canvas 1024px · margin 40px · col = 64px
    Key changes vs large:
      · Work sections expand to 1024px (full-viewport panels)
      · Work content row sits deeper: y = 373px
      · About section compresses to 1024px min-height
      · About hero inset doubles to 80px (matches Figma y=80 for Project Info)
    ─────────────────────────────────────────────────────────────── */
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .section--experience {
+    padding-top: 0;
+    padding-bottom: calc(var(--space-10) * 2);
+  }
+
+  .section--feedback {
     padding-block: calc(var(--space-10) * 2);
   }
 
@@ -677,6 +811,10 @@ body {
   .about__content {
     order: 0;
     padding-bottom: var(--space-10);
+  }
+
+  .col-about {
+    grid-column: 1 / span 12;
   }
 }
 
@@ -687,10 +825,15 @@ body {
      · Intro uses the shared fixed-chrome safe area
      · Work col-work-content expands to cols 2–11
      · About hero inset drops to 64px (Figma Project Info y=64)
-     · col-about narrows to col 2/span 10 (was col 3/span 8)
+     · About content keeps the medium full 12-column span
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .section--experience {
+    padding-top: 0;
+    padding-bottom: calc(var(--space-8) * 2);
+  }
+
+  .section--feedback {
     padding-block: calc(var(--space-8) * 2);
   }
 
@@ -701,11 +844,6 @@ body {
 
   .about__content {
     padding-bottom: var(--space-8);
-  }
-
-  /* About-me block: col 2–11 (span 10) at small */
-  .col-about {
-    grid-column: 2 / span 10;
   }
 }
 
@@ -719,7 +857,17 @@ body {
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .section--experience {
-    padding-block: var(--space-12);
+    padding-top: 0;
+    padding-bottom: var(--space-12);
+  }
+
+  .section--feedback {
+    min-height: auto;
+    padding-block: var(--space-10);
+  }
+
+  .feedback__inner {
+    gap: var(--space-4);
   }
 
   .about__hero {
@@ -730,6 +878,14 @@ body {
     padding-bottom: var(--space-6);
   }
 
+}
+
+/* ─── desktop: ≥ 1025px ────────────────────────────────────────
+   Feedback should read as one horizontal row on large and xl screens. */
+@media (min-width: 1025px) {
+  .feedback__quotes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* ─── large ≥ 1440px ────────────────────────────────────────────────

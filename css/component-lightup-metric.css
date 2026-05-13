@@ -1,0 +1,170 @@
+/*
+ * Luna Borgo — New Site
+ * css/component-lightup-metric.css
+ *
+ * Inline stat card: solid border container, pixel-art icon, prose sentence
+ * with inline stamp badges that wipe in on container hover.
+ * Figma source: "lightup metric" component
+ * Requires: css/tokens.css
+ *
+ * BEM:
+ *   .lightup-metric        — outer flex row container (solid border, no bg)
+ *   .lightup-metric__icon  — 80×80 pixel-art image (decorative, CSS mask)
+ *   .lightup-metric__body  — prose paragraph; flows naturally with inline badges
+ *   .lightup-badge         — inline stamp chip; fills left-to-right on container hover
+ *
+ * Entry contract: the page reveal system adds .in-view to the parent
+ * .work__metrics list. The card, icon, and body then enter in a small sequence.
+ *
+ * Hover contract: hovering anywhere on .lightup-metric triggers a left-to-right
+ * fill sweep on each .lightup-badge only. Container, body text, and icon do not change.
+ */
+
+
+/* ── 1. Container ────────────────────────────────────────────────────────── */
+
+.lightup-metric {
+  display:          flex;
+  flex-direction:   row;
+  align-items:      center;
+  gap:              var(--space-2);     /* 8px */
+  padding:          var(--space-4);     /* 16px */
+  border:           2px solid var(--color-neutral-fg);
+  border-radius:    var(--radius-sm);
+  list-style:       none;
+  outline:          none;
+}
+
+@keyframes lightup-metric-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lightup-metric-icon-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes lightup-metric-body-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.work__metrics.in-view .lightup-metric {
+  animation: lightup-metric-card-in 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center;
+}
+
+.work__metrics.in-view .lightup-metric__icon {
+  animation: lightup-metric-icon-in 300ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+  transform-origin: center;
+}
+
+.work__metrics.in-view .lightup-metric__body {
+  animation: lightup-metric-body-in 300ms ease 160ms both;
+}
+
+
+/* ── 2. Icon ─────────────────────────────────────────────────────────────── */
+
+.lightup-metric__icon {
+  display:          block;
+  flex-shrink:      0;
+  width:            80px;  /* Figma: 80×80 — no token */
+  height:           80px;  /* Figma: 80×80 — no token */
+  background-color: var(--color-neutral-fg-strong);
+  -webkit-mask-image:    url('https://www.figma.com/api/mcp/asset/dc8a8bb4-b8d6-4fb2-9567-f762cc47572e');
+          mask-image:    url('https://www.figma.com/api/mcp/asset/dc8a8bb4-b8d6-4fb2-9567-f762cc47572e');
+  -webkit-mask-size:     contain;
+          mask-size:     contain;
+  -webkit-mask-repeat:   no-repeat;
+          mask-repeat:   no-repeat;
+  -webkit-mask-position: center;
+          mask-position: center;
+}
+
+
+/* ── 3. Body text ────────────────────────────────────────────────────────── */
+
+.lightup-metric__body {
+  font-family:    var(--font-serif);
+  font-size:      var(--typography-body-sm);
+  font-weight:    var(--font-weight-light);
+  line-height:    var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
+  color:          var(--color-neutral-fg);
+  margin:         0;
+}
+
+
+/* ── 4. Inline stamp badge ───────────────────────────────────────────────── */
+
+.lightup-badge {
+  display:          inline-block;
+  vertical-align:   middle;
+
+  border-radius:    var(--radius-sm);  /* stamp-like hard rectangle */
+  padding:          0 2px;             /* 2px h-pad — no token */
+  min-width:        24px;              /* no token */
+  text-align:       center;
+
+  font-family:      var(--font-serif);
+  font-size:        var(--typography-body-sm);
+  font-weight:      var(--font-weight-light);
+  line-height:      var(--line-height-normal);
+  letter-spacing:   var(--letter-spacing-body);
+
+  color:            var(--color-neutral-fg);
+
+  /* left-to-right wipe: default shows transparent side */
+  background-image:    linear-gradient(
+    to right,
+    var(--color-neutral-fg) 50%,
+    transparent 50%
+  );
+  background-size:     200% 100%;
+  background-position: right center;
+
+  transition: background-position 0.35s ease, color 0.2s ease;
+}
+
+
+/* ── 5. Hover — badge fill sweeps in from left on container hover ────────── */
+
+@media (hover: hover) and (pointer: fine) {
+  .lightup-metric:hover .lightup-badge {
+    background-position: left center;
+    color:               var(--color-neutral-bg);
+  }
+}
+
+
+/* ── 6. Reduced motion — instant snap, no eased transition ──────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .work__metrics.in-view .lightup-metric,
+  .work__metrics.in-view .lightup-metric__icon,
+  .work__metrics.in-view .lightup-metric__body {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .lightup-badge {
+    transition-duration: 0ms;
+  }
+}

@@ -57,7 +57,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Montagu+Slab:opsz,wght@16..144,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@500&family=Noto+Serif+JP:wght@500&text=%E3%82%B7%E2%A4%91&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&text=%E3%82%B7&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math:wght@400&text=%E2%A4%B3&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="./css/tokens.css" />
     <link rel="stylesheet" href="./css/grid.css" />
@@ -68,6 +69,7 @@
     <link rel="stylesheet" href="./css/component-scroll-section.css" />
     <link rel="stylesheet" href="./css/component-hover-preview.css" />
     <link rel="stylesheet" href="./css/component-mini-panel.css" />
+    <link rel="stylesheet" href="./css/component-lightup-metric.css" />
 
     <link rel="stylesheet" href="./css/main.css" />
   </head>
@@ -76,16 +78,19 @@
       <symbol id="metric-badge-star" viewBox="0 0 20 20">
         <path d="M9.824 16.288C9.70667 15.5947 9.39733 14.848 8.896 14.048C8.39467 13.2373 7.68 12.4853 6.752 11.792C5.83467 11.0987 4.91733 10.656 4 10.464V9.792C4.90667 9.57867 5.776 9.184 6.608 8.608C7.45067 8.02133 8.15467 7.31733 8.72 6.496C9.296 5.65333 9.664 4.82133 9.824 4H10.496C10.592 4.53333 10.784 5.08267 11.072 5.648C11.36 6.20267 11.728 6.736 12.176 7.248C12.6347 7.74933 13.1467 8.20267 13.712 8.608C14.5547 9.20533 15.4133 9.6 16.288 9.792V10.464C15.7013 10.5813 15.0933 10.8213 14.464 11.184C13.8453 11.5467 13.2693 11.9787 12.736 12.48C12.2027 12.9707 11.7653 13.488 11.424 14.032C10.9227 14.832 10.6133 15.584 10.496 16.288H9.824Z" />
       </symbol>
-      <!-- SVG filter: feTurbulence heatwave for .mini-panel__icon-stage -->
-      <filter id="mini-panel-heatwave" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.018 0.025" numOctaves="3" seed="4" result="noise"/>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
 
       <!-- Streamline Pixel: content-files-archive-books-1 (CC BY 4.0 — streamlinehq.com) -->
       <symbol id="pixel-icon-archive-books" viewBox="0 0 80 80">
         <path d="M72.4 15.25V0H34.3V3.8H19.05V7.625H7.625V34.3H3.825V41.9H0V80H80V15.25H72.4ZM19.05 76.2H3.825V53.325H19.05V76.2ZM19.05 49.525H11.45V11.425H19.05V49.525ZM22.875 7.625H34.3V11.425H26.675V49.525H22.875V7.625ZM34.3 15.25V49.525H30.5V15.25H34.3ZM38.1 76.2H22.875V53.325H38.1V76.2ZM76.2 76.2H41.925V49.525H38.1V3.8H68.575V15.25H57.15V19.05H76.2V76.2Z" fill="currentColor"/>
         <path d="M64.775 53.325H68.575V57.15H64.775V53.325ZM64.775 45.725H68.575V49.525H64.775V45.725ZM57.15 57.15H64.775V60.95H57.15V57.15ZM53.35 53.325H57.15V57.15H53.35V53.325ZM53.35 45.725H57.15V49.525H53.35V45.725ZM53.35 19.05H57.15V26.675H53.35V19.05ZM49.525 26.675H53.35V34.3H49.525V26.675ZM45.725 34.3H49.525V41.9H45.725V34.3ZM45.725 7.625H49.525V11.425H45.725V7.625ZM41.925 41.9H45.725V49.525H41.925V41.9ZM26.675 60.95H34.3V68.575H26.675V60.95ZM7.625 60.95H15.25V68.575H7.625V60.95Z" fill="currentColor"/>
+      </symbol>
+
+      <symbol id="pixel-icon-quote" viewBox="0 0 24 24">
+        <path d="M3 5H10V12H7V16H3V5ZM14 5H21V12H18V16H14V5Z" fill="currentColor"/>
+      </symbol>
+
+      <symbol id="pixel-icon-linkedin" viewBox="0 0 24 24">
+        <path d="M5 5H9V9H5V5ZM5 10H9V19H5V10ZM11 10H15V11.4C15.6 10.6 16.6 10 18 10C20.4 10 22 11.6 22 14.6V19H18V15C18 13.9 17.6 13.2 16.7 13.2C15.8 13.2 15.3 13.8 15.1 14.4C15 14.6 15 14.9 15 15.2V19H11V10Z" fill="currentColor"/>
       </symbol>
     </svg>
 
@@ -149,8 +154,7 @@
           <div class="col-content intro__content">
             <div class="intro__text">
               <p class="intro__title">
-                hi, I’m luna <span class="intro__glyph" aria-hidden="true" lang="ja">シ</span> a designer focused on brand expression and scalable digital experiences <span class="intro__glyph">⤑</span> I build systems for teams that need to design at scale
-                <span class="accent">without losing their soul.</span>
+                hi, I’m luna <span class="intro__glyph intro__glyph--jp" aria-hidden="true" lang="ja">シ</span> a designer focused on brand expression and scalable digital experiences <span class="intro__glyph intro__glyph--arrow">⤳</span> I build systems for teams that need to design at <span class="accent">scale without losing their soul.</span>
               </p>
               <p class="intro__body">
                 for over twelve years, I've helped brands to turn creative vision into real experiences while building shared design languages that brings teams together.
@@ -166,6 +170,8 @@
            per gesture — the browser handles the "pause" natively.
            ──────────────────────────────────────────────────────── -->
 
+      <!-- Work + experience: wrapper bounds sticky #work while experience rolls over -->
+      <div class="work-experience-stack">
       <!-- WORK: Heineken + Adidas merged into one editorial section -->
       <section class="section section--work" id="work" aria-labelledby="work-heading">
         <div class="page-grid">
@@ -176,18 +182,13 @@
               <div class="work__project">
                 <h2 class="sr-only">Heineken</h2>
                 <div class="work__body">
-                  <p>I am a founding member of <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">Crate</span>, Heineken's global B2B design system. I built everything from <span class="hover-preview-link" data-preview-id="crate-tokens" tabindex="0">tokens</span> and components to workflows and, most recently, AI automations. With over 235 contributors in 8 global product teams, and organic adoption by OpCos, Crate has become the vital link within Heineken's digital product network.</p>
-                  <p>Next to Crate, I also led the creation of the brand framework and team culture that launched <span class="hover-preview-link" data-preview-id="eazle" tabindex="0">Eazle</span>, Heineken's global B2B platform consolidating 40 fragmented regional platforms into one cohesive product.</p>
-                  <p>I established the design principles and visual language guidance for the <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">brand application</span>, and built collaboration rituals that enabled rapid scaling while keeping a strong design culture.</p>
+                  <p>Heineken has recently consolidated 40 regional B2B platforms into a global product ecosystem, and during this large organizational transformation, teams needed a shared language but enough flexibility to scale across diverse markets.</p>
+                  <p>I established <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">Crate</span>, Heineken&rsquo;s global design system, shaping it from foundations to adoption, and I also led the <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">brand application</span> layer and design culture, setting up frameworks and rituals that connected product, engineering, marketing and brand. I enabled rapid scaling while keeping a strong design culture.</p>
                 </div>
                 <ul class="work__metrics">
-                  <li class="work__detail">
-                    <span class="work__metric-badge" aria-hidden="true">
-                      <svg class="work__metric-badge-icon" viewBox="0 0 20 20" focusable="false">
-                        <use href="#metric-badge-star"></use>
-                      </svg>
-                    </span>
-                    <span class="work__detail-text">Community engagement up 230% in two years; component health hit 94%, and SUS stayed at 70, above the 68 industry standard.</span>
+                  <li class="lightup-metric">
+                    <span class="lightup-metric__icon" aria-hidden="true"></span>
+                    <p class="lightup-metric__body">community engagement up <span class="lightup-badge">230%</span> in two years, component health reached <span class="lightup-badge">94</span> while system usability score <span class="lightup-badge">70</span> above industry standard</p>
                   </li>
                 </ul>
               </div>
@@ -200,13 +201,9 @@
                   <p>We replaced 10+ scattered carousels with one shared component, supporting 36 variations and driving significant yearly revenue.</p>
                 </div>
                 <ul class="work__metrics">
-                  <li class="work__detail">
-                    <span class="work__metric-badge" aria-hidden="true">
-                      <svg class="work__metric-badge-icon" viewBox="0 0 20 20" focusable="false">
-                        <use href="#metric-badge-star"></use>
-                      </svg>
-                    </span>
-                    <span class="work__detail-text">Increased AOV by <span class="sr-only">confidential percentage</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">%%</span></span>, generating <span class="sr-only">confidential annual revenue</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">€€</span></span>.M/year + consolidated 10+ scattered recommendation carousels → 1 shared component.</span>
+                  <li class="lightup-metric">
+                    <span class="lightup-metric__icon" aria-hidden="true"></span>
+                    <p class="lightup-metric__body">increased AOV by <span class="lightup-badge"><span class="sr-only">confidential percentage</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">%%</span></span></span>, generating <span class="lightup-badge"><span class="sr-only">confidential annual revenue</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">€€.M/year</span></span></span> + consolidated 10+ scattered recommendation carousels → 1 shared component.</p>
                   </li>
                 </ul>
               </div>
@@ -217,48 +214,60 @@
       </section>
 
       <!-- SLIDE 3: Earlier roles / job experience + CV -->
-      <section class="section section--work section--experience" aria-labelledby="work-experience-heading">
+      <section class="section section--work section--experience" id="experience" aria-labelledby="work-experience-heading">
         <div class="page-grid">
-
-          <!-- Left: editorial copy + experience list -->
-          <div class="col-two-thirds">
-            <h2 class="work__title" id="work-experience-heading">In ancient times</h2>
-            <div class="work__body">
-              <p>Led end-to-end UX/UI and brand projects across agency, freelance, and in-house environments. Built reusable UI kits to improve onboarding and developer collaboration, forming the foundation of my systems-oriented approach.</p>
-            </div>
-
-
-          </div>
-
-          <!-- Right: credential sidebar panel -->
-          <div class="col-one-third">
-
+          <div class="col-full">
             <aside class="mini-panel" aria-label="Career timeline">
-
-              <!-- Icon stage: pixel-art archive illustration (decorative) -->
-              <div class="mini-panel__icon-stage" aria-hidden="true">
+              <div class="mini-panel__container">
                 <div class="mini-panel__bg"></div>
-                <svg class="mini-panel__icon" viewBox="0 0 80 80" focusable="false" aria-hidden="true">
-                  <use href="#pixel-icon-archive-books"></use>
-                </svg>
+                <div class="mini-panel__icon-row" aria-hidden="true">
+                  <svg class="mini-panel__icon" viewBox="0 0 80 80" focusable="false" aria-hidden="true">
+                    <use href="#pixel-icon-archive-books"></use>
+                  </svg>
+                </div>
+
+                <div class="mini-panel__content">
+                  <h2 class="work__title" id="work-experience-heading">in ancient times</h2>
+                  <div class="work__body">
+                    <p>Led end-to-end UX/UI and brand projects across agency, freelance, and in-house environments. Early on I learned the value of building reusable UI kits and manuals to build bridges onboarding and developer collaboration, it formed the foundation of my systems-oriented approach.</p>
+                  </div>
+                </div>
               </div>
 
-              <!-- Employment timeline + CTA -->
               <div class="mini-panel__timeline" role="list" aria-label="Employment history">
-
                 <div class="mini-panel__row" role="listitem">
                   <span class="mini-panel__row-label">Heineken</span>
-                  <span class="mini-panel__row-value">S/2022</span>
+                  <span class="mini-panel__row-value">s/2022</span>
                 </div>
 
                 <div class="mini-panel__row" role="listitem">
                   <span class="mini-panel__row-label">Adidas</span>
-                  <span class="mini-panel__row-value">2019–2022</span>
+                  <span class="mini-panel__row-value">2021-2022</span>
                 </div>
 
                 <div class="mini-panel__row" role="listitem">
                   <span class="mini-panel__row-label">Aegon/HCL</span>
-                  <span class="mini-panel__row-value">2016–2019</span>
+                  <span class="mini-panel__row-value">2018-2021</span>
+                </div>
+
+                <div class="mini-panel__row" role="listitem">
+                  <span class="mini-panel__row-label">Atabix Solutions</span>
+                  <span class="mini-panel__row-value">2017-2018</span>
+                </div>
+
+                <div class="mini-panel__row" role="listitem">
+                  <span class="mini-panel__row-label">Unico Agencia Digital</span>
+                  <span class="mini-panel__row-value">2014-2016</span>
+                </div>
+
+                <div class="mini-panel__row" role="listitem">
+                  <span class="mini-panel__row-label">Freelancer</span>
+                  <span class="mini-panel__row-value">2014-2018</span>
+                </div>
+
+                <div class="mini-panel__row" role="listitem">
+                  <span class="mini-panel__row-label">Resultate</span>
+                  <span class="mini-panel__row-value">2013-2014</span>
                 </div>
 
                 <div class="mini-panel__row mini-panel__row--cta" role="listitem">
@@ -270,14 +279,67 @@
                     aria-label="Download CV as PDF"
                   >download cv</a>
                 </div>
-
               </div>
-
             </aside>
-
-          </div><!-- /.col-one-third -->
-
+          </div><!-- /.col-full -->
         </div><!-- /.page-grid -->
+      </section>
+      </div><!-- /.work-experience-stack -->
+
+      <!-- Feedback -->
+      <section class="section section--feedback" id="feedback" aria-labelledby="feedback-heading">
+        <div class="page-grid">
+          <div class="col-full feedback__inner">
+            <h2 class="feedback__title" id="feedback-heading">what they say</h2>
+
+            <div class="feedback__quotes" role="list" aria-label="Feedback quotes">
+              <figure class="feedback-card" role="listitem">
+                <blockquote class="feedback-card__quote">
+                  <svg class="feedback-card__quote-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#pixel-icon-quote"></use>
+                  </svg>
+                  <p>Luna is a standout designer and leader with a rare combination of strategic thinking, craftsmanship, and execution. Her impact on our design systems and overall design work was significant &mdash; she elevated standards, strengthened foundations, and consistently raised the bar for quality across the team.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#pixel-icon-linkedin"></use>
+                  </svg>
+                  <cite>Nicole Akin &ndash; Group Director at Walmart</cite>
+                </figcaption>
+              </figure>
+
+              <figure class="feedback-card" role="listitem">
+                <blockquote class="feedback-card__quote">
+                  <svg class="feedback-card__quote-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#pixel-icon-quote"></use>
+                  </svg>
+                  <p>Luna consistently deliver high-quality work with attention to detail, even when faced with complex challenges. Your ability to manage projects effectively, while maintaining strong relationships with stakeholders, ensures you consistently meet your goals.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#pixel-icon-linkedin"></use>
+                  </svg>
+                  <cite>Jesse de Jong &ndash; Design Lead at Heineken</cite>
+                </figcaption>
+              </figure>
+
+              <figure class="feedback-card" role="listitem">
+                <blockquote class="feedback-card__quote">
+                  <svg class="feedback-card__quote-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#pixel-icon-quote"></use>
+                  </svg>
+                  <p>Luna is a standout designer and leader with a rare combination of strategic thinking, craftsmanship, and execution. Her impact on our design systems and overall design work was significant &mdash; she elevated standards, strengthened foundations, and consistently raised the bar for quality across the team.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#pixel-icon-linkedin"></use>
+                  </svg>
+                  <cite>Nicole Akin &ndash; Group Director at Walmart</cite>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- About -->
@@ -306,9 +368,9 @@
             <p class="about__tagline">Thanks for checking my pixels.</p>
           </div>
 
-          <!-- Lower: about me text + CTA -->
+          <!-- Lower: personal text + CTA -->
           <div class="col-about about__content">
-            <h2 class="about__label">About <span class="hover-preview-link" data-preview-id="me" tabindex="0">me</span></h2>
+            <h2 class="about__label">what I say</h2>
             <div class="about__body">
               <p>Design has been part of my life long before it became my career. Back when computers were still a three-piece setup, a passion for reading and writing led me to start a blog – only to become completely obsessed with how it looked... and with all the gifs I wanted to make.</p>
               <p>Twelve years later, my obsession with pixels hasn't gone anywhere. Today, I channel it into making design more sustainable – and more fun. With a systems mindset and a passion for craft, I move fluidly between strategy and hands-on, making sure what we imagine is actually something we can ship.</p>
@@ -336,8 +398,9 @@
 
     </main>
 
-    <script src="./js/mini-panel.js" defer></script>
-    <script src="./js/scroll-snap.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" defer></script>
+    <script src="./js/work-pin-scrolltrigger.js" defer></script>
     <script src="./js/hover-preview.js" defer></script>
     <script src="./js/pixel-interactions.js" defer></script>
     <script src="./js/work-slides.js" defer></script>

@@ -140,7 +140,7 @@ Local DM Mono woff2 files are in `../assets/fonts/` (DMMono-400, DMMono-400itali
 `--typography-display` and the other scale tokens update automatically at each breakpoint when you import `tokens.css`. The table below documents all values for reference.
 
 
-| Token                   | ≥ 1440px | 1200 – 1439px | 769 – 1199px | ≤ 768px     |
+| Token                   | ≥ 1440px | 1025 – 1439px | 769 – 1024px | ≤ 768px     |
 | ----------------------- | -------- | ------------- | ------------ | ----------- |
 | `--typography-display`  | `40px`   | `40px`        | `32px`       | `24px`      |
 | `--typography-subtitle` | `24px`   | `24px`        | `16px`       | `16px`      |
@@ -163,7 +163,7 @@ CSS custom properties cannot be used inside `@media` conditions without build to
 | ------------------ | -------- | ---------------------------- | ---------------------------- | ----------- |
 | `--screen-x-small` | `480px`  | `@media (max-width: 480px)`  | —                            | 375 / 480   |
 | `--screen-small`   | `768px`  | `@media (max-width: 768px)`  | —                            | 768         |
-| `--screen-medium`  | `1200px` | `@media (max-width: 1199px)` | `@media (min-width: 1200px)` | 1200        |
+| `--screen-medium`  | `1024px` | `@media (max-width: 1024px)` | `@media (min-width: 1025px)` | 1024        |
 | `--screen-large`   | `1440px` | `@media (max-width: 1439px)` | `@media (min-width: 1440px)` | 1440        |
 | `--screen-x-large` | `1920px` | —                            | `@media (min-width: 1920px)` | 1920        |
 
@@ -174,9 +174,9 @@ CSS custom properties cannot be used inside `@media` conditions without build to
 | Range            | Media query                                          | Notes                            |
 | ---------------- | ---------------------------------------------------- | -------------------------------- |
 | X-large desktop  | `@media (min-width: 1680px)`                         | Footnote font size increases     |
-| Standard desktop | `@media (min-width: 1200px)`                         | Two-column layouts, full sidebar |
-| Medium desktop   | `@media (max-width: 1439px) and (min-width: 1200px)` | Compact desktop variant          |
-| Bridge           | `@media (max-width: 1199px) and (min-width: 769px)`  | Tablet / small laptop            |
+| Standard desktop | `@media (min-width: 1025px)`                         | Two-column layouts, full sidebar |
+| Medium desktop   | `@media (max-width: 1439px) and (min-width: 1025px)` | Compact desktop variant          |
+| Bridge           | `@media (max-width: 1024px) and (min-width: 769px)`  | Tablet / small laptop            |
 | Mobile           | `@media (max-width: 768px)`                          | Single-column, fixed top bar     |
 | X-small phone    | `@media (max-width: 480px)`                          | Compact spacing tweaks           |
 
@@ -223,16 +223,16 @@ CSS custom properties cannot be used inside `@media` conditions without build to
 | ----------------------------- | -------- | ------------------------------------------------------ |
 | `--size-top-bar`              | `68px`   | Fixed navigation bar height                            |
 | `--size-sidebar-x-small`      | `200px`  | Sidebar width at ≤ 480px                               |
-| `--size-sidebar-medium`       | `240px`  | Sidebar width at 1200px                                |
+| `--size-sidebar-medium`       | `240px`  | Sidebar width at 1024px                                |
 | `--size-sidebar-x-large`      | `320px`  | Sidebar width at ≥ 1920px                              |
 | `--size-home-content-x-small` | `343px`  | Central content max-width at 375px                     |
 | `--size-home-content-small`   | `688px`  | Central content max-width at 768px                     |
-| `--size-home-content-medium`  | `920px`  | Central content max-width at 1200px                    |
+| `--size-home-content-medium`  | `920px`  | Central content max-width at 1024px                    |
 | `--size-home-content-large`   | `1120px` | Central content max-width at 1440px                    |
 | `--size-home-content-x-large` | `1520px` | Central content max-width at 1920px                    |
 | `--size-content-left`         | `480px`  | Inner left column — text columns in two-column layouts |
 | `--size-case-column`          | `536px`  | Main content width in case study layout                |
-| `--size-work-title-medium`    | `340px`  | Work list title column at 1200px                       |
+| `--size-work-title-medium`    | `340px`  | Work list title column at 1024px                       |
 
 
 ### 4.4 Border radius
@@ -324,7 +324,7 @@ FONTS
   Sans ................. --font-sans      (Work Sans)
   Pixel wordmark ....... --font-pixel     (Press Start 2P / Nintendoid)
 
-TYPE SCALE (1200px → ≥1440px → ≤768px)
+TYPE SCALE (1024px → ≥1440px → ≤768px)
   Display ....  40 / 40 / 24px    --typography-display
   Subtitle ...  24 / 24 / 16px    --typography-subtitle
   Body LG ....  20 / 24 / 16px*   --typography-body-lg   (Montagu Slab)
@@ -336,7 +336,7 @@ TYPE SCALE (1200px → ≥1440px → ≤768px)
 BREAKPOINTS (use literal px in @media)
   480px   --screen-x-small
   768px   --screen-small
-  1200px  --screen-medium
+  1024px  --screen-medium
   1440px  --screen-large
   1920px  --screen-x-large
 
