@@ -34,7 +34,9 @@
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ─── Handover bridge ──────────────────────────────────────────────────────────
-  // CursorDitherTrail calls this when a particle crosses into the footer rect.
+  // Cursor trail calls this when a particle enters the pile physics band (viewport
+  // bottom · PILE_HEIGHT). Airborne pile grains draw on the trail canvas so they
+  // stay visible above sections like .section--thanks (z-index stacking).
 
   let onParticleHandover = null;
 
@@ -202,27 +204,34 @@
     window.addEventListener("touchcancel", () => setPressed(false), { passive: true });
   }
 
-  function trailTick() {
-    trailCtx.clearRect(0, 0, trailW, trailH);
-
-    const footerEl   = document.querySelector(".pixel-pile-footer");
-    const footerRect = footerEl ? footerEl.getBoundingClientRect() : null;
-
+  function simulateTrailParticlesForFrame(footerRect, pileBandTop) {
     for (let i = trailParticles.length - 1; i >= 0; i--) {
       const p = trailParticles[i];
       p.age++;
-      p.vy     += GRAVITY;
-      p.vx     *= DRAG_X;
-      p.trueX  += p.vx;
-      p.trueY  += p.vy;
+      p.vy    += GRAVITY;
+      p.vx    *= DRAG_X;
+      p.trueX += p.vx;
+      p.trueY += p.vy;
 
-      // Hand off to PixelPileFooter when entering footer bounds
-      if (footerRect && p.trueY > footerRect.top && onParticleHandover) {
-        if (p.trueX >= footerRect.left && p.trueX <= footerRect.right) {
-          onParticleHandover({ trueX: p.trueX, trueY: p.trueY, vx: p.vx, vy: p.vy, r: p.r, g: p.g, b: p.b });
-          trailParticles.splice(i, 1);
-          continue;
-        }
+      const inPileBand =
+        footerRect &&
+        pileBandTop !== Infinity &&
+        p.trueY >= pileBandTop &&
+        p.trueX >= footerRect.left &&
+        p.trueX <= footerRect.right;
+
+      if (inPileBand && onParticleHandover) {
+        onParticleHandover({
+          trueX: p.trueX,
+          trueY: p.trueY,
+          vx:    p.vx,
+          vy:    p.vy,
+          r:     p.r,
+          g:     p.g,
+          b:     p.b,
+        });
+        trailParticles.splice(i, 1);
+        continue;
       }
 
       if (p.trueY > trailH + 20 || p.age >= p.lifetime) {
@@ -232,16 +241,24 @@
 
       p.x = Math.round(p.trueX / DOT_SIZE) * DOT_SIZE;
       p.y = Math.round(p.trueY / DOT_SIZE) * DOT_SIZE;
+    }
+  }
 
+  function drawTrailParticlesOnCanvas() {
+    for (let i = 0; i < trailParticles.length; i++) {
+      const p = trailParticles[i];
       const alpha = 1 - p.age / p.lifetime;
       trailCtx.fillStyle = `rgba(${p.r},${p.g},${p.b},${alpha.toFixed(3)})`;
       trailCtx.fillRect(p.x, p.y, DOT_SIZE, DOT_SIZE);
     }
-
-    requestAnimationFrame(trailTick);
   }
 
-  requestAnimationFrame(trailTick);
+  function trailOnlyFrame() {
+    trailCtx.clearRect(0, 0, trailW, trailH);
+    simulateTrailParticlesForFrame(null, Infinity);
+    drawTrailParticlesOnCanvas();
+    requestAnimationFrame(trailOnlyFrame);
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // PIXEL PILE FOOTER
@@ -257,7 +274,10 @@
   const gridH = Math.ceil(PILE_HEIGHT / DOT_SIZE);
 
   const pileContainer = document.querySelector(".pixel-pile-footer");
-  if (!pileContainer) return;
+  if (!pileContainer) {
+    requestAnimationFrame(trailOnlyFrame);
+    return;
+  }
 
   const pileCanvas = document.createElement("canvas");
   Object.assign(pileCanvas.style, {
@@ -460,19 +480,11 @@
     }
   }
 
-  function pileTick() {
-    if (!pileGrid) {
-      requestAnimationFrame(pileTick);
-      return;
-    }
+  function pilePhysicsStep() {
+    if (!pileGrid) return;
 
-    const w            = pileCanvas.width;
     const currentGridW = getGridW();
-    pileCtx.clearRect(0, 0, w, PILE_HEIGHT);
 
-    const color = getTrailColor();
-
-    // 1. Update & draw in-flight particles
     for (let i = pileParticles.length - 1; i >= 0; i--) {
       const p = pileParticles[i];
       p.age++;
@@ -504,14 +516,9 @@
         pileParticles.splice(i, 1);
       } else if (p.age >= p.lifetime) {
         pileParticles.splice(i, 1);
-      } else {
-        const alpha = 1 - p.age / p.lifetime;
-        pileCtx.fillStyle = `rgba(${p.r},${p.g},${p.b},${alpha.toFixed(3)})`;
-        pileCtx.fillRect(drawX, drawY, DOT_SIZE, DOT_SIZE);
       }
     }
 
-    // 2. Falling-sand simulation — cells settle downward / diagonally
     const leftFirst = Math.random() > 0.5;
     for (let r = gridH - 2; r >= 0; r--) {
       for (let c = 0; c < currentGridW; c++) {
@@ -540,11 +547,36 @@
         }
       }
     }
+  }
 
-    // 3. Draw settled pile with Bayer dither alpha
+  function drawPileAirborneOnTrail() {
+    const rect      = pileContainer.getBoundingClientRect();
+    const canvasTop = rect.bottom - PILE_HEIGHT;
+
+    for (let i = 0; i < pileParticles.length; i++) {
+      const p = pileParticles[i];
+      const drawX = Math.round(p.trueX / DOT_SIZE) * DOT_SIZE;
+      const drawY = Math.round(p.trueY / DOT_SIZE) * DOT_SIZE;
+      const sx    = rect.left + drawX;
+      const sy    = canvasTop + drawY;
+      const alpha = 1 - p.age / p.lifetime;
+      trailCtx.fillStyle = `rgba(${p.r},${p.g},${p.b},${alpha.toFixed(3)})`;
+      trailCtx.fillRect(sx, sy, DOT_SIZE, DOT_SIZE);
+    }
+  }
+
+  function pileDrawSettledOnly() {
+    if (!pileGrid) return;
+
+    const w  = pileCanvas.width;
+    const gw = getGridW();
+    pileCtx.clearRect(0, 0, w, PILE_HEIGHT);
+
+    const color = getTrailColor();
+
     for (let r = 0; r < gridH; r++) {
-      for (let c = 0; c < currentGridW; c++) {
-        if (pileGrid[r * currentGridW + c] === 1) {
+      for (let c = 0; c < gw; c++) {
+        if (pileGrid[r * gw + c] === 1) {
           const bayerVal = BAYER_8X8[(r % 8) * 8 + (c % 8)] / 64.0;
           const alpha    = 0.55 + bayerVal * 0.45;
           pileCtx.fillStyle = `rgba(${color.r},${color.g},${color.b},${alpha.toFixed(3)})`;
@@ -552,14 +584,28 @@
         }
       }
     }
+  }
 
-    requestAnimationFrame(pileTick);
+  function unifiedFrame() {
+    const footerEl   = document.querySelector(".pixel-pile-footer");
+    const footerRect = footerEl ? footerEl.getBoundingClientRect() : null;
+    const pileBandTop = footerRect ? footerRect.bottom - PILE_HEIGHT : Infinity;
+
+    simulateTrailParticlesForFrame(footerRect, pileBandTop);
+    pilePhysicsStep();
+
+    trailCtx.clearRect(0, 0, trailW, trailH);
+    drawTrailParticlesOnCanvas();
+    drawPileAirborneOnTrail();
+    pileDrawSettledOnly();
+
+    requestAnimationFrame(unifiedFrame);
   }
 
   if (reducedMotion) {
     // Single static frame — no animation
     requestAnimationFrame(drawStaticPile);
   } else {
-    requestAnimationFrame(pileTick);
+    requestAnimationFrame(unifiedFrame);
   }
 })();
