@@ -1,0 +1,56 @@
+<!-- component: experience-panel -->
+<!--
+  Work experience panel: employment timeline + CV download.
+  Figma source: node 458:3392
+
+  Requires:
+    css/tokens.css
+    css/component-button.css
+    css/component-experience-panel.css
+
+  Scroll/effects:
+    This section has no row scroll-reveal. The full page version mounts the
+    interactive dither background into #experience-panel-dither-root
+    (.experience-panel__dither-mount on the live page).
+-->
+
+<aside class="experience-panel" aria-label="Career timeline">
+
+  <div class="experience-panel__container">
+    <div class="experience-panel__bg"></div>
+
+    <div class="experience-panel__content">
+
+      <!-- Employment timeline + CTA -->
+      <div class="experience-panel__timeline" role="list" aria-label="Employment history">
+
+        <div class="experience-panel__row" role="listitem">
+          <span class="experience-panel__row-label">Heineken</span>
+          <span class="experience-panel__row-value">S/2022</span>
+        </div>
+
+        <div class="experience-panel__row" role="listitem">
+          <span class="experience-panel__row-label">Adidas</span>
+          <span class="experience-panel__row-value">2019-2022</span>
+        </div>
+
+        <div class="experience-panel__row" role="listitem">
+          <span class="experience-panel__row-label">Aegon/HCL</span>
+          <span class="experience-panel__row-value">2016-2019</span>
+        </div>
+
+        <div class="experience-panel__row experience-panel__row--cta" role="listitem">
+          <span class="experience-panel__row-label">and more</span>
+          <a
+            class="button button--bold"
+            href="brand_ref/docs/LunaBorgo_Designer_CV.pdf"
+            download="LunaBorgo_Designer_CV.pdf"
+            aria-label="Download CV as PDF"
+          >download cv</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</aside>

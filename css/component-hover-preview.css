@@ -1,70 +1,134 @@
 /*
   css/component-hover-preview.css
-  Hover-preview links: dashed pseudo-element underline + floating image card on hover.
+  Hover-preview links: native wavy underline (matches Figma text styles) + floating preview card.
 
   Visual language:
-    · Underline: dashed ::after pseudo-element, draws left-to-right once on scroll-in
+    · Underline: WAVY accent (`--color-accent-fg`); thickness 4% / offset 8.75% (~half prior visual weight;
+      browsers vary wave geometry). Based on Figma tokens on frames such as `501:13560` / `554:27334`.
     · Card: borderless, sharp corners (--radius-sm), dark surface
-    · Motion: scale + fade in, slight tilt entry, cursor-tracking
-    · Affordance: underline-draw fires once when link scrolls into view
-    · Reduced motion: line shown immediately, no draw animation
+    · Motion: preview card scales in; underline colour fades in after scroll-reveal (timing tied to
+      main.css `--scroll-reveal-fade-duration`)
+    · Keyboard: :focus-visible shows underline + ring immediately; JS opens the preview card
+    · Touch (coarse pointer): one-time hint when #work enters view (sessionStorage)
+    · Reduced motion: underline colour applies immediately when revealed
 */
 
 /* ── Hover-preview link ─────────────────────────────────────────── */
 
 .hover-preview-link {
   position: relative;
-  text-decoration: none;
   cursor: crosshair;
   touch-action: manipulation;
+
+  -webkit-text-decoration-line: underline;
+  text-decoration-line: underline;
+  -webkit-text-decoration-style: wavy;
+  text-decoration-style: wavy;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 4%;
+  text-underline-offset: 8.75%;
+
+  transition: text-decoration-color 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0s;
 }
 
-.hover-preview-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 0;
-  border-bottom: 1px dashed var(--color-neutral-fg);
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-
-/* ── Focus state (keyboard navigation) ─────────────────────────── */
+/* ── Focus (keyboard): ring + underline visible immediately ─────── */
 
 .hover-preview-link:focus-visible {
   outline: 2px solid var(--color-accent-fg);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
+  text-decoration-color: var(--color-accent-fg);
+  transition-delay: 0s;
 }
 
-/* ── Hover state: keep line visible before .in-view fires ──────── */
+/* ── Hover: underline visible before parent paragraph is revealed ─ */
 
 @media (hover: hover) and (pointer: fine) {
-  .hover-preview-link:hover::after {
-    transform: scaleX(1);
+  .hover-preview-link:hover {
+    text-decoration-color: var(--color-accent-fg);
+    transition-delay: 0s;
   }
 }
 
-/* ── Underline draw: fires once as link scrolls into view ──────── */
-/*    .in-view is added to parent <p> elements by work-slides.js    */
+/* ── After scroll-reveal: accent underline fades in (delayed colour) ─ */
 
-@keyframes underline-draw {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
+.in-view .hover-preview-link {
+  text-decoration-color: var(--color-accent-fg);
+  transition-delay: calc(var(--scroll-reveal-fade-duration, 500ms) + 100ms);
 }
 
-.in-view .hover-preview-link::after {
-  animation: underline-draw 0.5s ease 0.15s 1 forwards;
+@media (hover: hover) and (pointer: fine) {
+  .in-view .hover-preview-link:hover {
+    transition-delay: 0s;
+  }
 }
 
 /* ── Reduced motion ─────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .hover-preview-link::after {
-    animation: none;
-    transform: scaleX(1);
+  .hover-preview-link {
+    transition-duration: 1ms;
+  }
+
+  .in-view .hover-preview-link {
+    transition-delay: 0s;
+  }
+}
+
+/* ── Other preview triggers (hero name; underline stays in main.css) ───────── */
+
+.intro__name[data-preview-id] {
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+
+.intro__name[data-preview-id]:focus-visible {
+  outline: 2px solid var(--color-accent-fg);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── One-time touch hint (#preview-touch-hint, toggled in hover-preview.js) ─── */
+
+.preview-touch-hint {
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  z-index: 350;
+  transform: translate(-50%, 120%);
+  max-width: calc(100vw - (var(--spacing-margin) * 2));
+
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-neutral-stroke);
+  background: var(--color-neutral-bg);
+
+  font-family: var(--font-mono);
+  font-size: var(--typography-mono);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-neutral-fg);
+  pointer-events: none;
+
+  opacity: 0;
+  transition:
+    opacity 220ms ease,
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.preview-touch-hint.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-touch-hint {
+    transition: opacity 120ms ease;
+    transform: translate(-50%, 0);
   }
 }
 
@@ -111,8 +175,8 @@
     Constrain the *image* itself (not percentages), so it always scales
     down to fit while keeping its intrinsic aspect ratio.
   */
-  max-width: min(390px, calc(100vw - (var(--spacing-margin) * 2)));
-  max-height: min(270px, calc(100vh - (var(--spacing-margin) * 2)));
+  max-width: min(780px, calc(100vw - (var(--spacing-margin) * 2)));
+  max-height: min(540px, calc(100vh - (var(--spacing-margin) * 2)));
   object-fit: contain;
 }
 
@@ -129,4 +193,4 @@
   }
 }
 
-/* Mobile/touch is handled via tap in JS (no CSS disable). */
+/* Touch: tap opens/closes preview (hover-preview.js); coarse-pointer hint above. */

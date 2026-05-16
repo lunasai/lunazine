@@ -1,48 +1,48 @@
 {
   "crate-design-system": {
-    "alt": "Crate design system interface preview",
+    "alt": "Crate — Heineken global B2B design system preview",
     "sources": {
-      "avif": "./assets/previews/generated/crate-design-system-390w.avif 390w, ./assets/previews/generated/crate-design-system-780w.avif 780w",
-      "webp": "./assets/previews/generated/crate-design-system-390w.webp 390w, ./assets/previews/generated/crate-design-system-780w.webp 780w",
-      "png": "./assets/previews/generated/crate-design-system-390w.png 390w, ./assets/previews/generated/crate-design-system-780w.png 780w"
+      "avif": "./assets/previews/generated/crate-design-system-390w.avif 390w, ./assets/previews/generated/crate-design-system-780w.avif 780w, ./assets/previews/generated/crate-design-system-1560w.avif 1560w",
+      "webp": "./assets/previews/generated/crate-design-system-390w.webp 390w, ./assets/previews/generated/crate-design-system-780w.webp 780w, ./assets/previews/generated/crate-design-system-1560w.webp 1560w",
+      "png": "./assets/previews/generated/crate-design-system-390w.png 390w, ./assets/previews/generated/crate-design-system-780w.png 780w, ./assets/previews/generated/crate-design-system-1560w.png 1560w"
     },
     "src": "./assets/previews/generated/crate-design-system-390w.png"
   },
   "crate-tokens": {
-    "alt": "Crate token workflow preview",
+    "alt": "Crate design tokens and workflows preview",
     "sources": {
-      "avif": "./assets/previews/generated/crate-tokens-390w.avif 390w, ./assets/previews/generated/crate-tokens-780w.avif 780w",
-      "webp": "./assets/previews/generated/crate-tokens-390w.webp 390w, ./assets/previews/generated/crate-tokens-780w.webp 780w",
-      "png": "./assets/previews/generated/crate-tokens-390w.png 390w, ./assets/previews/generated/crate-tokens-780w.png 780w"
+      "avif": "./assets/previews/generated/crate-tokens-390w.avif 390w, ./assets/previews/generated/crate-tokens-780w.avif 780w, ./assets/previews/generated/crate-tokens-1560w.avif 1560w",
+      "webp": "./assets/previews/generated/crate-tokens-390w.webp 390w, ./assets/previews/generated/crate-tokens-780w.webp 780w, ./assets/previews/generated/crate-tokens-1560w.webp 1560w",
+      "png": "./assets/previews/generated/crate-tokens-390w.png 390w, ./assets/previews/generated/crate-tokens-780w.png 780w, ./assets/previews/generated/crate-tokens-1560w.png 1560w"
     },
     "src": "./assets/previews/generated/crate-tokens-390w.png"
   },
-  "eazle": {
-    "alt": "Eazle platform preview",
-    "sources": {
-      "avif": "./assets/previews/generated/eazle-390w.avif 390w, ./assets/previews/generated/eazle-780w.avif 780w",
-      "webp": "./assets/previews/generated/eazle-390w.webp 390w, ./assets/previews/generated/eazle-780w.webp 780w",
-      "png": "./assets/previews/generated/eazle-390w.png 390w, ./assets/previews/generated/eazle-780w.png 780w"
-    },
-    "src": "./assets/previews/generated/eazle-390w.png"
-  },
   "eazle-brand": {
-    "alt": "Eazle brand application preview",
+    "alt": "Brand application track preview",
     "sources": {
-      "avif": "./assets/previews/generated/eazle-brand-390w.avif 390w, ./assets/previews/generated/eazle-brand-780w.avif 780w",
-      "webp": "./assets/previews/generated/eazle-brand-390w.webp 390w, ./assets/previews/generated/eazle-brand-780w.webp 780w",
-      "png": "./assets/previews/generated/eazle-brand-390w.png 390w, ./assets/previews/generated/eazle-brand-780w.png 780w"
+      "avif": "./assets/previews/generated/eazle-brand-390w.avif 390w, ./assets/previews/generated/eazle-brand-780w.avif 780w, ./assets/previews/generated/eazle-brand-1560w.avif 1560w",
+      "webp": "./assets/previews/generated/eazle-brand-390w.webp 390w, ./assets/previews/generated/eazle-brand-780w.webp 780w, ./assets/previews/generated/eazle-brand-1560w.webp 1560w",
+      "png": "./assets/previews/generated/eazle-brand-390w.png 390w, ./assets/previews/generated/eazle-brand-780w.png 780w, ./assets/previews/generated/eazle-brand-1560w.png 1560w"
     },
     "src": "./assets/previews/generated/eazle-brand-390w.png"
   },
   "adidas-recommendations": {
-    "alt": "Adidas recommendations framework preview",
+    "alt": "Unified product recommendation framework preview",
     "sources": {
-      "avif": "./assets/previews/generated/adidas-recommendations-390w.avif 390w, ./assets/previews/generated/adidas-recommendations-780w.avif 780w",
-      "webp": "./assets/previews/generated/adidas-recommendations-390w.webp 390w, ./assets/previews/generated/adidas-recommendations-780w.webp 780w",
-      "png": "./assets/previews/generated/adidas-recommendations-390w.png 390w, ./assets/previews/generated/adidas-recommendations-780w.png 780w"
+      "avif": "./assets/previews/generated/adidas-recommendations-390w.avif 390w, ./assets/previews/generated/adidas-recommendations-780w.avif 780w, ./assets/previews/generated/adidas-recommendations-1560w.avif 1560w",
+      "webp": "./assets/previews/generated/adidas-recommendations-390w.webp 390w, ./assets/previews/generated/adidas-recommendations-780w.webp 780w, ./assets/previews/generated/adidas-recommendations-1560w.webp 1560w",
+      "png": "./assets/previews/generated/adidas-recommendations-390w.png 390w, ./assets/previews/generated/adidas-recommendations-780w.png 780w, ./assets/previews/generated/adidas-recommendations-1560w.png 1560w"
     },
     "src": "./assets/previews/generated/adidas-recommendations-390w.png"
+  },
+  "adidas-shared-component": {
+    "alt": "Shared carousel component preview",
+    "sources": {
+      "avif": "./assets/previews/generated/adidas-shared-component-390w.avif 390w, ./assets/previews/generated/adidas-shared-component-780w.avif 780w, ./assets/previews/generated/adidas-shared-component-1560w.avif 1560w",
+      "webp": "./assets/previews/generated/adidas-shared-component-390w.webp 390w, ./assets/previews/generated/adidas-shared-component-780w.webp 780w, ./assets/previews/generated/adidas-shared-component-1560w.webp 1560w",
+      "png": "./assets/previews/generated/adidas-shared-component-390w.png 390w, ./assets/previews/generated/adidas-shared-component-780w.png 780w, ./assets/previews/generated/adidas-shared-component-1560w.png 1560w"
+    },
+    "src": "./assets/previews/generated/adidas-shared-component-390w.png"
   },
   "me": {
     "alt": "Portrait of Luna Borgo",
@@ -52,5 +52,14 @@
       "jpg": "./assets/previews/generated/me-390w.jpg 390w"
     },
     "src": "./assets/previews/generated/me-390w.jpg"
+  },
+  "intro-luna": {
+    "alt": "Luna — portrait hover preview",
+    "sources": {
+      "avif": "./assets/previews/generated/intro-luna-390w.avif 390w",
+      "webp": "./assets/previews/generated/intro-luna-390w.webp 390w",
+      "jpg": "./assets/previews/generated/intro-luna-390w.jpg 390w"
+    },
+    "src": "./assets/previews/generated/intro-luna-390w.jpg"
   }
 }

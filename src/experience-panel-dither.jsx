@@ -11,6 +11,21 @@ function readViewportPixelSize() {
   };
 }
 
+/**
+ * Extra canvas size so counter-scroll parallax never reveals the solid panel fill.
+ * Must stay in sync with `PARALLAX_FACTOR` in `js/experience-dither-parallax.js`.
+ */
+const EXPERIENCE_DITHER_PARALLAX_FACTOR = 0.9;
+
+function readDitherFramePixelSize() {
+  const { w, h } = readViewportPixelSize();
+  const travel = Math.ceil(h * EXPERIENCE_DITHER_PARALLAX_FACTOR);
+  return {
+    w: w + Math.ceil(w * 0.1),
+    h: h + 2 * travel + 128,
+  };
+}
+
 const FALLBACK_DITHER_PALETTE = {
   bgColor: [0.12156862745098039, 0.11764705882352941, 0.3058823529411765],
   waveColor: [0.3333333333333333, 0.2627450980392157, 0.8941176470588236],
@@ -42,15 +57,15 @@ function readDitherPalette() {
   };
 }
 
-function MiniPanelDitherMount() {
+function ExperiencePanelDitherMount() {
   const [ditherPalette, setDitherPalette] = useState(readDitherPalette);
   const [reducedMotion, setReducedMotion] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
-  const [viewportPx, setViewportPx] = useState(readViewportPixelSize);
+  const [viewportPx, setViewportPx] = useState(readDitherFramePixelSize);
 
   useEffect(() => {
-    const sync = () => setViewportPx(readViewportPixelSize());
+    const sync = () => setViewportPx(readDitherFramePixelSize());
     sync();
     window.addEventListener("resize", sync);
     window.addEventListener("orientationchange", sync);
@@ -82,7 +97,7 @@ function MiniPanelDitherMount() {
 
   return (
     <div
-      className="mini-panel-dither__viewport-frame"
+      className="experience-panel-dither__viewport-frame"
       style={{
         width: viewportPx.w,
         height: viewportPx.h,
@@ -94,7 +109,7 @@ function MiniPanelDitherMount() {
         bgColor={ditherPalette.bgColor}
         disableAnimation={DITHER_FORCE_ANIMATE ? false : reducedMotion}
         enableMouseInteraction={enableMouse}
-        pixelSize={2}
+        pixelSize={1}
         colorNum={2}
         waveSpeed={0.1}
         waveFrequency={1.2}
@@ -108,10 +123,10 @@ function MiniPanelDitherMount() {
 }
 
 function mount() {
-  const el = document.getElementById("mini-panel-dither-root");
+  const el = document.getElementById("experience-panel-dither-root");
   if (!el) return;
   const root = createRoot(el);
-  root.render(<MiniPanelDitherMount />);
+  root.render(<ExperiencePanelDitherMount />);
 }
 
 if (document.readyState === "loading") {

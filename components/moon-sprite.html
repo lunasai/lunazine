@@ -1,23 +1,3 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Navbar preview</title>
-
-    <link rel="stylesheet" href="../css/tokens.css" />
-    <link rel="stylesheet" href="../css/component-navbar.css" />
-    <link rel="stylesheet" href="../css/component-button.css" />
-
-    <style>
-      body {
-        margin: 0;
-        padding: var(--spacing-margin);
-        background: var(--color-neutral-bg);
-      }
-    </style>
-  </head>
-  <body>
 <!-- Inline once per page (before scripts). Paths use currentColor → .navbar__logo-mark color token. -->
 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="moon-icon-sprite" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
   <symbol id="moon-new-moon" viewBox="0 0 156 156">
@@ -45,26 +25,3 @@
     <path fill="currentColor" d="M90 6H108V12H78V18H72V24H60V36H54V48H48V84H54V96H60V102H66V108H78V114H96V120H108V114H126V108H138V102H144V90H150V78H156V102H150V114H144V126H138V132H132V138H126V144H120V150H108V156H48V150H36V144H30V138H18V126H12V120H6V108H0V54H6V42H12V30H18V24H24V18H36V12H42V6H66V0H90V6Z"/>
   </symbol>
 </svg>
-
-    <!-- from component-navbar.html -->
-    <header class="navbar" role="banner" aria-label="Site header">
-      <a class="navbar__brand" href="/" aria-label="Home">
-        <span class="navbar__name">luna</span>
-        <span class="navbar__logo-mark" aria-hidden="true">
-          <svg class="navbar__logo-svg" width="16" height="16" focusable="false" aria-hidden="true">
-            <use id="moon-logo-use" href="#moon-full-moon" />
-          </svg>
-        </span>
-        <span class="navbar__logo-type">product & systems designer</span>
-      </a>
-
-      <nav class="navbar__nav" aria-label="Primary navigation">
-        <ul class="navbar__nav-list">
-          <li><a class="button" href="#work">work</a></li>
-          <li><a class="button" href="#about">about</a></li>
-        </ul>
-      </nav>
-    </header>
-  </body>
-</html>
-

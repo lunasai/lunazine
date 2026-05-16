@@ -1,0 +1,8 @@
+Icons exported from Figma portfolio_web (node 501:13560 region “about” / “feedback”).
+Mapped from MCP design_context SVG payloads; fills normalized to currentColor in index.html sprite.
+
+Names in file → symbol ids in index.html svg-symbol-sprite:
+  pixel:quote-right-solid           → #figma-pixel-quote-right-solid  (+ rotate+scaleY in CSS)
+  streamline-pixel:logo-linkedin    → #figma-pixel-linkedin
+  streamline-pixel:email-mail-open-address → #figma-pixel-email-open
+  pixelarticons:download-sharp      → #figma-pixel-download-sharp

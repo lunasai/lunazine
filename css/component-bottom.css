@@ -35,6 +35,7 @@
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1;
+  text-transform: uppercase;
   white-space: nowrap;
   color: var(--color-neutral-fg);
   background: var(--color-neutral-opacity-strong);
@@ -73,6 +74,7 @@
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1;
+  text-transform: uppercase;
   white-space: nowrap;
   color: var(--color-neutral-fg);
   background: var(--color-neutral-opacity-strong);
@@ -132,5 +134,20 @@
 
 .bottom__mode .button[aria-pressed="true"] {
   opacity: 1;
+}
+
+/* Light theme: footer switches to serif (Montagu Slab) + lowercase */
+[data-theme="light"] .bottom {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: -0.04em;
+  text-transform: lowercase;
+}
+
+[data-theme="light"] .bottom__mode .button {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: -0.04em;
+  text-transform: lowercase;
 }
 

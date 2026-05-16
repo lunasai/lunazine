@@ -1,6 +1,6 @@
 /*
   js/work-slides.js
-  Progress bar + unified scroll-reveal.
+  Unified scroll-reveal for work, feedback, and about.
 
   Pattern (applied to work, feedback, and about):
     1. JS adds will-animate to each container (opt-in: content fully
@@ -16,30 +16,6 @@
 
 (function () {
   'use strict';
-
-  /* ── Progress bar ───────────────────────────────────────────────
-     Maps scrollY / (scrollHeight - innerHeight) to scaleY on the
-     fill element. Uses rAF to avoid layout thrash on scroll.
-  */
-  var progressFill = document.querySelector('.progress-bar__fill');
-
-  if (progressFill) {
-    var rafId = null;
-
-    function updateProgress() {
-      var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      var ratio     = maxScroll > 0 ? scrollTop / maxScroll : 0;
-      progressFill.style.transform = 'scaleY(' + ratio + ')';
-      rafId = null;
-    }
-
-    window.addEventListener('scroll', function () {
-      if (!rafId) rafId = requestAnimationFrame(updateProgress);
-    }, { passive: true });
-
-    updateProgress();
-  }
 
   /* ── Scroll reveal ──────────────────────────────────────────────
      Each entry declares a container selector and the child elements

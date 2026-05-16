@@ -12,6 +12,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Serif/body: display lowercase from source copy; mono stacks set their own transform */
+  text-transform: lowercase;
 }
 
 html,
@@ -63,6 +65,7 @@ body {
   font-family: var(--font-mono);
   font-size: var(--typography-mono);
   letter-spacing: var(--letter-spacing-mono);
+  text-transform: uppercase;
   text-decoration: none;
   border-radius: var(--radius-md);
   outline: 2px solid var(--color-accent-fg);
@@ -71,6 +74,11 @@ body {
 
 .skip-link:focus {
   top: var(--spacing-margin);
+}
+
+/* Skip target + in-page anchors: keep content below fixed header when scrolled into view */
+#main-content {
+  scroll-margin-top: var(--section-fixed-chrome-clearance);
 }
 
 /* ─── Tag component ─────────────────────────────────────────── */
@@ -144,7 +152,6 @@ body {
   z-index: 0;
 }
 
-.section--experience,
 .section--feedback,
 .section--about {
   position: relative;
@@ -157,8 +164,8 @@ body {
 .section--work {
   min-height: 100svh;
   position: relative;
-  padding-top: 120px;
-  padding-bottom: 120px;
+  padding-top: var(--section-fixed-chrome-clearance);
+  padding-bottom: var(--section-fixed-chrome-clearance);
   box-sizing: border-box;
 }
 
@@ -174,48 +181,6 @@ body {
   background-color: var(--color-neutral-bg);
 }
 
-/* Compact older-roles panel: content-sized so it does not create dead scroll space. */
-.section--experience {
-  min-height: auto;
-  padding-top: 0;
-  padding-bottom: calc(var(--space-12) * 2);
-}
-
-/* #experience also has .section--work (shared work styles); keep top flush under #work. */
-section#experience.section--experience {
-  padding-top: 0;
-}
-
-/* ─── Progress bar ───────────────────────────────────────────
-   Fixed left edge. Fill scales from top via transform:scaleY.
-   Driven by raw scroll position for a continuous feel.
-   ────────────────────────────────────────────────────────── */
-
-.progress-bar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 4px;
-  z-index: 50;          /* above content; below fixed chrome (100) */
-  pointer-events: none;
-}
-
-.progress-bar__fill {
-  position: absolute;
-  inset: 0;
-  background: var(--color-accent-fg);
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform 80ms linear;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .progress-bar__fill {
-    transition: none;
-  }
-}
-
 /* ─── Scroll reveal: unified per-element fade-up ──────────────
    Applies to work (#work), feedback (.section--feedback), and about (.section--about).
    JS adds will-animate to each container
@@ -223,7 +188,16 @@ section#experience.section--experience {
    fill-mode:both keeps opacity:1 after play — no separate lock.
 
    Intro is CSS-only (load animation) and not included here.
+
+   Duration is a custom property so preview-link underlines (component-hover-preview.css)
+   can wait until after this fade finishes — clearer hover affordance.
    ────────────────────────────────────────────────────────── */
+
+:root {
+  --scroll-reveal-fade-duration: 500ms;
+  /* Clears fixed .site-header (inset + navbar) when scrolling to #work / #about and section padding */
+  --section-fixed-chrome-clearance: 120px;
+}
 
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(10px); }
@@ -255,7 +229,7 @@ section#experience.section--experience {
 .section--about.will-animate .about__label.in-view,
 .section--about.will-animate .about__body p.in-view,
 .section--about.will-animate .about__cta.in-view {
-  animation: fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fade-up var(--scroll-reveal-fade-duration) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* ── Feedback stagger ───────────────────────────────────────── */
@@ -291,6 +265,11 @@ section#experience.section--experience {
   .intro__body {
     animation: none;
   }
+
+  .intro__name {
+    animation: none;
+    text-decoration-color: var(--color-accent-fg);
+  }
 }
 
 /* ─── Intro ─────────────────────────────────────────────────── */
@@ -311,8 +290,8 @@ section#experience.section--experience {
 }
 
 /* ─── Intro entrance: staggered fade-up on page load ─────────
-   300ms initial delay lets the page settle before text arrives.
-   Two paragraphs stagger at 300ms and 420ms respectively.
+   ~348ms initial delay lets the page settle before text arrives.
+   Two paragraphs stagger at ~348ms and ~487ms respectively (+16% vs prior base timings).
    animation-fill-mode:both hides them during the delay so no
    text flashes before the animation begins.
    ────────────────────────────────────────────────────────── */
@@ -323,11 +302,14 @@ section#experience.section--experience {
 }
 
 .intro__title {
-  animation: intro-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
+  --intro-reveal-delay: 348ms;
+  --intro-reveal-duration: 812ms;
+  animation: intro-fade-up var(--intro-reveal-duration) cubic-bezier(0.22, 1, 0.36, 1)
+    var(--intro-reveal-delay) both;
 }
 
 .intro__body {
-  animation: intro-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+  animation: intro-fade-up 812ms cubic-bezier(0.22, 1, 0.36, 1) 487ms both;
 }
 
 .intro__text {
@@ -345,9 +327,11 @@ section#experience.section--experience {
 .intro__title {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-medium);
-  font-size: var(--typography-title);
-  line-height: var(--line-height-title);
-  letter-spacing: var(--letter-spacing-tight);
+  font-size: var(--typography-intro-headline);
+  /* Figma: intro headline size is decoupled from section typography/title;
+     line-height follows flowing hero copy (leading-none in file). */
+  line-height: 1;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -376,9 +360,28 @@ section#experience.section--experience {
   margin: 0;
 }
 
-/* Intro accent text uses the default accent foreground. */
-.intro__text .accent {
-  color: var(--color-accent-fg);
+/* "luna" name: same wavy underline recipe as .hover-preview-link (keeps parity when tuning thickness). */
+@keyframes intro-name-wavy-color {
+  from {
+    text-decoration-color: transparent;
+  }
+  to {
+    text-decoration-color: var(--color-accent-fg);
+  }
+}
+
+.intro__name {
+  -webkit-text-decoration-line: underline;
+  text-decoration-line: underline;
+  -webkit-text-decoration-style: wavy;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 4%;
+  text-underline-offset: 8.75%;
+  text-decoration-color: transparent;
+  animation: intro-name-wavy-color 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(
+    var(--intro-reveal-delay, 348ms) + var(--intro-reveal-duration, 812ms) + 100ms
+  );
 }
 
 /* ─── Work sections ──────────────────────────────────────────── */
@@ -388,25 +391,21 @@ section#experience.section--experience {
   grid-column: 3 / span 8;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .col-work-content {
-    grid-column: 2 / span 10;
+    grid-column: 1 / span 12;
   }
 }
 
-/* Section heading above project copy / experience list */
+/* Section heading — full-width, sits directly in the 12-col grid */
 .work__title {
-  margin: 0 0 var(--space-6) 0;
+  margin: 0 0 var(--space-10) 0;
   font-family: var(--font-serif);
   font-weight: var(--font-weight-medium);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
-}
-
-#work > .page-grid .col-work-content > .work__title {
-  margin-bottom: var(--space-10);
 }
 
 /* Vertical stack of project subsections */
@@ -477,10 +476,10 @@ section#experience.section--experience {
 /* Project copy: body type scale (not section headings) */
 .work__body {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-body);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-body-md);
   line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-body);
+  letter-spacing: var(--letter-spacing-body-md);
   color: var(--color-neutral-fg);
 }
 
@@ -489,7 +488,7 @@ section#experience.section--experience {
 }
 
 .work__body p + p {
-  margin-top: var(--space-6); /* 24px between paragraphs */
+  margin-top: var(--space-4); /* 16px — Figma mb-[16px] between paragraphs */
 }
 
 .work__metrics {
@@ -499,6 +498,18 @@ section#experience.section--experience {
   display: flex;
   flex-direction: column;
   gap: var(--space-2); /* 8px between rows */
+}
+
+/* Impact panel: right-aligned on desktop, stacks full-width on mobile */
+.work__project__impact {
+  width: 100%;
+}
+
+@media (min-width: 1025px) {
+  .work__project__impact {
+    margin-left: auto;
+    max-width: 56%; /* ~4.5 of 8 work cols, mirrors Figma col 8–11 position */
+  }
 }
 
 /* Adidas: keep €X.XXM/year shape without exposing the figure */
@@ -595,7 +606,6 @@ section#experience.section--experience {
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
-  text-align: right;
 }
 
 .feedback__quotes {
@@ -622,13 +632,19 @@ section#experience.section--experience {
   flex: 0 0 auto;
   width: var(--space-6);
   height: var(--space-6);
-  color: var(--color-accent-fg);
+  color: var(--color-neutral-fg);
+}
+
+/* Figma orients pixel:quote-right-solid via −scale-y + rotate; reproduce as 2D transform */
+.feedback-card__quote-icon--figma-orient {
+  transform: rotate(180deg) scaleY(-1);
+  transform-origin: center center;
 }
 
 .feedback-card__quote p {
   margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
+  font-weight: var(--font-weight-regular);
   font-size: var(--typography-body-md);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-body-md);
@@ -640,7 +656,6 @@ section#experience.section--experience {
   align-items: center;
   gap: var(--space-2);
   margin-top: var(--space-2);
-  color: var(--color-accent-fg);
 }
 
 .feedback-card__source cite {
@@ -653,32 +668,25 @@ section#experience.section--experience {
   line-height: 1.18; /* no token: Figma mono source line height */
   letter-spacing: var(--letter-spacing-mono);
   text-transform: uppercase;
-  color: var(--color-accent-fg);
 }
 
 /* ─── About section ──────────────────────────────────────────── */
 
-/* At least full viewport tall; grows to contain all about content. */
+/* About section — top padding matches work: clears fixed chrome on #about anchor jumps. */
 .section--about {
-  min-height: 100svh;
+  padding-block: var(--section-fixed-chrome-clearance) 0;
 }
 
-/* Col 3-10 span (matches x=269.33, w=901.33 at 1440px) */
+/* Extra breathing room above the pixel-pile-footer */
+.section--about .page-grid {
+  padding-bottom: var(--space-10); /* 40px */
+}
+
+/* Full-width: Figma about section uses px-[40px] flex layout with w-full body text */
 .col-about {
-  grid-column: 3 / span 8;
+  grid-column: 1 / span 12;
 }
 
-/* Upper hero block: full-width, vertically centred content */
-.about__hero {
-  min-height: 50svh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-6); /* 24px gap between ASCII and tagline */
-  padding-top: 0;
-  overflow-x: auto; /* protect layout if art is wider than viewport */
-}
 
 .about__ascii {
   font-family: var(--font-mono-ascii);
@@ -686,33 +694,111 @@ section#experience.section--experience {
   font-size: var(--typography-footnote);
   line-height: normal;
   color: var(--color-neutral-fg);
+  text-transform: none;
   /* text-align must be left so relative spaces are preserved */
   text-align: left;
   white-space: pre;
   /* let content determine width; flex parent centres the block */
   width: fit-content;
+  max-width: 100%;
   margin: 0;
+  overflow: clip;
 }
 
-.about__tagline {
+/* ─── Thanks / sign-off section ─────────────────────────────── */
+
+.section--thanks {
+  position: relative;
+  z-index: 2;
+  background-color: var(--color-neutral-bg);
+  padding-block: var(--spacing-margin) calc(var(--space-10) * 2);
+  box-sizing: border-box;
+}
+
+.thanks__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.thanks__title {
+  margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-display);
-  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
-  text-align: center;
+}
+
+.thanks__body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+/* Body paragraph: grows to fill remaining row width */
+.thanks__body-p {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-body-lg);
+  line-height: var(--line-height-body-lg);
+  letter-spacing: var(--letter-spacing-body-lg);
+  color: var(--color-neutral-fg);
+}
+
+/* Desktop row order: body(0) | cat(2) | love-luna(3) */
+.thanks__cat {
+  flex: 0 0 auto;
+  order: 2;
+}
+
+.thanks__signoff {
+  order: 3;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-body-lg);
+  line-height: var(--line-height-body-lg);
+  letter-spacing: var(--letter-spacing-body-lg);
+  color: var(--color-neutral-fg);
+}
+
+/* Mobile: natural HTML order (body / love-luna / cat), cat right-aligned */
+@media (max-width: 768px) {
+  .thanks__body {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .thanks__cat {
+    order: 0;
+    align-self: flex-end;
+  }
+
+  .thanks__signoff {
+    order: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section--thanks {
+    /* No motion in this section currently */
+  }
 }
 
 /* Lower content block */
-/* Figma "about me" (368:13286): flex-col gap-[12px]; pb loosened +50% vs Figma for scroll breathing room */
 .about__content {
   display: flex;
   flex-direction: column;
   gap: var(--space-3); /* 12px */
-  padding-top: var(--grid-row-gap); /* 16px row-gap from hero */
-  padding-bottom: 120px;
+  padding-top: 0;
+  padding-bottom: var(--space-10); /* 40px */
   box-sizing: border-box;
 }
 
@@ -721,15 +807,17 @@ section#experience.section--experience {
   font-weight: var(--font-weight-medium);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
-  margin: 0;
+  margin: 0 0 var(--space-6); /* 24px below label before body */
 }
 
 .about__body {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-body-sm);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-body-md);
   line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body-md);
   color: var(--color-neutral-fg);
 }
 
@@ -746,7 +834,79 @@ section#experience.section--experience {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.about__cta-label {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-body-sm);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body-md);
+  color: var(--color-neutral-fg);
+}
+
+.about__cta-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* Shared icon + text CTA button base */
+.about__cta-btn {
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-2);
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-body-sm);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body-md);
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--color-neutral-fg);
+  transition: opacity 150ms ease;
+}
+
+.about__cta-btn:hover {
+  opacity: 0.7;
+}
+
+.about__cta-btn:focus-visible {
+  outline: 2px solid var(--color-accent-bg);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* CV download: dark filled pill */
+.about__cta-btn--cv {
+  background: var(--color-neutral-fg);
+  color: var(--color-neutral-bg);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border-right: 1px solid transparent;
+}
+
+.about__cta-btn--cv:hover {
+  opacity: 0.85;
+}
+
+/* Match CV pill horizontal inset so icons line up with download glyph */
+.about__cta-btn--email,
+.about__cta-btn--linkedin {
+  padding-inline-start: var(--space-3);
+}
+
+/* Icon sizing */
+.about__cta-icon {
+  flex-shrink: 0;
+  width: 24px; /* no token */
+  height: 24px; /* no token */
 }
 
 .about__copy-feedback {
@@ -770,8 +930,8 @@ section#experience.section--experience {
 
 
 /* ─── Pixel pile footer ──────────────────────────────────────────
-   Full-width canvas block that lives at the bottom of .about__scroll.
-   The JS inserts a <canvas> as a first child and runs the sand sim.
+   Full-width canvas block at the very bottom of <main>, below
+   .section--thanks. The JS inserts a <canvas> and runs the sand sim.
    ──────────────────────────────────────────────────────────────── */
 
 .pixel-pile-footer {
@@ -779,7 +939,6 @@ section#experience.section--experience {
   width: 100%;
   height: 60px;
   overflow: visible;
-  flex-shrink: 0; /* don't collapse inside flex containers */
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -797,24 +956,8 @@ section#experience.section--experience {
      · About hero inset doubles to 80px (matches Figma y=80 for Project Info)
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .section--experience {
-    padding-top: 0;
-    padding-bottom: calc(var(--space-10) * 2);
-  }
-
   .section--feedback {
     padding-block: calc(var(--space-10) * 2);
-  }
-
-  /* Medium follows the mobile About reading order: text first, ASCII sign-off after. */
-  .about__hero   { order: 1; }
-  .about__content {
-    order: 0;
-    padding-bottom: var(--space-10);
-  }
-
-  .col-about {
-    grid-column: 1 / span 12;
   }
 }
 
@@ -828,22 +971,8 @@ section#experience.section--experience {
      · About content keeps the medium full 12-column span
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .section--experience {
-    padding-top: 0;
-    padding-bottom: calc(var(--space-8) * 2);
-  }
-
   .section--feedback {
     padding-block: calc(var(--space-8) * 2);
-  }
-
-  .about__hero {
-    min-height: auto;
-    padding-block: var(--space-12) var(--space-8);
-  }
-
-  .about__content {
-    padding-bottom: var(--space-8);
   }
 }
 
@@ -856,11 +985,6 @@ section#experience.section--experience {
    Work layout unchanged — col-work-content stays at cols 2–11 (≤768px breakpoint).
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .section--experience {
-    padding-top: 0;
-    padding-bottom: var(--space-12);
-  }
-
   .section--feedback {
     min-height: auto;
     padding-block: var(--space-10);
@@ -868,14 +992,6 @@ section#experience.section--experience {
 
   .feedback__inner {
     gap: var(--space-4);
-  }
-
-  .about__hero {
-    padding-block: var(--space-10) var(--space-6);
-  }
-
-  .about__content {
-    padding-bottom: var(--space-6);
   }
 
 }
@@ -890,7 +1006,7 @@ section#experience.section--experience {
 
 /* ─── large ≥ 1440px ────────────────────────────────────────────────
    Work section two-column split: skip col 1, text cols 2–8 (7 cols),
-   skip col 9, mini-panel cols 10–12 (3 cols).
+   skip col 9, secondary content cols 10–12 (3 cols).
    Scoped to .section--work so base utilities stay unchanged.
    ─────────────────────────────────────────────────────────────── */
 @media (min-width: 1440px) {

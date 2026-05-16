@@ -6,9 +6,10 @@
  * A runtime manifest is written to assets/previews/manifest.json so the browser
  * JS can pick the best format/size without knowing generated filenames.
  *
- * Two widths are generated per image:
- *   390w — display size (the card maxes out at 390 px wide)
- *   780w — 2× for HiDPI screens
+ * Three widths are generated per image:
+ *   390w — legacy fallback for `<img src>`
+ *   780w — 1× when the hover card is shown up to ~780 CSS px wide
+ *   1560w — 2× for HiDPI at that full card width
  *
  * Three formats:
  *   avif  — best compression, modern browsers
@@ -31,7 +32,7 @@ const mapFile   = join(srcDir, "previews.json");
 const manifest  = join(root, "assets", "previews", "manifest.json");
 
 /* Widths to generate. Keep in sync with the CSS max-width on .hover-preview-card img. */
-const WIDTHS = [390, 780];
+const WIDTHS = [390, 780, 1560];
 
 /* ── Helpers ────────────────────────────────────────────────────────── */
 

@@ -7,7 +7,7 @@ This document describes how scroll and section animations work on the site, and 
 
 | Area                                             | Primary files                               |
 | ------------------------------------------------ | ------------------------------------------- |
-| Scroll-entry work (#work), feedback, about + progress bar | `[js/work-slides.js](../js/work-slides.js)` |
+| Scroll-entry work (#work), feedback, about | `[js/work-slides.js](../js/work-slides.js)` |
 | All visual timing, keyframes, reduced motion     | `[css/main.css](../css/main.css)`           |
 | Soft scroll snap (not content motion)            | `[js/scroll-snap.js](../js/scroll-snap.js)` |
 
@@ -45,7 +45,7 @@ This document describes how scroll and section animations work on the site, and 
 | ---------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **Intro (hero)** | `@keyframes` + `animation` with `**animation-fill-mode: both`**           | Runs on page load; no JS. `both` holds the “before” state during the delay, then the “after” state forever. |
 | **Work (#work)** | Shared `fade-up` reveal when `.in-view` is set; metric cards add component-level choreography | Each block animates when scrolled into view; metric cards use the same trigger but sequence card → icon → body internally. |
-| **Experience**   | None (static mini-panel)                                                  | No `will-animate` / `fade-up`; panel uses a plain fill in `[css/component-mini-panel.css](../css/component-mini-panel.css)`. |
+| **Experience**   | Dither background only                                                    | No `will-animate` / `fade-up`; the experience panel uses its own dither background in `[css/component-experience-panel.css](../css/component-experience-panel.css)`. |
 | **Feedback**     | Shared `fade-up` reveal when `.in-view` is set                            | Quote cards stagger via `animation-delay` on `.feedback-card` children. |
 | **About**        | Shared `fade-up` reveal when `.in-view` is set                            | About copy uses the same per-element reveal language as Work.                                           |
 
@@ -83,7 +83,7 @@ When adding a new subsection inside `#work`, either:
 ### Experience (`section--experience`)
 
 - **Trigger:** None — not listed in `[js/work-slides.js](../js/work-slides.js)` reveal sections.
-- **JS / CSS:** No scroll-entry. Mini-panel: plain background only (`component-mini-panel.css`); no CRT, heatwave, scanlines, hover effects, or `mini-panel.js`.
+- **JS / CSS:** No scroll-entry. Experience panel dither is mounted by `src/experience-panel-dither.jsx`; no CRT, heatwave, scanlines, row reveal, or separate panel scroll script.
 
 ### About (`section--about`)
 
@@ -97,16 +97,9 @@ When adding a new subsection inside `#work`, either:
 - **JS:** Adds `will-animate` to `.section--feedback`. On intersect for each target, adds `in-view` and unobserves that target.
 - **CSS:** Same shared `fade-up` as Work; staggered delays on `.feedback-card:nth-child(n).in-view` in `[css/main.css](../css/main.css)`.
 
-### Progress bar
-
-- **Not** keyed to section classes. `[js/work-slides.js](../js/work-slides.js)` maps `scrollY / (scrollHeight - innerHeight)` to `scaleY` on `.progress-bar__fill`.
-- **Note:** The IIFE **returns early** if `.progress-bar__fill` is missing. In that case scroll-reveal observers in the same file **do not run**. If you split or refactor this file, avoid tying unrelated observers to that guard unless intentional.
-
----
-
 ## Reduced motion (`prefers-reduced-motion: reduce`)
 
-Global: `[css/main.css](../css/main.css)` — `html { scroll-behavior: auto; }`, progress bar transition removed.
+Global: `[css/main.css](../css/main.css)` — `html { scroll-behavior: auto; }`.
 
 - **Intro:** Animations disabled on hero paragraphs (content remains visible by default).
 - **Work:** Elements with `.in-view`: `animation: none` and `opacity: 1` (and RM users get that class on all items at init). Component-level metric card motion is also disabled.
