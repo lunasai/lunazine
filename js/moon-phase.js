@@ -1,7 +1,8 @@
 /**
  * moon-phase.js
  * Computes the current lunar phase and points the navbar moon <use> at the
- * matching symbol (components/moon-sprite.html). Paths use fill="currentColor".
+ * matching symbol (moon icons live in index.html’s main svg-symbol-sprite;
+ * paths are synced from assets/moon-icon via npm run sync:moon).
  *
  * Uses illumination geometry from SunCalc (MIT © Vladimir Agafonkin) —
  * moon position per http://aa.quae.nl/en/reken/hemelpositie.html ,
