@@ -604,6 +604,8 @@ html[data-theme="dark"] {
 
 .feedback__title {
   margin: 0;
+  /* Figma 554:27378 gap 24px; pad clears descenders below lh 0.9 vs the fixed title frame */
+  padding-bottom: var(--space-2);
   font-family: var(--font-serif);
   font-weight: var(--font-weight-medium);
   font-size: var(--typography-title);
