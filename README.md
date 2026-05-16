@@ -74,7 +74,7 @@ The hover previews (shown when hovering underlined work/about links) use an opti
    <span class="hover-preview-link" data-preview-id="my-project" tabindex="0">link text</span>
    ```
 
-The generated files in `assets/previews/generated/` are git-ignored — they are rebuilt automatically during `npm run build`.
+Optimized previews in `assets/previews/generated/` are **committed** so GitHub Pages (which publishes the repo root as-is) can serve hover images. After changing sources under `asset-sources/previews/`, run `npm run assets:optimize` and commit the updated `generated/` files together with `assets/previews/manifest.json`.
 
 See [`docs/asset-optimization-workflow.md`](docs/asset-optimization-workflow.md) for the full human/agent workflow, including troubleshooting and do/don't guidance.
 
