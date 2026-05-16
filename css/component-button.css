@@ -221,11 +221,12 @@ a.button.button--chrome.is-feedback:visited {
   line-height: 1.18;
   letter-spacing: var(--letter-spacing-chrome);
 
-  /* Hover pill + gutter — About row uses equal full-track width (.about__cta-buttons) */
+  /* Idle: icon + label · Hover/Figma: icon hides, pill wraps label only (centered) */
   transition:
     background-color 0.38s cubic-bezier(0.25, 0.72, 0.25, 1),
     color 0.3s cubic-bezier(0.25, 0.72, 0.25, 1),
     border-radius 0.42s cubic-bezier(0.25, 0.72, 0.25, 1),
+    padding 0.42s cubic-bezier(0.25, 0.72, 0.25, 1),
     gap 0.42s cubic-bezier(0.25, 0.72, 0.25, 1);
 }
 
@@ -276,9 +277,11 @@ a.button.button--cta.is-feedback:visited {
   transition: gap 0.42s cubic-bezier(0.25, 0.72, 0.25, 1);
 }
 
+/* Figma hover: no leading icon, pill shrink-wraps label (text centered in capsule) */
 @media (hover: hover) and (pointer: fine) {
   .button.button--cta:not(.is-feedback):hover {
-    padding: 0;
+    padding-block: var(--space-1);
+    padding-inline: var(--space-2);
     border-radius: var(--radius-chip-pill);
     background: var(--color-control-pill-hover-bg);
     color: var(--color-control-pill-hover-fg);
@@ -304,6 +307,36 @@ a.button.button--cta.is-feedback:visited {
   }
 }
 
+/* Touch-primary: no :hover — mirror pill while pressed */
+@media (hover: none) {
+  .button.button--cta:not(.is-feedback):active {
+    padding-block: var(--space-1);
+    padding-inline: var(--space-2);
+    border-radius: var(--radius-chip-pill);
+    background: var(--color-control-pill-hover-bg);
+    color: var(--color-control-pill-hover-fg);
+    justify-content: center;
+    gap: 0;
+  }
+
+  .button.button--cta:not(.is-feedback):active .button__face--default {
+    justify-content: center;
+    gap: 0;
+  }
+
+  .button.button--cta:not(.is-feedback):active > svg,
+  .button.button--cta:not(.is-feedback):active .button__face--default > svg {
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-3px);
+    pointer-events: none;
+  }
+
+  a.button.button--cta:not(.is-feedback):visited:active {
+    color: var(--color-control-pill-hover-fg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .button.button--cta {
     transition: none;
@@ -323,6 +356,13 @@ a.button.button--cta.is-feedback:visited {
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
   .button.button--cta:not(.is-feedback):hover > svg,
   .button.button--cta:not(.is-feedback):hover .button__face--default > svg {
+    transform: none;
+  }
+}
+
+@media (hover: none) and (prefers-reduced-motion: reduce) {
+  .button.button--cta:not(.is-feedback):active > svg,
+  .button.button--cta:not(.is-feedback):active .button__face--default > svg {
     transform: none;
   }
 }

@@ -846,6 +846,14 @@ html[data-theme="dark"] {
   margin-top: var(--space-4); /* 16px */
 }
 
+/* Don’t stretch with .about__content (column flex defaults to align-items: stretch);
+   otherwise .about__cta fills the grid column and block wrappers read as “full row”. */
+.about__content > .about__cta {
+  align-self: flex-start;
+  width: fit-content;
+  max-width: 100%;
+}
+
 .about__cta {
   display: flex;
   flex-direction: column;
@@ -866,14 +874,18 @@ html[data-theme="dark"] {
 .about__cta-buttons {
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* widest row sets column inline-size; pills span full button */
+  align-items: flex-start;
   gap: var(--space-3);
-  width: max-content;
+  width: fit-content;
+  max-width: 100%;
 }
 
-.about__cta-buttons > .button.button--cta {
-  width: 100%;
-  justify-content: flex-start;
+/* Each CTA pill matches its own icon + label width (Figma); never stretch to column width */
+.about__cta-buttons .button.button--cta {
+  width: fit-content;
+  max-width: 100%;
+  align-self: flex-start;
+  flex-shrink: 0;
 }
 
 
