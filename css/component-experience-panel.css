@@ -1,0 +1,248 @@
+/*
+ * Luna Borgo - New Site
+ * css/component-experience-panel.css
+ *
+ * Full work experience panel: title/copy + timeline + CV download.
+ * Figma source: node 501:17320 (renamed in code after becoming section-level UI)
+ * Requires: css/tokens.css, css/component-button.css
+ *
+ * BEM:
+ *   .experience-panel              - outer section panel container
+ *   .experience-panel__container   - panel shell; fill via .experience-panel__bg
+ *     (experience shell bleeds to viewport; copy uses grid margin as padding)
+ *   .experience-panel__bg          - visual surface background (solid underlay)
+ *   .experience-panel__dither-mount - sticky viewport-tall WebGL host (experience only)
+ *   .experience-panel__bg--dither  - pointer-events on the dither mount
+ *   .experience-panel__content     - title + body copy + timeline inside the container
+ *   .experience-panel__timeline    - stacked employment rows
+ *   .experience-panel__row         - one bordered row: label left + value right
+ *   .experience-panel__row--cta    - last row variant: "and more" + download button
+ *   .experience-panel__row-label   - left-aligned text
+ *   .experience-panel__row-value   - right-aligned text
+ *
+ * Scroll/effects: there is no row scroll-reveal in this section. The only
+ * section-specific effect is the interactive dither background mounted into
+ * #experience-panel-dither-root (.experience-panel__dither-mount on index).
+ */
+
+
+/* 1. Outer container */
+
+.experience-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* no token - Figma panel stack gap */
+}
+
+/* Align the panel column to the top of the grid row (prevent stretch) */
+.section--work:has(.experience-panel) .page-grid {
+  align-items: start;
+}
+
+
+/* 2. Panel container */
+
+.experience-panel__container {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: var(--space-10);
+  min-height: 626px; /* no token - Figma large container height */
+  padding: var(--spacing-margin);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden; /* clips .experience-panel__bg within border-radius */
+  box-sizing: border-box;
+}
+
+/* Plain surface fill (no filter, scanlines, or row scroll-reveal animation) */
+.experience-panel__bg {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-accent-bg-subtle);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* WebGL dither background: allow pointer interaction for the wave shader */
+.experience-panel__bg--dither {
+  pointer-events: auto;
+}
+
+/*
+ * Tall experience panel: a full-viewport-height sticky mount keeps the WebGL layer
+ * aligned to the visible window (not the 1.5× panel center), so parallax never
+ * reveals the solid accent fill. Negative margin collapses layout height.
+ */
+.section--experience .experience-panel__dither-mount {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  flex-shrink: 0;
+  margin-bottom: calc(-100vh - var(--space-10));
+  margin-bottom: calc(-100dvh - var(--space-10));
+  pointer-events: auto;
+}
+
+/* Explicit viewport-sized box for R3F so <Canvas> always gets stable width/height (px). */
+.experience-panel-dither__viewport-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.experience-panel__content {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-6);
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.experience-panel__content .work__title {
+  margin: 0;
+  color: var(--color-neutral-fg);
+}
+
+.experience-panel__content .work__body {
+  color: var(--color-neutral-fg);
+  font-size: var(--typography-body-md);
+  letter-spacing: var(--letter-spacing-body-md);
+}
+
+.experience-panel__content .work__body p {
+  margin: 0;
+}
+
+/* Experience: panel shell spans viewport; text aligns with .page-grid content */
+.section--experience .experience-panel__container {
+  --experience-panel-page-gutter: var(--grid-margin, var(--spacing-margin));
+
+  margin-inline: calc(-1 * var(--experience-panel-page-gutter));
+  width: calc(100% + 2 * var(--experience-panel-page-gutter));
+  max-width: none;
+  box-sizing: border-box;
+  padding-inline: 0;
+  padding-block: var(--spacing-margin);
+  min-height: 150vh; /* fallback */
+  min-height: 150dvh;
+}
+
+.section--experience .experience-panel__content {
+  padding-inline: var(--experience-panel-page-gutter);
+  justify-content: center;
+}
+
+/* Body copy uses full width between gutters (padding counted inside width). */
+.section--experience .experience-panel__content .work__body {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.section--experience .experience-panel__content .work__body p {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.experience-panel__content .experience-panel__timeline {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* 3. Timeline list */
+
+.experience-panel__timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* 4. Timeline row */
+
+.experience-panel__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-block: var(--space-2); /* 8px - Figma vertical rhythm */
+  padding-inline: 0;
+  border-bottom: 2px solid var(--color-accent-fg);
+
+  font-family:    var(--font-mono);
+  font-weight:    var(--font-weight-regular);
+  font-size:      var(--typography-mono);
+  line-height:    var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  font-feature-settings: 'case' 1;
+  color: var(--color-neutral-fg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .experience-panel__row {
+    transition: background-color 200ms ease;
+  }
+
+  .experience-panel__row:hover {
+    background-color: var(--color-accent-bg-subtle);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .experience-panel__row {
+    transition: none;
+  }
+}
+
+
+/* 5. Row text atoms */
+
+.experience-panel__row-label {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.experience-panel__row-value {
+  flex: 1 0 0;
+  min-width: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+
+@media (max-width: 480px) {
+  .experience-panel__container {
+    min-height: 706px; /* no token - Figma small container height */
+    padding-inline: var(--space-10);
+    padding-block: var(--space-10);
+  }
+
+  .section--experience .experience-panel__container {
+    margin-inline: calc(-1 * var(--experience-panel-page-gutter));
+    width: calc(100% + 2 * var(--experience-panel-page-gutter));
+    padding-inline: 0;
+    padding-block: var(--space-10);
+    min-height: 150vh;
+    min-height: 150dvh;
+  }
+
+  .section--experience .experience-panel__content {
+    padding-inline: var(--experience-panel-page-gutter);
+  }
+}

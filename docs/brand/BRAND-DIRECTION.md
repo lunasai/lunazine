@@ -83,7 +83,7 @@ The system uses a deliberate serif/mono pairing — not a typical serif/sans com
 
 ### 4.2 Uppercase rule
 
-All text with `text-transform: uppercase` must use `var(--font-mono)`. No exceptions. The tracking of DM Mono at uppercase is intentional — `0.28px` desktop, `0.24px` below 1200px.
+All text with `text-transform: uppercase` must use `var(--font-mono)`. No exceptions. The tracking of DM Mono at uppercase is intentional — `0.28px` desktop, `0.24px` at or below 1024px.
 
 ### 4.3 Display headings
 

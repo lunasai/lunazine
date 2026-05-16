@@ -1,0 +1,124 @@
+/*
+ * Luna Borgo — New Site
+ * css/component-metric-item.css
+ *
+ * Impact metric list: bold mono label + rows of metric items,
+ * each with a geometric block bullet + a left-to-right fill sweep
+ * on hover (intrinsic text width only), inverting fg/bg on the copy.
+ * Figma source: "impact" + "metric item" components
+ * Requires: css/tokens.css
+ *
+ * BEM:
+ *   .impact-list              — outer wrapper (label + items)
+ *   .impact-list__label       — "IMPACT" mono bold heading
+ *   .metric-item              — single row: block bullet + text
+ *   .metric-item__block       — 12×14px filled square bullet (decorative)
+ *   .metric-item__text        — mono sentence-case metric copy
+ *
+ * Hover contract: hovering .metric-item scales a ::before on
+ * .metric-item__text (same box as the copy via fit-content) — no
+ * gradient seam, square stays clear, fill does not extend past the line.
+ */
+
+
+/* ── 1. List wrapper ─────────────────────────────────────────────────────── */
+
+.impact-list {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-2);   /* 8px */
+}
+
+
+/* ── 2. Label ────────────────────────────────────────────────────────────── */
+
+.impact-list__label {
+  font-family:    var(--font-mono);
+  font-size:      var(--typography-mono);
+  font-weight:    700;              /* bold — design system has no bold-mono weight token */
+  font-style:     normal;
+  font-synthesis: none;             /* use Space Mono 700 only — no faux bold */
+  line-height:    1.18;
+  letter-spacing: var(--letter-spacing-mono);
+  color:          var(--color-neutral-fg);
+  margin:         0;
+}
+
+
+/* ── 3. Metric row ───────────────────────────────────────────────────────── */
+
+.metric-item {
+  --metric-item-block: 12px;
+  --metric-item-gap:   var(--space-2); /* 8px */
+  display:          flex;
+  align-items:      center;
+  gap:              var(--metric-item-gap);
+  list-style:       none;
+}
+
+
+/* ── 4. Block bullet ─────────────────────────────────────────────────────── */
+
+.metric-item__block {
+  display:          block;
+  flex-shrink:      0;
+  width:            var(--metric-item-block);
+  height:           14px;           /* Figma spec — no token */
+  background-color: var(--color-neutral-fg);
+}
+
+
+/* ── 5. Text + sweep (box = copy width, not flex-grow row width) ─────────── */
+
+.metric-item__text {
+  position:         relative;
+  display:          inline-block;
+  width:            fit-content;
+  max-width:        100%;
+  min-width:        0;
+  isolation:        isolate;
+  font-family:      var(--font-mono);
+  font-size:        var(--typography-mono);
+  font-weight:      var(--font-weight-regular);
+  font-style:       normal;
+  font-synthesis:   none;
+  line-height:      1.18;
+  letter-spacing:   var(--letter-spacing-mono);
+  color:            var(--color-neutral-fg);
+  transition:       color 0.2s ease;
+}
+
+.metric-item__text::before {
+  content:            '';
+  position:           absolute;
+  inset:              0;
+  background-color:   var(--color-neutral-fg);
+  transform:          scaleX(0);
+  transform-origin:   left center;
+  transition:         transform 0.35s ease;
+  z-index:            -1;
+  pointer-events:     none;
+}
+
+
+/* ── 6. Hover — fill matches text box, copy inverts ──────────────────────── */
+
+@media (hover: hover) and (pointer: fine) {
+  .metric-item:hover .metric-item__text::before {
+    transform: scaleX(1);
+  }
+
+  .metric-item:hover .metric-item__text {
+    color: var(--color-neutral-bg);
+  }
+}
+
+
+/* ── 7. Reduced motion — instant snap ───────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-item__text,
+  .metric-item__text::before {
+    transition-duration: 0ms;
+  }
+}

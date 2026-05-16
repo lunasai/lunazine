@@ -1,26 +1,30 @@
 {
   "crate-design-system": {
-    "source": "crate-design-system.png",
-    "alt": "Crate design system interface preview"
+    "source": "crate.png",
+    "alt": "Crate — Heineken global B2B design system preview"
   },
   "crate-tokens": {
-    "source": "crate-tokens.png",
-    "alt": "Crate token workflow preview"
-  },
-  "eazle": {
-    "source": "eazle.png",
-    "alt": "Eazle platform preview"
+    "source": "design tokens.png",
+    "alt": "Crate design tokens and workflows preview"
   },
   "eazle-brand": {
-    "source": "eazle-brand.png",
-    "alt": "Eazle brand application preview"
+    "source": "brand application.png",
+    "alt": "Brand application track preview"
   },
   "adidas-recommendations": {
-    "source": "adidas-recommendations.png",
-    "alt": "Adidas recommendations framework preview"
+    "source": "product recommendation framework.png",
+    "alt": "Unified product recommendation framework preview"
+  },
+  "adidas-shared-component": {
+    "source": "one shared component.png",
+    "alt": "Shared carousel component preview"
   },
   "me": {
     "source": "me.jpeg",
     "alt": "Portrait of Luna Borgo"
+  },
+  "intro-luna": {
+    "source": "me.jpeg",
+    "alt": "Luna — portrait hover preview"
   }
 }

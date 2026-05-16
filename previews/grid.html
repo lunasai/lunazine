@@ -411,9 +411,9 @@
     }
     .t-title {
       font-family: var(--font-serif);
-      font-weight: var(--font-weight-medium);
+      font-weight: var(--font-weight-light);
       font-size: var(--typography-title);
-      line-height: var(--line-height-tight);
+      line-height: var(--line-height-title);
       letter-spacing: var(--letter-spacing-tight);
       color: var(--color-neutral-fg);
     }
@@ -426,6 +426,7 @@
     }
     .t-body-sm {
       font-family: var(--font-serif);
+      font-weight: var(--font-weight-light);
       font-size: var(--typography-body-sm);
       line-height: var(--line-height-normal);
       color: var(--color-neutral-fg);
@@ -547,16 +548,16 @@
           <div class="ruler-bar-fill" style="width:calc(1440/1920*100%)"></div>
         </div>
         <span class="ruler-px">1440px</span>
-        <span class="ruler-spec"><em>margin 80px</em> · col 92px</span>
+        <span class="ruler-spec"><em>margin 40px</em> · col ≈98.7px</span>
       </div>
 
-      <div class="ruler-row" id="row-m" data-bp="medium" data-width="1200">
+      <div class="ruler-row" id="row-m" data-bp="medium" data-width="1024">
         <span class="ruler-name">medium</span>
         <div class="ruler-bar-track">
-          <div class="ruler-bar-fill" style="width:calc(1200/1920*100%)"></div>
+          <div class="ruler-bar-fill" style="width:calc(1024/1920*100%)"></div>
         </div>
-        <span class="ruler-px">1200px</span>
-        <span class="ruler-spec"><em>margin 40px</em> · col ≈78.7px</span>
+        <span class="ruler-px">1024px</span>
+        <span class="ruler-spec"><em>margin 40px</em> · col 64px</span>
       </div>
 
       <div class="ruler-row" id="row-s" data-bp="small" data-width="768">
@@ -574,7 +575,7 @@
           <div class="ruler-bar-fill" style="width:calc(480/1920*100%)"></div>
         </div>
         <span class="ruler-px">480px</span>
-        <span class="ruler-spec"><em>margin 24px</em> · col ≈21.3px</span>
+        <span class="ruler-spec"><em>margin 16px</em> · col ≈22.7px</span>
       </div>
 
     </div>
@@ -770,7 +771,7 @@
       <span class="type-meta">
         display<br>
         --typography-display<br>
-        <b id="tdD">40px</b>
+        <b id="tdD">80px</b>
       </span>
       <span class="t-display">Luna Borgo</span>
     </div>
@@ -779,7 +780,7 @@
       <span class="type-meta">
         title<br>
         --typography-title<br>
-        <b id="tdT">32px</b>
+        <b id="tdT">64px</b>
       </span>
       <span class="t-title">Brand &amp; Systems</span>
     </div>
@@ -788,7 +789,7 @@
       <span class="type-meta">
         body<br>
         --typography-body<br>
-        <b id="tdB">24px</b>
+        <b id="tdB">32px</b>
       </span>
       <span class="t-body">Scalable digital experiences for teams that need to design at scale.</span>
     </div>
@@ -797,7 +798,7 @@
       <span class="type-meta">
         body sm<br>
         --typography-body-sm<br>
-        <b id="tdBS">16px</b>
+        <b id="tdBS">20px</b>
       </span>
       <span class="t-body-sm">For over twelve years, I've helped brands turn creative vision into real experiences.</span>
     </div>
@@ -820,7 +821,7 @@
     <p class="section-head">
       07 — <strong>Paragraph Spacing</strong>
       — --paragraph-spacing = line-height-tight (1.2) × --typography-display
-      = <span id="paraEq" style="color:var(--color-accent-fg)">48px</span>
+      = <span id="paraEq" style="color:var(--color-accent-fg)">96px</span>
     </p>
 
     <div class="para-demo">
@@ -828,7 +829,7 @@
       <p class="t-display">Second paragraph — the gap above equals --paragraph-spacing.</p>
       <p class="t-display" style="color:var(--color-neutral-fg-muted)">Third paragraph.</p>
 
-      <span class="para-badge" id="paraBadge">--paragraph-spacing: 48px (1.2 × 40px)</span>
+      <span class="para-badge" id="paraBadge">--paragraph-spacing: 96px (1.2 × 80px)</span>
     </div>
   </section>
 
@@ -849,7 +850,7 @@
     function getBp(vw) {
       if (vw <= 480)  return 'x-small';
       if (vw <= 768)  return 'small';
-      if (vw <= 1200) return 'medium';
+      if (vw <= 1024) return 'medium';
       if (vw <= 1440) return 'large';
       return 'x-large';
     }

@@ -1,0 +1,218 @@
+/*
+ * Luna Borgo — New Site
+ * css/component-rotating-metric.css
+ *
+ * Full-width horizontal ticker that continuously loops metric phrases.
+ * Requires: css/tokens.css
+ *
+ * BEM:
+ *   .rotating-metric            — outer band (border + padding, position context)
+ *   .rotating-metric__viewport  — overflow clip; isolates the track from the pause button
+ *   .rotating-metric__track     — animated flex row (two copies of content = seamless loop)
+ *   .rotating-metric__items     — one complete copy of all phrases and separators
+ *   .rotating-metric__sep       — star separator glyph between phrases
+ *   .rotating-metric__sep-icon  — inline SVG inside the separator
+ *   .rotating-metric__phrase    — one metric unit: label(s) + badge
+ *   .rotating-metric__label     — mono sentence-case text span
+ *   .rotating-metric__badge     — highlighted pill value (e.g. "230%")
+ *   .rotating-metric__pause     — absolute pause/play toggle (WCAG 2.2.2)
+ *   .rotating-metric__pause-icon — SVG inside the pause button
+ *   .rotating-metric__icon-pause — pause bars path (hidden when .is-frozen)
+ *   .rotating-metric__icon-play  — play triangle path (hidden when running)
+ *
+ * State classes (JS-managed):
+ *   .is-frozen   — paused, either by user or by IntersectionObserver (off-screen)
+ */
+
+
+/* ── 1. Keyframe ─────────────────────────────────────────────────────────── */
+
+@keyframes rotating-metric-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); } /* -50% because track content is doubled */
+}
+
+
+/* ── 2. Outer band ───────────────────────────────────────────────────────── */
+
+.rotating-metric {
+  --rotating-metric-duration: 32s;
+
+  position: relative; /* positions the pause button */
+  border-top:    1px solid var(--color-accent-fg);
+  border-bottom: 1px solid var(--color-accent-fg);
+  padding-block: var(--space-2);
+}
+
+
+/* ── 3. Overflow viewport ────────────────────────────────────────────────── */
+/*      Separate from the outer band so the absolute pause button is not      */
+/*      clipped by overflow: hidden.                                           */
+
+.rotating-metric__viewport {
+  overflow: hidden;
+}
+
+
+/* ── 4. Animated track ───────────────────────────────────────────────────── */
+
+.rotating-metric__track {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4); /* 16px between the two .rotating-metric__items copies */
+  width: max-content;
+  will-change: transform;
+  animation: rotating-metric-scroll var(--rotating-metric-duration) linear infinite;
+  animation-play-state: running;
+}
+
+
+/* ── 5. Frozen state (user-paused or scrolled off-screen) ────────────────── */
+
+.rotating-metric.is-frozen .rotating-metric__track {
+  animation-play-state: paused;
+}
+
+
+/* ── 6. One complete set of phrases + separators ─────────────────────────── */
+
+.rotating-metric__items {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4); /* 16px between each sep / phrase pair */
+}
+
+
+/* ── 7. Star separator ───────────────────────────────────────────────────── */
+
+.rotating-metric__sep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-accent-fg);
+}
+
+.rotating-metric__sep-icon {
+  display: block;
+  inline-size: 16px; /* no token */
+  block-size: 16px;  /* no token */
+  fill: currentColor;
+}
+
+
+/* ── 8. Metric phrase ────────────────────────────────────────────────────── */
+
+.rotating-metric__phrase {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px; /* Figma: 6px gap — no exact token */
+  white-space: nowrap;
+}
+
+
+/* ── 9. Label text ───────────────────────────────────────────────────────── */
+
+.rotating-metric__label {
+  font-family:    var(--font-mono);
+  font-weight:    var(--font-weight-regular);
+  font-size:      var(--typography-mono);
+  line-height:    var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-accent-fg);
+}
+
+
+/* ── 10. Badge pill ──────────────────────────────────────────────────────── */
+
+.rotating-metric__badge {
+  font-family:    var(--font-mono);
+  font-weight:    var(--font-weight-regular);
+  font-size:      var(--typography-mono);
+  line-height:    var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-accent-fg);
+  border-radius: 17px; /* Figma: 17px — no exact token */
+  padding: var(--space-1) 2px; /* Figma: 4px / 2px — no exact 2px token */
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+
+/* ── 11. Badge highlight on phrase hover (fine pointer only) ─────────────── */
+
+@media (hover: hover) and (pointer: fine) {
+  .rotating-metric__phrase:hover .rotating-metric__badge {
+    background-color: var(--color-accent-bg);
+    color: var(--color-neutral-fg-on-accent);
+  }
+}
+
+
+/* ── 12. Pause / play button ─────────────────────────────────────────────── */
+
+.rotating-metric__pause {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-accent-fg);
+  /* Hidden until keyboard focus — tab to the control to pause/play (WCAG 2.2.2). */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.rotating-metric__pause:focus-visible {
+  outline: 2px solid var(--color-accent-bg);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+
+/* ── 13. Pause icon — swaps between pause bars and play triangle ──────────── */
+
+.rotating-metric__pause-icon {
+  display: block;
+  inline-size: 12px; /* no token */
+  block-size: 12px;  /* no token */
+  fill: currentColor;
+}
+
+/* Default (running): show pause bars, hide play triangle */
+.rotating-metric__icon-play  { display: none; }
+.rotating-metric__icon-pause { display: block; }
+
+/* Frozen (paused): show play triangle, hide pause bars */
+.rotating-metric.is-frozen .rotating-metric__icon-pause { display: none; }
+.rotating-metric.is-frozen .rotating-metric__icon-play  { display: block; }
+
+
+/* ── 14. Reduced motion ──────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .rotating-metric__track {
+    animation: none;
+    will-change: auto;
+  }
+
+  /* Allow horizontal scrolling so all content is still reachable */
+  .rotating-metric__viewport {
+    overflow-x: auto;
+  }
+
+  /* No animation to control — pause button is not relevant */
+  .rotating-metric__pause {
+    display: none;
+  }
+}

@@ -6,13 +6,12 @@
 (function () {
   "use strict";
 
-  var logoType = document.querySelector(".navbar__logo-type");
+  var brandTexts = document.querySelectorAll(".navbar__name, .navbar__logo-type");
   var intro = document.getElementById("intro");
 
-  if (!logoType || !intro) return;
+  if (!brandTexts.length || !intro) return;
 
-  logoType.addEventListener("click", function (e) {
-    // Only handle the text click target (not the moon icon).
+  function onBrandTextClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -23,6 +22,9 @@
     }
 
     intro.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  brandTexts.forEach(function (el) {
+    el.addEventListener("click", onBrandTextClick);
   });
 })();
-

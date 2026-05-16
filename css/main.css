@@ -1,6 +1,6 @@
 /*
   css/main.css
-  Full responsive layout: large (1440) → medium (1200) → small (768) → x-small (480).
+  Full responsive layout: large (1440) → medium (1024) → small (768) → x-small (480).
   Depends on: css/tokens.css, css/grid.css, component css files.
 */
 
@@ -29,6 +29,14 @@ body {
   margin: 0;
   background: var(--color-neutral-bg);
   color: var(--color-neutral-fg);
+}
+
+/* Dark theme: same font-weight tokens as light, but bright-on-dark rendering
+   reads heavier with default subpixel AA — greyscale smoothing aligns perception
+   with the light reference (incl. Impact mono list + Montagu body). */
+html[data-theme="dark"] {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ─── Text selection ─────────────────────────────────────────── */
@@ -73,6 +81,31 @@ body {
   top: var(--spacing-margin);
 }
 
+/* Skip target + in-page anchors: keep content below fixed header when scrolled into view */
+#main-content {
+  scroll-margin-top: var(--section-fixed-chrome-clearance);
+}
+
+/* ─── Tag component ─────────────────────────────────────────── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 2px 6px; /* Figma: 2px/6px — no exact token */
+  border: 1px solid var(--color-accent-bg);
+  border-radius: 17px; /* Figma: 17px — no exact token */
+  color: var(--color-accent-fg);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  font-feature-settings: "case" 1;
+  white-space: nowrap;
+}
+
 /* ─── Fixed chrome ──────────────────────────────────────────────
    Both bars sit exactly --spacing-margin (40px large) from the
    viewport edge, matching the Figma frame inset. Left/right
@@ -102,6 +135,8 @@ body {
 
 .site {
   padding: 0;
+  position: relative;
+  z-index: 0;
 }
 
 /* ─── Sections ──────────────────────────────────────────────── */
@@ -109,100 +144,109 @@ body {
 /* Intro: at least full viewport tall; grows with content */
 .section--intro {
   min-height: 100svh;
+  display: flex;
+  align-items: stretch;
+  padding-block: calc(var(--spacing-margin) + var(--space-12));
+  box-sizing: border-box;
 }
 
-/* Work slides: at least full viewport tall; grows with content.
-   Flex centers the .page-grid child vertically when content is
-   shorter than the viewport. */
+/* Intro: normal flow (scroll stacking is work → experience only). */
+#intro.section--intro {
+  position: relative;
+  z-index: 0;
+}
+
+.section--feedback,
+.section--about {
+  position: relative;
+  z-index: 2;
+  background-color: var(--color-neutral-bg);
+}
+
+/* Work section: at least full viewport tall; grows with content.
+   Vertical padding clears the fixed chrome and adds breathing room. */
 .section--work {
   min-height: 100svh;
   position: relative;
-  display: flex;
-  align-items: center;
+  padding-top: var(--section-fixed-chrome-clearance);
+  padding-bottom: var(--section-fixed-chrome-clearance);
+  box-sizing: border-box;
 }
 
+/* Bounds work + experience overlap region. */
+.work-experience-stack {
+  position: relative;
+}
 
-/* ─── Progress bar ───────────────────────────────────────────
-   Fixed left edge. Fill scales from top via transform:scaleY.
-   Driven by raw scroll position for a continuous feel.
+/* Work layer that ScrollTrigger pins during work → experience transition. */
+#work.section--work {
+  position: relative;
+  z-index: 1;
+  background-color: var(--color-neutral-bg);
+}
+
+/* ─── Scroll reveal: unified per-element fade-up ──────────────
+   Applies to work (#work), feedback (.section--feedback), and about (.section--about).
+   JS adds will-animate to each container
+   (opt-in) and in-view to each element on first intersection.
+   fill-mode:both keeps opacity:1 after play — no separate lock.
+
+   Intro is CSS-only (load animation) and not included here.
+
+   Duration is a custom property so preview-link underlines (component-hover-preview.css)
+   can wait until after this fade finishes — clearer hover affordance.
    ────────────────────────────────────────────────────────── */
 
-.progress-bar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 4px;
-  z-index: 50;          /* above content; below fixed chrome (100) */
-  pointer-events: none;
+:root {
+  --scroll-reveal-fade-duration: 500ms;
+  /* Clears fixed .site-header (inset + navbar) when scrolling to #work / #about and section padding */
+  --section-fixed-chrome-clearance: 120px;
 }
 
-.progress-bar__fill {
-  position: absolute;
-  inset: 0;
-  background: var(--color-accent-fg);
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform 80ms linear;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .progress-bar__fill {
-    transition: none;
-  }
-}
-
-/* ─── Slide content: fade-up on entry ────────────────────────
-   Default opacity: 0 prevents the backwards-fill glitch:
-   when .is-active is toggled, animation-fill-mode:both applies
-   the "from" values (opacity:0) immediately during the delay.
-   Since the default is already 0, there is no visible jump.
-
-   90ms settle delay: snap completes before content arrives.
-   Stagger: title +0ms → details +90ms → col-body +180ms.
-   ────────────────────────────────────────────────────────── */
-
-@keyframes work-fade-up {
+@keyframes fade-up {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0);    }
 }
 
-.section--work .work__title,
-.section--work .work__details,
-.section--work .col-body {
+/* Hidden state: scoped so only elements inside will-animate
+   containers are hidden, and only while not yet revealed. */
+#work.will-animate .work__title:not(.in-view),
+#work.will-animate .work__projects .work__body p:not(.in-view),
+#work.will-animate .work__projects .work__metrics:not(.in-view),
+.section--feedback.will-animate .feedback__title:not(.in-view),
+.section--feedback.will-animate .feedback-card:not(.in-view),
+.section--about.will-animate .about__tagline:not(.in-view),
+.section--about.will-animate .about__label:not(.in-view),
+.section--about.will-animate .about__body p:not(.in-view),
+.section--about.will-animate .about__cta:not(.in-view) {
   opacity: 0;
 }
 
-.section--work.is-active .work__title {
-  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1)  90ms both;
+/* Revealed state: all share the same animation at 0ms delay by default.
+   Sections whose elements all enter the viewport simultaneously (about
+   label+tagline) use explicit delays to create a visible sequence. */
+#work.will-animate .work__title.in-view,
+#work.will-animate .work__projects .work__body p.in-view,
+.section--feedback.will-animate .feedback__title.in-view,
+.section--feedback.will-animate .feedback-card.in-view,
+.section--about.will-animate .about__tagline.in-view,
+.section--about.will-animate .about__label.in-view,
+.section--about.will-animate .about__body p.in-view,
+.section--about.will-animate .about__cta.in-view {
+  animation: fade-up var(--scroll-reveal-fade-duration) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.section--work.is-active .work__details {
-  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
-}
+/* ── Feedback stagger ───────────────────────────────────────── */
+.section--feedback.will-animate .feedback__title.in-view                 { animation-delay:   0ms; }
+.section--feedback.will-animate .feedback-card:nth-child(1).in-view      { animation-delay: 120ms; }
+.section--feedback.will-animate .feedback-card:nth-child(2).in-view      { animation-delay: 240ms; }
+.section--feedback.will-animate .feedback-card:nth-child(3).in-view      { animation-delay: 360ms; }
 
-.section--work.is-active .col-body {
-  animation: work-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) 270ms both;
-}
-
-/* ─── About section: fade-up on scroll entry ──────────────────
-   .will-animate is set immediately by JS (opt-in pattern).
-   Without JS the section is fully visible at all times.
-   .is-visible is added by IntersectionObserver — one-shot.
-   ────────────────────────────────────────────────────────── */
-
-.section--about.will-animate {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity   500ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.section--about.is-visible {
-  opacity: 1;
-  transform: none;
-}
+/* ── About top stagger ────────────────────────────────────────
+   Tagline and label are both above the fold when section enters;
+   stagger them so they don't appear as a single simultaneous flash. */
+.section--about.will-animate .about__tagline.in-view { animation-delay:   0ms; }
+.section--about.will-animate .about__label.in-view   { animation-delay: 100ms; }
 
 /* ─── Reduced motion overrides ────────────────────────────────
    Disable transform movement; keep fast opacity transitions so
@@ -214,45 +258,44 @@ body {
    ────────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .section--work.is-active .work__title,
-  .section--work.is-active .work__details,
-  .section--work.is-active .col-body {
-    animation: none;
-    opacity: 1;
+  /* Scroll-reveal items: JS adds in-view immediately for RM users,
+     so ensure no animation plays and opacity is fully on. */
+  .in-view {
+    animation: none !important;
+    opacity: 1 !important;
   }
 
-  .intro__text p:first-child,
-  .intro__text p:last-child {
+  .intro__title,
+  .intro__body {
     animation: none;
   }
 
-  .section--about.will-animate {
-    transform: none;
-    transition: opacity 200ms ease;
+  .intro__name {
+    animation: none;
+    text-decoration-color: var(--color-accent-fg);
   }
 }
 
 /* ─── Intro ─────────────────────────────────────────────────── */
 
-/* Desktop/tablet intro: center copy in the viewport while preserving the grid columns. */
-@media (min-width: 769px) {
-  .section--intro {
-    display: flex;
-    align-items: center;
-  }
+/* Intro content is centered inside the safe area between fixed chrome. */
+.section--intro > .page-grid {
+  width: 100%;
+  min-height: calc(100svh - var(--spacing-margin) - var(--space-12) - var(--spacing-margin) - var(--space-12));
+  align-items: center;
+}
 
-  .section--intro > .page-grid {
-    width: 100%;
-  }
+.section--intro .col-content {
+  grid-column: 1 / span 12;
+}
 
-  .intro__content {
-    padding-top: 0;
-  }
+.intro__content {
+  min-width: 0;
 }
 
 /* ─── Intro entrance: staggered fade-up on page load ─────────
-   300ms initial delay lets the page settle before text arrives.
-   Two paragraphs stagger at 300ms and 420ms respectively.
+   ~348ms initial delay lets the page settle before text arrives.
+   Two paragraphs stagger at ~348ms and ~487ms respectively (+16% vs prior base timings).
    animation-fill-mode:both hides them during the delay so no
    text flashes before the animation begins.
    ────────────────────────────────────────────────────────── */
@@ -262,61 +305,126 @@ body {
   to   { opacity: 1; transform: translateY(0);    }
 }
 
-.intro__text p:first-child {
-  animation: intro-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
+.intro__title {
+  --intro-reveal-delay: 348ms;
+  --intro-reveal-duration: 812ms;
+  animation: intro-fade-up var(--intro-reveal-duration) cubic-bezier(0.22, 1, 0.36, 1)
+    var(--intro-reveal-delay) both;
 }
 
-.intro__text p:last-child {
-  animation: intro-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+.intro__body {
+  animation: intro-fade-up 812ms cubic-bezier(0.22, 1, 0.36, 1) 487ms both;
 }
 
 .intro__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  color: var(--color-neutral-fg);
+}
+
+.intro__title,
+.intro__body {
+  text-wrap: pretty;
+}
+
+.intro__title {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-intro-headline);
+  /* Figma: intro headline size is decoupled from section typography/title;
+     line-height follows flowing hero copy (leading-none in file). */
+  line-height: 1;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.intro__glyph {
+  font-weight: var(--font-weight-regular);
+}
+
+.intro__glyph--jp {
+  font-family: var(--font-glyph-jp);
+}
+
+.intro__glyph--arrow {
+  font-family: var(--font-glyph-arrow);
+}
+
+.intro__body {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
-  font-size: var(--typography-display);
-  line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
-  color: var(--color-neutral-fg);
+  font-size: var(--typography-body-lg);
+  line-height: var(--line-height-body-lg);
+  letter-spacing: var(--letter-spacing-body-lg);
+  margin: 0;
 }
 
 .intro__text p {
   margin: 0;
 }
 
-.intro__text p + p {
-  margin-top: var(--paragraph-spacing);
+/* "luna" name: same wavy underline recipe as .hover-preview-link (keeps parity when tuning thickness). */
+@keyframes intro-name-wavy-color {
+  from {
+    text-decoration-color: transparent;
+  }
+  to {
+    text-decoration-color: var(--color-accent-fg);
+  }
 }
 
-/* Figma intro body text accent span (368:13140): semantic highlight fg #8eff8e */
-.intro__text .accent {
-  color: var(--color-highlight-fg);
+/* Underlined name inherits .intro__title medium weight (not hover-link regular 400) */
+.intro__name {
+  -webkit-text-decoration-line: underline;
+  text-decoration-line: underline;
+  -webkit-text-decoration-style: wavy;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 4%;
+  text-underline-offset: 8.75%;
+  text-decoration-color: transparent;
+  animation: intro-name-wavy-color 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(
+    var(--intro-reveal-delay, 348ms) + var(--intro-reveal-duration, 812ms) + 100ms
+  );
 }
 
 /* ─── Work sections ──────────────────────────────────────────── */
 
-/* Content row — no padding-top needed; section flex-centers it */
-.work__row {
-  padding-top: 0;
+/* Content column: cols 3–10 on desktop, expands on mobile */
+.col-work-content {
+  grid-column: 3 / span 8;
 }
 
-/* Left column: project title + detail rows */
+@media (max-width: 1024px) {
+  .col-work-content {
+    grid-column: 1 / span 12;
+  }
+}
+
+/* Section heading — full-width, sits directly in the 12-col grid */
 .work__title {
+  margin: 0 0 var(--space-10) 0;
   font-family: var(--font-serif);
   font-weight: var(--font-weight-medium);
-  font-size: var(--typography-title); /* 32px */
-  line-height: var(--line-height-tight);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
-  margin: 0;
 }
 
-.work__details {
-  list-style: none;
-  padding: 0;
-  margin: var(--space-2) 0 0 0; /* 8px gap below title */
+/* Vertical stack of project subsections */
+.work__projects {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2); /* 8px between rows */
+  gap: 88px;
+}
+
+/* Single project: body + metrics */
+.work__project {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
 .work__detail {
@@ -325,14 +433,15 @@ body {
   gap: 10px; /* Figma: 10px — no exact token */
   font-family: var(--font-mono);
   font-weight: var(--font-weight-regular);
+  font-style: normal;
+  font-synthesis: none;
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
 }
 
 .work__detail-arrow {
-  color: var(--color-accent-fg);
+  color: var(--color-neutral-fg);
   flex-shrink: 0;
   line-height: inherit;
 }
@@ -370,12 +479,13 @@ body {
   flex: 1 1 auto;
 }
 
-/* Right column: body text + metrics */
+/* Project copy: body type scale (not section headings) */
 .work__body {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
-  font-size: var(--typography-body);
+  font-size: var(--typography-body-md);
   line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body-md);
   color: var(--color-neutral-fg);
 }
 
@@ -384,16 +494,28 @@ body {
 }
 
 .work__body p + p {
-  margin-top: var(--space-4); /* 16px — from Figma mb-[16px] */
+  margin-top: var(--space-4); /* 16px — Figma mb-[16px] between paragraphs */
 }
 
 .work__metrics {
   list-style: none;
   padding: 0;
-  margin: var(--space-6) 0 0 0; /* 24px gap below body text */
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-2); /* 8px between rows */
+}
+
+/* Impact panel: right-aligned on desktop, stacks full-width on mobile */
+.work__project__impact {
+  width: 100%;
+}
+
+@media (min-width: 1025px) {
+  .work__project__impact {
+    margin-left: auto;
+    max-width: 56%; /* ~4.5 of 8 work cols, mirrors Figma col 8–11 position */
+  }
 }
 
 /* Adidas: keep €X.XXM/year shape without exposing the figure */
@@ -403,7 +525,7 @@ body {
 
 .work__metric-redacted__blur {
   display: inline-block;
-  filter: blur(5px);
+  filter: blur(3px);
   user-select: none;
   letter-spacing: 0.12em;
   margin-inline: 0.06em;
@@ -434,7 +556,6 @@ body {
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   color: var(--color-neutral-fg);
 }
 
@@ -446,7 +567,6 @@ body {
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   color: var(--color-neutral-fg);
 }
 
@@ -462,29 +582,114 @@ body {
   margin-top: var(--space-6); /* 24px gap below experience list */
 }
 
-/* ─── About section ──────────────────────────────────────────── */
+/* ─── Feedback section ───────────────────────────────────────── */
 
-/* At least full viewport tall; grows to contain all about content. */
-.section--about {
+.section--feedback {
   min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-block: calc(var(--space-10) * 2);
+  box-sizing: border-box;
 }
 
-/* Col 3-10 span (matches x=269.33, w=901.33 at 1440px) */
-.col-about {
-  grid-column: 3 / span 8;
+.section--feedback > .page-grid {
+  width: 100%;
 }
 
-/* Upper hero block: full-width, vertically centred content */
-.about__hero {
-  min-height: 591px; /* Figma Project Info height */
+.feedback__inner {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-6); /* 24px gap between ASCII and tagline */
-  padding-top: calc(var(--spacing-margin) + 24px); /* clear fixed header */
-  overflow-x: auto; /* protect layout if art is wider than viewport */
+  gap: var(--space-6);
 }
+
+.feedback__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-tight);
+  color: var(--color-neutral-fg);
+}
+
+.feedback__quotes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-10);
+}
+
+.feedback-card {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-neutral-fg);
+}
+
+.feedback-card__quote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.feedback-card__quote-icon,
+.feedback-card__source-icon {
+  flex: 0 0 auto;
+  width: var(--space-4);  /* 16px */
+  height: var(--space-4);
+  color: var(--color-neutral-fg);
+}
+
+/* Figma orients pixel:quote-right-solid via −scale-y + rotate; reproduce as 2D transform */
+.feedback-card__quote-icon--figma-orient {
+  transform: rotate(180deg) scaleY(-1);
+  transform-origin: center center;
+}
+
+.feedback-card__quote p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-quote-body);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
+  color: var(--color-neutral-fg);
+}
+
+.feedback-card__source {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.feedback-card__source cite {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: 1.18; /* no token: Figma mono source line height */
+  letter-spacing: var(--letter-spacing-mono);
+}
+
+/* ─── About section ──────────────────────────────────────────── */
+
+/* About section — top padding matches work: clears fixed chrome on #about anchor jumps. */
+.section--about {
+  padding-block: var(--section-fixed-chrome-clearance) 0;
+}
+
+/* Extra breathing room above the pixel-pile-footer */
+.section--about .page-grid {
+  padding-bottom: var(--space-10); /* 40px */
+}
+
+/* Full-width: Figma about section uses px-[40px] flex layout with w-full body text */
+.col-about {
+  grid-column: 1 / span 12;
+}
+
 
 .about__ascii {
   font-family: var(--font-mono-ascii);
@@ -492,52 +697,131 @@ body {
   font-size: var(--typography-footnote);
   line-height: normal;
   color: var(--color-neutral-fg);
+  text-transform: none;
   /* text-align must be left so relative spaces are preserved */
   text-align: left;
   white-space: pre;
   /* let content determine width; flex parent centres the block */
   width: fit-content;
+  max-width: 100%;
   margin: 0;
+  overflow: clip;
 }
 
-.about__tagline {
+/* ─── Thanks / sign-off section ─────────────────────────────── */
+
+.section--thanks {
+  position: relative;
+  z-index: 2;
+  background-color: var(--color-neutral-bg);
+  padding-top: var(--spacing-thanks-padding-top);
+  padding-bottom: calc(var(--space-10) * 2);
+  box-sizing: border-box;
+}
+
+.thanks__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.thanks__title {
+  margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-display);
-  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
-  text-align: center;
+}
+
+.thanks__body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+/* Body paragraph: grows to fill remaining row width */
+.thanks__body-p {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-body-lg);
+  line-height: var(--line-height-body-lg);
+  letter-spacing: var(--letter-spacing-body-lg);
+  color: var(--color-neutral-fg);
+}
+
+/* Desktop row order: body(0) | cat(2) | love-luna(3) */
+.thanks__cat {
+  flex: 0 0 auto;
+  order: 2;
+}
+
+.thanks__signoff {
+  order: 3;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-body-lg);
+  line-height: var(--line-height-body-lg);
+  letter-spacing: var(--letter-spacing-body-lg);
+  color: var(--color-neutral-fg);
+}
+
+/* Mobile: natural HTML order (body / love-luna / cat), cat right-aligned */
+@media (max-width: 768px) {
+  .thanks__body {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .thanks__cat {
+    order: 0;
+    align-self: flex-end;
+  }
+
+  .thanks__signoff {
+    order: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section--thanks {
+    /* No motion in this section currently */
+  }
 }
 
 /* Lower content block */
-/* Figma "about me" (368:13286): flex-col gap-[12px]; pb loosened +50% vs Figma for scroll breathing room */
 .about__content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3); /* 12px */
-  padding-top: var(--grid-row-gap); /* 16px row-gap from hero */
-  padding-bottom: 120px;
+  gap: var(--space-10); /* 40px — body to “More about me” CTA */
+  padding-top: 0;
+  padding-bottom: var(--space-10); /* 40px */
   box-sizing: border-box;
 }
 
 .about__label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-mono);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--typography-title);
+  line-height: var(--line-height-title);
+  letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
-  margin: 0;
+  margin: 0 0 var(--space-6); /* 24px below label before body */
 }
 
 .about__body {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-extra-light);
-  font-size: var(--typography-body-sm);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-quote-body);
   line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
   color: var(--color-neutral-fg);
 }
 
@@ -550,36 +834,39 @@ body {
 }
 
 .about__cta {
-  margin-top: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
-.about__copy-feedback {
+.about__cta-label {
   margin: 0;
-  min-height: 1lh;
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-weight: var(--font-weight-regular);
-  font-size: var(--typography-footnote);
+  font-size: var(--typography-body-sm);
   line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
-  color: var(--color-neutral-fg-muted);
+  letter-spacing: var(--letter-spacing-body-md);
+  color: var(--color-neutral-fg);
 }
 
-.about__copy-feedback:empty {
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+.about__cta-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* widest row sets column inline-size; pills span full button */
+  gap: var(--space-3);
+  width: max-content;
+}
+
+.about__cta-buttons > .button.button--cta {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 
 /* ─── Pixel pile footer ──────────────────────────────────────────
-   Full-width canvas block that lives at the bottom of .about__scroll.
-   The JS inserts a <canvas> as a first child and runs the sand sim.
+   Full-width canvas block at the very bottom of <main>, below
+   .section--thanks. The JS inserts a <canvas> and runs the sand sim.
    ──────────────────────────────────────────────────────────────── */
 
 .pixel-pile-footer {
@@ -587,7 +874,6 @@ body {
   width: 100%;
   height: 60px;
   overflow: visible;
-  flex-shrink: 0; /* don't collapse inside flex containers */
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -596,18 +882,17 @@ body {
    Column values cross-referenced against Figma node 374:1278.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── medium: ≤ 1200px ─────────────────────────────────────────
-   Canvas 1200px · margin 40px · col ≈ 78.7px
+/* ─── medium: ≤ 1024px ─────────────────────────────────────────
+   Canvas 1024px · margin 40px · col = 64px
    Key changes vs large:
      · Work sections expand to 1024px (full-viewport panels)
      · Work content row sits deeper: y = 373px
      · About section compresses to 1024px min-height
      · About hero inset doubles to 80px (matches Figma y=80 for Project Info)
    ─────────────────────────────────────────────────────────────── */
-@media (max-width: 1200px) {
-  /* Project Info moves from y=40 to y=80 in medium frames */
-  .about__hero {
-    padding-top: 80px;
+@media (max-width: 1024px) {
+  .section--feedback {
+    padding-block: calc(var(--space-10) * 2);
   }
 }
 
@@ -615,78 +900,57 @@ body {
 /* ─── small: ≤ 768px ────────────────────────────────────────────
    Canvas 768px · margin 24px · col ≈ 45.3px
    Key changes vs medium:
-     · Intro text row sits at y = 216px (from 227px)
-     · Work layout STACKS: project info (col 2/span 10) above
-       body text (col 3/span 10, 1-col indent)
-     · Work content row padding-top resets to 216px
+     · Intro uses the shared fixed-chrome safe area
+     · Work col-work-content expands to cols 2–11
      · About hero inset drops to 64px (Figma Project Info y=64)
-     · col-about narrows to col 2/span 10 (was col 3/span 8)
+     · About content keeps the medium full 12-column span
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  /* Intro: text row at y=216 */
-  .intro__content {
-    padding-top: 216px;
-  }
-
-  /* Work: increase vertical distance between stacked blocks (≈40px) */
-  .work__row {
-    row-gap: var(--space-10); /* 40px */
-    padding-top: 0;
-  }
-
-  /* Work: stacked layout.
-     col-sidebar occupies cols 2–11 (span 10).
-     col-body occupies cols 3–12 (span 10, 1-col indent).
-     Because the ranges overlap, CSS Grid auto-placement pushes
-     col-body into the next row — no explicit row assignment needed.
-     These selectors beat the grid.css collapse (1/span 12) because
-     they are more specific (.section--work .col-*). */
-  .section--work .col-sidebar {
-    grid-column: 2 / span 10;
-  }
-
-  .section--work .col-body {
-    grid-column: 3 / span 10;
-  }
-
-  /* About: hero top inset from Figma Project Info y=64 */
-  .about__hero {
-    padding-top: 64px;
-  }
-
-  /* About-me block: col 2–11 (span 10) at small */
-  .col-about {
-    grid-column: 2 / span 10;
+  .section--feedback {
+    padding-block: calc(var(--space-8) * 2);
   }
 }
 
 
 /* ─── x-small: ≤ 480px ──────────────────────────────────────────
    Canvas 480px · margin 16px · col ≈ 21.3px
-   Column assignments and y-offsets are identical to small.
    Typography scale adjustments handled entirely by tokens.css
-   (--typography-mono drops to 12px, display/body shrink further).
-   No additional layout overrides required.
+   (title shrinks further; body-lg remains 24px).
+   Intro uses the shared fixed-chrome safe area.
+   Work layout unchanged — col-work-content stays at cols 2–11 (≤768px breakpoint).
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  /* Intro: vertically center the hero copy on x-small viewports */
-  .section--intro {
-    display: flex;
-    align-items: center;
+  .section--feedback {
+    min-height: auto;
+    padding-block: var(--space-10);
   }
 
-  .intro__content {
-    padding-top: 0;
+  .feedback__inner {
+    gap: var(--space-4);
   }
 
-  /* Work: reduce indent so body starts 1 column earlier (align w/ sidebar) */
-  .section--work .col-body {
-    grid-column: 2 / span 10;
+}
+
+/* ─── desktop: ≥ 1025px ────────────────────────────────────────
+   Feedback should read as one horizontal row on large and xl screens. */
+@media (min-width: 1025px) {
+  .feedback__quotes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ─── large ≥ 1440px ────────────────────────────────────────────────
+   Work section two-column split: skip col 1, text cols 2–8 (7 cols),
+   skip col 9, secondary content cols 10–12 (3 cols).
+   Scoped to .section--work so base utilities stay unchanged.
+   ─────────────────────────────────────────────────────────────── */
+@media (min-width: 1440px) {
+  .section--work .col-two-thirds {
+    grid-column: 2 / span 7;
   }
 
-  /* Work: tighter vertical spacing between sidebar and body */
-  .work__row {
-    row-gap: var(--space-4); /* 16px */
+  .section--work .col-one-third {
+    grid-column: 10 / span 3;
   }
 }
 
@@ -696,4 +960,13 @@ body {
    About frame 357:12898: height 1024 (long-scroll about uses 1185 — applies below 1920).
    Intro centering is handled by the desktop/tablet flex rule above.
    ─────────────────────────────────────────────────────────────── */
+@media (min-width: 1920px) {
+  .section--work .col-two-thirds {
+    grid-column: 2 / span 7;
+  }
+
+  .section--work .col-one-third {
+    grid-column: 10 / span 3;
+  }
+}
 

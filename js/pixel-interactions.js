@@ -17,8 +17,7 @@
   const DOT_SIZE = 3;
 
   // ─── Color ────────────────────────────────────────────────────────────────────
-  // Reads --color-accent-fg from the CSS token so pixels and the progress bar
-  // always share exactly the same color, including across theme switches.
+  // Reads --color-accent-fg from the CSS token so pixel trails match accent UI.
 
   function getTrailColor() {
     const hex = getComputedStyle(document.documentElement)

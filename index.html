@@ -1,11 +1,53 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Luna Borgo</title>
 
-    <link rel="icon" type="image/svg+xml" href="./assets/moon-icon/waxing%20crescent.svg" />
+    <script>
+      (function () {
+        const STORAGE_KEY = "theme";
+        const SOURCE_KEY = "theme-source";
+        const root = document.documentElement;
+
+        function isTheme(theme) {
+          return theme === "dark" || theme === "light";
+        }
+
+        function getSystemTheme() {
+          return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        }
+
+        function getStoredTheme() {
+          try {
+            const savedTheme = localStorage.getItem(STORAGE_KEY);
+            const savedSource = localStorage.getItem(SOURCE_KEY);
+
+            if (savedSource === "manual" && isTheme(savedTheme)) {
+              return savedTheme;
+            }
+
+            if (savedTheme === "light") {
+              localStorage.setItem(SOURCE_KEY, "manual");
+              return savedTheme;
+            }
+
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(SOURCE_KEY);
+          } catch (error) {
+            return null;
+          }
+
+          return null;
+        }
+
+        root.setAttribute("data-theme", getStoredTheme() || getSystemTheme());
+      })();
+    </script>
+
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
     <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
@@ -13,7 +55,9 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Montagu+Slab:opsz,wght@16..144,300;16..144,400;16..144,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Montagu+Slab:opsz,wght@16..144,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&text=%E3%82%B7&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math:wght@400&text=%E2%A4%B3&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="./css/tokens.css" />
     <link rel="stylesheet" href="./css/grid.css" />
@@ -23,6 +67,7 @@
     <link rel="stylesheet" href="./css/component-bottom.css" />
     <link rel="stylesheet" href="./css/component-scroll-section.css" />
     <link rel="stylesheet" href="./css/component-hover-preview.css" />
+    <link rel="stylesheet" href="./css/component-metric-item.css" />
 
     <link rel="stylesheet" href="./css/main.css" />
   </head>
@@ -30,6 +75,29 @@
     <svg class="svg-symbol-sprite" aria-hidden="true" focusable="false" width="0" height="0">
       <symbol id="metric-badge-star" viewBox="0 0 20 20">
         <path d="M9.824 16.288C9.70667 15.5947 9.39733 14.848 8.896 14.048C8.39467 13.2373 7.68 12.4853 6.752 11.792C5.83467 11.0987 4.91733 10.656 4 10.464V9.792C4.90667 9.57867 5.776 9.184 6.608 8.608C7.45067 8.02133 8.15467 7.31733 8.72 6.496C9.296 5.65333 9.664 4.82133 9.824 4H10.496C10.592 4.53333 10.784 5.08267 11.072 5.648C11.36 6.20267 11.728 6.736 12.176 7.248C12.6347 7.74933 13.1467 8.20267 13.712 8.608C14.5547 9.20533 15.4133 9.6 16.288 9.792V10.464C15.7013 10.5813 15.0933 10.8213 14.464 11.184C13.8453 11.5467 13.2693 11.9787 12.736 12.48C12.2027 12.9707 11.7653 13.488 11.424 14.032C10.9227 14.832 10.6133 15.584 10.496 16.288H9.824Z" />
+      </symbol>
+
+      <!-- Figma exports (currentColor → inherits semantic fg / CTA text color) -->
+      <symbol id="figma-pixel-quote-right-solid" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M10 3H11V17H10V19H9V20H8V21H6V22H4V21H3V18H4V17H6V16H7V12H2V11H1V3H2V2H10V3ZM23 3V17H22V19H21V20H20V21H18V22H16V21H15V18H16V17H18V16H19V12H14V11H13V3H14V2H22V3H23Z"/>
+      </symbol>
+      <symbol id="figma-pixel-linkedin" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M22.8525 2.2875H24V21.7125H22.8525V2.2875ZM21.7125 21.7125H22.8525V22.86H21.7125V21.7125ZM21.7125 1.14H22.8525V2.2875H21.7125V1.14ZM20.565 3.4275H21.7125V20.5725H20.565V3.4275ZM2.28 22.86H21.7125V24H2.28V22.86ZM3.4275 20.5725H20.565V21.7125H3.4275V20.5725ZM17.1375 11.43H15.9975V10.2825H13.71V11.43H12.57V10.2825H10.2825V17.145H12.57V13.7175H13.71V12.57H14.8575V13.7175H15.9975V17.145H18.285V12.57H17.1375V11.43ZM5.7075 10.2825H7.995V17.145H5.7075V10.2825ZM5.7075 6.855H7.995V9.1425H5.7075V6.855ZM3.4275 2.2875H20.565V3.4275H3.4275V2.2875ZM2.28 0H21.7125V1.14H2.28V0ZM2.28 3.4275H3.4275V20.5725H2.28V3.4275ZM1.14 21.7125H2.28V22.86H1.14V21.7125ZM1.14 1.14H2.28V2.2875H1.14V1.14ZM0 2.2875H1.14V21.7125H0V2.2875Z"/>
+      </symbol>
+      <symbol id="figma-pixel-email-open" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M22.86 9.14242V8.00242H21.7125V6.85492H20.5725V4.57492H19.4325V13.7174H20.5725V12.5699H21.7125V11.4299H22.86V21.7124H24V9.14242H22.86ZM21.7125 21.7124H22.86V22.8599H21.7125V21.7124ZM2.28751 22.8599H21.7125V23.9999H2.28751V22.8599ZM18.285 13.7174H19.4325V14.8574H18.285V13.7174ZM17.145 19.4324H18.285V20.5724H17.145V19.4324ZM17.145 14.8574H18.285V15.9974H17.145V14.8574ZM15.9975 18.2849H17.145V19.4324H15.9975V18.2849ZM15.9975 15.9974H17.145V17.1449H15.9975V15.9974ZM15.9975 8.00242H17.145V11.4299H15.9975V8.00242ZM14.8575 6.85492H15.9975V8.00242H14.8575V6.85492ZM8.00251 17.1449H15.9975V18.2849H8.00251V17.1449ZM13.7175 11.4299H15.9975V12.5699H13.7175V11.4299ZM13.7175 8.00242H10.29V9.14242H12.57V11.4299H13.7175V8.00242ZM10.29 11.4299H12.57V12.5699H10.29V11.4299ZM9.14251 5.71492H14.8575V6.85492H9.14251V5.71492ZM9.14251 13.7174H14.8575V14.8574H9.14251V13.7174ZM9.14251 9.14242H10.29V11.4299H9.14251V9.14242Z"/>
+        <path fill="currentColor" d="M8.00251 12.57H9.14251V13.7175H8.00251V12.57ZM8.00251 6.855H9.14251V8.0025H8.00251V6.855ZM6.85501 18.285H8.00251V19.4325H6.85501V18.285ZM6.85501 15.9975H8.00251V17.145H6.85501V15.9975ZM6.85501 8.0025H8.00251V12.57H6.85501V8.0025ZM5.71501 19.4325H6.85501V20.5725H5.71501V19.4325ZM5.71501 14.8575H6.85501V15.9975H5.71501V14.8575ZM19.4325 4.575V3.4275H17.145V2.2875H15.9975V1.14H14.8575V0H9.14251V1.14H8.00251V2.2875H6.85501V3.4275H4.57501V4.575H19.4325ZM4.57501 13.7175H5.71501V14.8575H4.57501V13.7175ZM1.14001 21.7125H2.28751V22.86H1.14001V21.7125Z"/>
+        <path fill="currentColor" d="M1.14 11.4299H2.2875V12.5699H3.4275V13.7174H4.575V4.57492H3.4275V6.85492H2.2875V8.00242H1.14V9.14242H0V21.7124H1.14V11.4299Z"/>
+      </symbol>
+      <symbol id="figma-pixel-download-sharp" viewBox="0 0 18 18">
+        <path fill="currentColor" d="M18 12V16H16V12H18ZM18 16V18H0V16H18ZM2 12V16H0V12H2ZM10 0V14H8V0H10Z"/>
+        <path fill="currentColor" d="M4 8V10H14V8H4ZM6 10V12H8V10H6ZM10 10V12H12V10H10Z"/>
+        <path fill="currentColor" d="M12 8V10H14V8H12Z"/>
+      </symbol>
+      <!-- Figma streamline-pixel hand-awesome · feedback glyph (625:17286) -->
+      <symbol id="figma-pixel-hand-awesome" viewBox="0 0 16 16">
+        <path fill="currentColor" d="M5.3325 4.9525H6.0975V5.7125H5.3325V4.9525ZM4.5725 14.1V6.4775H5.3325V5.7125H4.5725V4.95H1.5225V15.615H4.5725V14.855H6.1V14.1H4.5725ZM3.8075 8H3.05V6.48H3.81L3.8075 8ZM6.0975 4.1925H6.8575V4.9525H6.0975V4.1925ZM6.8575 1.1425H7.6175V4.1925H6.8575V1.1425ZM7.6175 6.4775H8.3825V7.2375H7.6175V6.4775ZM7.6175 0.3825H9.1425V1.1425H7.6175V0.3825ZM8.3825 5.7125H9.1425V6.4775H8.3825V5.7125ZM8.3825 8.7625H9.1425V10.2875H8.3825V8.7625ZM8.3825 11.0475H9.1425V12.5725H8.3825V11.0475ZM9.1425 1.1425H9.9025V1.9025H9.1425V1.1425ZM9.1425 4.9525H9.9025V5.7125H9.1425V4.9525ZM9.9025 1.9025H10.6675V4.9525H9.9025V1.9025ZM9.9025 5.7125H13.7125V6.4775H9.9025V5.7125ZM10.6675 14.0975H9.9025V14.8575H6.0975V15.6175H12.1925V14.8575H10.6675V14.0975ZM9.1425 12.5725V14.0975H9.9025V13.3325H12.9525V14.0975H13.7125V12.5725H9.1425ZM12.1925 14.0975H12.9525V14.8575H12.1925V14.0975Z"/>
+        <path fill="currentColor" d="M13.7125 7.9975H9.9025V6.4775H9.1425V8.7625H13.7125V10.2875H9.1425V11.0475H13.7125V12.5725H14.4775V6.4775H13.7125V7.9975Z"/>
       </symbol>
     </svg>
 
@@ -39,19 +107,19 @@
     <div class="site-header">
       <header class="navbar" role="banner" aria-label="Site header">
         <a class="navbar__brand" href="./" aria-label="Home">
+          <span class="navbar__name">luna</span>
           <span class="navbar__logo-mark" aria-hidden="true">
-            <img id="moon-logo" src="./assets/moon-icon/full%20moon.svg" alt="" />
+            <svg class="navbar__logo-svg" width="16" height="16" focusable="false" aria-hidden="true">
+              <use id="moon-logo-use" href="#moon-full-moon" />
+            </svg>
           </span>
-          <span class="navbar__logo-type">
-            luna<br />
-            borgo
-          </span>
+          <span class="navbar__logo-type">product &amp; systems designer</span>
         </a>
 
         <nav class="navbar__nav" aria-label="Primary navigation">
           <ul class="navbar__nav-list">
-            <li><a class="button" href="#work">work</a></li>
-            <li><a class="button" href="#about">about</a></li>
+            <li><a class="button button--chrome" href="#work">work</a></li>
+            <li><a class="button button--chrome" href="#about">about</a></li>
           </ul>
         </nav>
       </header>
@@ -62,25 +130,27 @@
       <footer class="bottom" aria-label="Footer status bar">
         <button
           type="button"
-          class="button bottom__contact js-copy-email"
+          class="button button--chrome bottom__contact js-copy-email"
           data-email="lunaborgo@gmail.com"
-          data-copied-text="email copied"
           aria-label="Copy email lunaborgo@gmail.com to clipboard"
-          data-tooltip="tap to copy"
-        >email me</button>
+          data-tooltip="Tap to copy"
+        >
+          <span class="button__face button__face--default">email me</span>
+          <span class="button__face button__face--feedback" aria-live="polite">
+            <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <use href="#figma-pixel-hand-awesome"></use>
+            </svg>
+            <span class="button__feedback-label">copied</span>
+          </span>
+        </button>
 
-        <time class="bottom__time" datetime="22:00:00" data-tooltip="luna's current timezone">22:00:00 AMS</time>
+        <time class="bottom__time" datetime="22:00:00" data-tooltip="Luna's current timezone">22:00:00 AMS</time>
 
         <div class="bottom__mode" aria-label="Theme toggle">
-          <button class="button" type="button" aria-pressed="false" id="theme-light" aria-label="Switch to light mode">light</button>
-          <button class="button" type="button" aria-pressed="true" id="theme-dark" aria-label="Switch to dark mode">dark</button>
+          <button class="button button--chrome" type="button" aria-pressed="false" id="theme-light" aria-label="Switch to light mode">light</button>
+          <button class="button button--chrome" type="button" aria-pressed="true" id="theme-dark" aria-label="Switch to dark mode">dark</button>
         </div>
       </footer>
-    </div>
-
-    <!-- ── Progress bar: tracks active work slide (aria-hidden — decorative) ── -->
-    <div class="progress-bar" aria-hidden="true">
-      <div class="progress-bar__fill"></div>
     </div>
 
     <!-- ── Scrollable content ── -->
@@ -92,12 +162,11 @@
         <div class="page-grid">
           <div class="col-content intro__content">
             <div class="intro__text">
-              <p>
-                Hi, I'm Luna <span aria-hidden="true" lang="ja">シ</span> A designer focused on brand expression and scalable digital experiences. I build systems for teams that need to design at scale
-                <span class="accent">without losing their soul.</span>
+              <p class="intro__title">
+                Hi, I&rsquo;m <span class="intro__name" data-preview-id="intro-luna" tabindex="0">Luna</span> <span class="intro__glyph intro__glyph--jp" aria-hidden="true" lang="ja">シ</span> a designer focused on brand expression and scalable digital experiences <span class="intro__glyph intro__glyph--arrow" aria-hidden="true">⤳</span> I build systems for teams that need to design at scale without losing their soul.
               </p>
-              <p>
-                For over twelve years, I've helped brands to turn creative vision into real experiences while building shared design languages that brings teams together.
+              <p class="intro__body">
+                For over twelve years, I&rsquo;ve helped brands to turn creative vision into real experiences while building shared design languages that bring teams together.
               </p>
             </div>
           </div>
@@ -110,130 +179,214 @@
            per gesture — the browser handles the "pause" natively.
            ──────────────────────────────────────────────────────── -->
 
-      <!-- SLIDE 1: Heineken / Design system and product -->
-      <section class="section section--work" id="work" aria-label="Work – Heineken, Design system and product">
-            <div class="page-grid work__row">
-              <div class="col-sidebar">
-                <h2 class="work__title">Heineken</h2>
-              </div>
+      <!-- Work + experience: wrapper bounds sticky #work while experience rolls over -->
+      <div class="work-experience-stack">
+      <!-- WORK: Heineken + Adidas merged into one editorial section -->
+      <section class="section section--work" id="work" aria-labelledby="work-heading">
+        <div class="page-grid">
+          <h2 class="work__title col-full" id="work-heading">Recent work</h2>
+          <div class="work__projects col-work-content">
 
-              <div class="col-body">
-                <div class="work__body">
-                  <p>I am a founding member of <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">Crate</span>, Heineken's global B2B design system. I built everything from <span class="hover-preview-link" data-preview-id="crate-tokens" tabindex="0">tokens</span> and components to workflows and, most recently, AI automations. With over 235 contributors in 8 global product teams, and organic adoption by OpCos, Crate has become the vital link within Heineken's digital product network.</p>
-                  <p>Next to Crate, I also led the creation of the brand framework and team culture that launched <span class="hover-preview-link" data-preview-id="eazle" tabindex="0">Eazle</span>, Heineken's global B2B platform consolidating 40 fragmented regional platforms into one cohesive product.</p>
-                  <p>I established the design principles and visual language guidance for the <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">brand application</span>, and built collaboration rituals that enabled rapid scaling while keeping a strong design culture.</p>
-                </div>
+            <div class="work__project">
+              <h2 class="sr-only">Heineken</h2>
+              <div class="work__body">
+                <p>I joined Heineken in 2024, when we merged 40 regional B2B platforms into a unified global product ecosystem. This major organisational transformation required a shared language that was flexible enough to scale across diverse markets.</p>
+                <p>In that scenario, I founded <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">Crate</span> &ndash; Heineken&rsquo;s global B2B design system. Shaping it from <span class="hover-preview-link" data-preview-id="crate-tokens" tabindex="0">design tokens</span> and workflows to most recently, AI automations. I also led <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">the brand application</span> track and design culture, setting up frameworks and rituals that connected product, engineering, marketing and brand.</p>
+                <p>I enabled rapid scaling from 6 to over 245 contributors in two years while keeping a strong design culture.</p>
+              </div>
+              <div class="impact-list work__project__impact">
+                <p class="impact-list__label">Impact</p>
                 <ul class="work__metrics">
-                  <li class="work__detail">
-                    <span class="work__metric-badge" aria-hidden="true">
-                      <svg class="work__metric-badge-icon" viewBox="0 0 20 20" focusable="false">
-                        <use href="#metric-badge-star"></use>
-                      </svg>
-                    </span>
-                    <span class="work__detail-text">Community engagement up 230% in two years; component health hit 94%, and SUS stayed at 70, above the 68 industry standard.</span>
+                  <li class="metric-item">
+                    <span class="metric-item__block" aria-hidden="true"></span>
+                    <span class="metric-item__text">55% &#x2192; 94% component health in 6 months</span>
+                  </li>
+                  <li class="metric-item">
+                    <span class="metric-item__block" aria-hidden="true"></span>
+                    <span class="metric-item__text">40 regional platforms &#x2192; 1 global B2B platform</span>
+                  </li>
+                  <li class="metric-item">
+                    <span class="metric-item__block" aria-hidden="true"></span>
+                    <span class="metric-item__text">Voluntary adoption by 4 Heineken OpCos</span>
+                  </li>
+                  <li class="metric-item">
+                    <span class="metric-item__block" aria-hidden="true"></span>
+                    <span class="metric-item__text">230% community engagement growth</span>
                   </li>
                 </ul>
               </div>
             </div>
-          </section>
 
-      <!-- SLIDE 2: Adidas / Product recommendations framework -->
-      <section class="section section--work" aria-label="Work – Adidas">
-            <div class="page-grid work__row">
-              <div class="col-sidebar">
-                <h2 class="work__title">Adidas</h2>
+            <div class="work__project">
+              <h2 class="sr-only">Adidas</h2>
+              <div class="work__body">
+                <p>Before that, at Adidas, I partnered with data science and engineering to design a <span class="hover-preview-link" data-preview-id="adidas-recommendations" tabindex="0">unified product recommendation framework</span>.</p>
+                <p>What started as a quick experiment grew into a cross-team effort to build a reusable component and recommendation framework that blends smart algorithms with editorial input.</p>
+                <p>We replaced 10+ scattered carousels with <span class="hover-preview-link" data-preview-id="adidas-shared-component" tabindex="0">one shared component</span>, supporting 36 variations and driving significant yearly revenue.</p>
               </div>
-
-              <div class="col-body">
-                <div class="work__body">
-                  <p>Working closely with designers, data science, and engineering, I led the concept and design of a <span class="hover-preview-link" data-preview-id="adidas-recommendations" tabindex="0">unified framework</span> that delivers the right products to the right customers across homepage, PDP, cart, and checkout.</p>
-                  <p>The process started with rapid experimentation and evolved to a collaboration with the design system team to build a shared recommendation component: reusable, consistent, and built to last. The result is a system that balances algorithmic intelligence with editorial control.</p>
-                </div>
+              <div class="impact-list work__project__impact">
+                <p class="impact-list__label">Impact</p>
                 <ul class="work__metrics">
-                  <li class="work__detail">
-                    <span class="work__metric-badge" aria-hidden="true">
-                      <svg class="work__metric-badge-icon" viewBox="0 0 20 20" focusable="false">
-                        <use href="#metric-badge-star"></use>
-                      </svg>
-                    </span>
-                    <span class="work__detail-text">Redesigned a previously tested experiment and the UI update made it work – <span class="sr-only"> Confidential annual revenue.</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">€€</span>M/year</span>.</span>
+                  <li class="metric-item">
+                    <span class="metric-item__block" aria-hidden="true"></span>
+                    <span class="metric-item__text">Increased AOV by <span class="sr-only">confidential percentage</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">%%</span></span></span>
                   </li>
-                  <li class="work__detail">
-                    <span class="work__metric-badge" aria-hidden="true">
-                      <svg class="work__metric-badge-icon" viewBox="0 0 20 20" focusable="false">
-                        <use href="#metric-badge-star"></use>
-                      </svg>
-                    </span>
-                    <span class="work__detail-text">10+ scattered recommendation carousels → 1 shared component. Supports 36 variations.</span>
+                  <li class="metric-item">
+                    <span class="metric-item__block" aria-hidden="true"></span>
+                    <span class="metric-item__text">Generating <span class="sr-only">confidential annual revenue</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">€€.M/year</span></span></span>
+                  </li>
+                  <li class="metric-item">
+                    <span class="metric-item__block" aria-hidden="true"></span>
+                    <span class="metric-item__text">10+ scattered carousels &#x2192; 1 shared component</span>
                   </li>
                 </ul>
               </div>
             </div>
-          </section>
 
-      <!-- SLIDE 3: Before that / job experience + CV -->
-      <section class="section section--work" aria-label="Work – Experience">
-            <div class="page-grid work__row">
-              <div class="col-sidebar">
-                <h2 class="work__title">Before that</h2>
-              </div>
+          </div>
+        </div>
+      </section>
 
-              <div class="col-body">
-                <div class="work__body">
-                  <p>Led end-to-end UX/UI and brand projects across agency, freelance, and in-house environments. Built reusable UI kits to improve onboarding and developer collaboration, forming the foundation of my systems-oriented approach.</p>
-                </div>
+      </div><!-- /.work-experience-stack -->
 
-                <ul class="work__experience" aria-label="Job experience">
-                  <li class="work__experience-row">
-                    <span class="work__experience-year">2022–now</span>
-                    <div class="work__experience-role">
-                      <p>Senior Designer, Design Systems</p>
-                      <p>Heineken · Amsterdam</p>
-                    </div>
-                  </li>
-                  <li class="work__experience-row">
-                    <span class="work__experience-year">2019–22</span>
-                    <div class="work__experience-role">
-                      <p>Product Designer, Browse and Delight</p>
-                      <p>Adidas · Amsterdam</p>
-                    </div>
-                  </li>
-                  <li class="work__experience-row">
-                    <span class="work__experience-year">2016–19</span>
-                    <div class="work__experience-role">
-                      <p>UX/UI Designer</p>
-                      <p>Aegon – HCL Technologies</p>
-                    </div>
-                  </li>
-                  <li class="work__experience-row">
-                    <span class="work__experience-year">2016–19</span>
-                    <div class="work__experience-role">
-                      <p>UX/UI Designer</p>
-                      <p>Atabix</p>
-                    </div>
-                  </li>
-                  <li class="work__experience-row">
-                    <span class="work__experience-year"></span>
-                    <div class="work__experience-role">
-                      <p>and a couple more...</p>
-                    </div>
-                  </li>
-                </ul>
+      <!-- Feedback -->
+      <section class="section section--feedback" id="feedback" aria-labelledby="feedback-heading">
+        <div class="page-grid">
+          <div class="col-full feedback__inner">
+            <h2 class="feedback__title" id="feedback-heading">What they say</h2>
 
-                <div class="work__cta">
-                  <a class="button button--accent" href="brand_ref/docs/LunaBorgo_Designer_CV.pdf" download="LunaBorgo_Designer_CV.pdf"><span aria-hidden="true">&gt;</span> download full cv</a>
-                </div>
-              </div>
+            <div class="feedback__quotes" role="list" aria-label="Feedback quotes">
+              <figure class="feedback-card" role="listitem">
+                <blockquote class="feedback-card__quote">
+                  <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#figma-pixel-quote-right-solid"></use>
+                  </svg>
+                  <p>Luna is a standout designer and leader with a rare combination of strategic thinking, craftsmanship, and execution. Her impact on our design systems and overall design work was significant &mdash; she elevated standards, strengthened foundations, and consistently raised the bar for quality across the team.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#figma-pixel-linkedin"></use>
+                  </svg>
+                  <cite>Nicole Akin &ndash; Group director at Walmart</cite>
+                </figcaption>
+              </figure>
+
+              <figure class="feedback-card" role="listitem">
+                <blockquote class="feedback-card__quote">
+                  <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#figma-pixel-quote-right-solid"></use>
+                  </svg>
+                  <p>Luna consistently deliver high-quality work with attention to detail, even when faced with complex challenges. Your ability to manage projects effectively, while maintaining strong relationships with stakeholders, ensures you consistently meet your goals.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#figma-pixel-linkedin"></use>
+                  </svg>
+                  <cite>Jesse de Jong &ndash; Design lead at Heineken</cite>
+                </figcaption>
+              </figure>
+
+              <figure class="feedback-card" role="listitem">
+                <blockquote class="feedback-card__quote">
+                  <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#figma-pixel-quote-right-solid"></use>
+                  </svg>
+                  <p>Luna is truly one of the most dependable and trustworthy people I have the pleasure of working with. Her ability to provide spot-on design advice and navigate complex situations is something I rely on wholeheartedly.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <use href="#figma-pixel-linkedin"></use>
+                  </svg>
+                  <cite>Andrew Silfkin &ndash; Senior designer</cite>
+                </figcaption>
+              </figure>
             </div>
-          </section>
+          </div>
+        </div>
+      </section>
 
       <!-- About -->
       <section class="section section--about" id="about" aria-label="About">
         <div class="about__scroll">
         <div class="page-grid">
-          <!-- Upper: centered ASCII art + tagline -->
-          <div class="col-full about__hero">
-            <pre class="about__ascii" aria-hidden="true">
+          <h2 class="about__label col-full">What I say</h2>
+          <!-- Main copy + CTA (reads first on all viewports) -->
+          <div class="col-about about__content">
+            <div class="about__body">
+              <p>Design has been part of my life long before it became my career. Back when computers were still a three-piece setup, a passion for reading and writing led me to start a blog &ndash; only to become completely obsessed with how it looked (and with all the gifs I wanted to make).</p>
+              <p>Twelve years later, and after experiencing many faces of design &ndash; graphic, brand, service, digital &ndash; I use my experience and passion for craft to help brands design at scale.</p>
+              <p>Away from screens, I&rsquo;m a person that shoots on film, listens to loud music, reads a bunch of books while drinking a bunch of coffee, maintain an ever-evolving Japan itinerary I may or may not act on and enjoy living in Amsterdam with a husband (whom I&rsquo;ve already converted into a designer) and two cats (still working on those).</p>
+            </div>
+            <div class="about__cta">
+              <p class="about__cta-label">More about me:</p>
+              <div class="about__cta-buttons">
+                <a
+                  class="button button--cta js-feedback-download"
+                  href="brand_ref/docs/LunaBorgo_Designer_CV.pdf"
+                  download="LunaBorgo_Designer_CV.pdf"
+                  aria-label="Download CV as PDF"
+                >
+                  <span class="button__face button__face--default">
+                    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-download-sharp"></use>
+                    </svg>
+                    Download cv
+                  </span>
+                  <span class="button__face button__face--feedback" aria-live="polite">
+                    <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-hand-awesome"></use>
+                    </svg>
+                    <span class="button__feedback-label">downloaded</span>
+                  </span>
+                </a>
+                <button
+                  type="button"
+                  class="button button--cta js-copy-email"
+                  data-email="lunaborgo@gmail.com"
+                  aria-label="Copy email lunaborgo@gmail.com to clipboard"
+                >
+                  <span class="button__face button__face--default">
+                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-email-open"></use>
+                    </svg>
+                    Get in touch
+                  </span>
+                  <span class="button__face button__face--feedback" aria-live="polite">
+                    <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-hand-awesome"></use>
+                    </svg>
+                    <span class="button__feedback-label">copied</span>
+                  </span>
+                </button>
+                <a
+                  class="button button--cta"
+                  href="https://www.linkedin.com/in/lunaborgo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Connect on LinkedIn"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <use href="#figma-pixel-linkedin"></use>
+                  </svg>
+                  Connect
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        </div><!-- /.about__scroll -->
+      </section>
+
+      <!-- Thanks / sign-off -->
+      <section class="section section--thanks" id="thanks" aria-label="Sign-off">
+        <div class="page-grid">
+          <div class="col-full thanks__inner">
+            <h2 class="thanks__title">Thanks for the visit.</h2>
+            <div class="thanks__body">
+              <p class="thanks__body-p">If you&rsquo;d like to see more of my work, wanna partner for a project or just chat about design, send me a mail! I&rsquo;d love to hear from you ^^</p>
+              <p class="thanks__signoff">Love, Luna</p>
+              <pre class="about__ascii thanks__cat" aria-hidden="true">
        _
        \*-.
         )  _`-.
@@ -249,41 +402,49 @@
          ; '   : :`-:     _.`* ;
 [bug] .*' /  .*' ; .*`- +'  `*'
       `*-*   `*-*  `*-*'
-            </pre>
-            <p class="about__tagline">Thanks for checking my pixels.</p>
-          </div>
-
-          <!-- Lower: about me text + CTA -->
-          <div class="col-about about__content">
-            <h2 class="about__label">About <span class="hover-preview-link" data-preview-id="me" tabindex="0">me</span></h2>
-            <div class="about__body">
-              <p>Design has been part of my life long before it became my career. Back when computers were still a three-piece setup, a passion for reading and writing led me to start a blog – only to become completely obsessed with how it looked... and with all the gifs I wanted to make.</p>
-              <p>Twelve years later, my obsession with pixels hasn't gone anywhere. Today, I channel it into making design more sustainable – and more fun. With a systems mindset and a passion for craft, I move fluidly between strategy and hands-on, making sure what we imagine is actually something we can ship.</p>
-              <p>By combine storytelling, visual craft and genuine interest, I inspire and connect. Helping brands scale while creating the conditions for teams to do their best work.</p>
-              <p>Away from screens, I'm still a person: I shoot on film, listen to loud music, read a bunch of books while drinking a bunch of coffee, maintain an ever-evolving Japan itinerary I may or may not act on and enjoy living in Amsterdam with a husband (whom I've already converted into a designer) and two cats (still working on those).</p>
-              <p>ok here's my email if you think you need a cool designer hehe thanks bye ;*</p>
-            </div>
-            <div class="about__cta">
-              <button
-                type="button"
-                class="button button--accent js-copy-email"
-                data-email="lunaborgo@gmail.com"
-                aria-label="Copy email lunaborgo@gmail.com to clipboard"
-              >
-                <span aria-hidden="true">&gt;</span> lunaborgo@gmail.com
-              </button>
-              <p class="about__copy-feedback" role="status" aria-live="polite"></p>
+              </pre>
             </div>
           </div>
         </div>
-        <!-- Pixel pile — falls from cursor clicks, accumulates as a sand mountain -->
-        <div class="pixel-pile-footer" aria-hidden="true"></div>
-        </div><!-- /.about__scroll -->
       </section>
+
+      <!-- Pixel pile — falls from cursor clicks, accumulates as a sand mountain at page bottom -->
+      <div class="pixel-pile-footer" aria-hidden="true"></div>
 
     </main>
 
-    <script src="./js/scroll-snap.js" defer></script>
+<!-- Inline once per page (before scripts). Paths use currentColor → .navbar__logo-mark color token. -->
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="moon-icon-sprite" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="moon-new-moon" viewBox="0 0 156 156">
+    <path fill="currentColor" d="M12 72H6V84H12V108H18V120H24V126H30V132H36V138H42V144H54V150H108V156H48V150H36V144H30V138H24V132H18V126H12V114H6V90H0V66H6V48H12V72ZM120 150H108V144H120V150ZM144 132H138V138H132V144H120V138H126V132H132V126H138V120H144V132ZM150 120H144V108H150V120ZM90 6H114V12H126V18H132V24H138V30H144V36H150V48H156V108H150V54H144V42H138V36H132V30H126V24H120V18H108V12H84V6H72V12H54V18H42V24H30V18H36V12H48V6H66V0H90V6ZM24 42H18V48H12V36H18V30H24V42ZM30 30H24V24H30V30Z"/>
+  </symbol>
+  <symbol id="moon-waxing-crescent" viewBox="0 0 156 156">
+    <path fill="currentColor" d="M90 6H114V12H126V18H132V24H138V30H144V36H150V48H156V108H150V120H144V132H138V138H132V144H120V150H108V156H48V150H36V144H30V138H24V132H18V126H12V114H6V90H12V96H18V102H24V108H30V114H48V120H66V114H84V108H90V102H96V96H102V84H108V42H102V30H96V24H90V18H78V12H48V6H66V0H90V6ZM6 90H0V72H6V90Z"/>
+  </symbol>
+  <symbol id="moon-first-quarter" viewBox="0 0 150 156">
+    <path fill="currentColor" d="M84 6H108V12H120V18H126V24H132V30H138V36H144V48H150V108H144V120H138V132H132V138H126V144H114V150H102V156H42V150H30V144H24V138H18V132H12V126H6V114H24V120H36V114H54V108H66V102H72V90H78V78H84V48H78V36H72V30H66V24H60V18H48V12H42V6H60V0H84V6ZM6 114H0V108H6V114Z"/>
+  </symbol>
+  <symbol id="moon-waxing-gibbous" viewBox="0 0 150 156">
+    <path fill="currentColor" d="M84 6H108V12H120V18H126V24H132V30H138V36H144V48H150V108H144V120H138V132H132V138H126V144H114V150H102V156H42V150H30V144H24V138H18V132H12V126H6V114H24V120H36V114H54V108H66V102H72V90H78V78H84V48H78V36H72V30H66V24H60V18H48V12H42V6H60V0H84V6ZM6 114H0V108H6V114Z"/>
+  </symbol>
+  <symbol id="moon-full-moon" viewBox="0 0 156 156">
+    <path fill="currentColor" d="M90 6H114V12H126V18H132V24H138V30H144V36H150V48H156V108H150V120H144V132H138V138H132V144H120V150H108V156H48V150H36V144H30V138H24V132H18V126H12V114H6V90H0V66H6V48H12V36H18V30H24V24H30V18H36V12H48V6H66V0H90V6Z"/>
+  </symbol>
+  <symbol id="moon-waning-gibbous" viewBox="0 0 150 156">
+    <path fill="currentColor" d="M90 6H114V18H108V24H102V30H96V36H90V48H84V84H90V96H96V102H102V108H114V114H132V120H144V132H138V138H132V144H120V150H108V156H48V150H36V144H30V138H24V132H18V126H12V114H6V90H0V66H6V48H12V36H18V30H24V24H30V18H36V12H48V6H66V0H90V6ZM150 120H144V114H150V120Z"/>
+  </symbol>
+  <symbol id="moon-third-quarter" viewBox="0 0 156 156">
+    <path fill="currentColor" d="M90 6H108V12H78V18H72V24H60V36H54V48H48V84H54V96H60V102H66V108H78V114H96V120H108V114H126V108H138V102H144V90H150V78H156V102H150V114H144V126H138V132H132V138H126V144H120V150H108V156H48V150H36V144H30V138H18V126H12V120H6V108H0V54H6V42H12V30H18V24H24V18H36V12H42V6H66V0H90V6Z"/>
+  </symbol>
+  <symbol id="moon-waning-crescent" viewBox="0 0 156 156">
+    <path fill="currentColor" d="M90 6H108V12H78V18H72V24H60V36H54V48H48V84H54V96H60V102H66V108H78V114H96V120H108V114H126V108H138V102H144V90H150V78H156V102H150V114H144V126H138V132H132V138H126V144H120V150H108V156H48V150H36V144H30V138H18V126H12V120H6V108H0V54H6V42H12V30H18V24H24V18H36V12H42V6H66V0H90V6Z"/>
+  </symbol>
+</svg>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" defer></script>
+    <script src="./js/work-pin-scrolltrigger.js" defer></script>
     <script src="./js/hover-preview.js" defer></script>
     <script src="./js/pixel-interactions.js" defer></script>
     <script src="./js/work-slides.js" defer></script>
@@ -294,21 +455,68 @@
 
     <script>
       (function () {
-        const root     = document.documentElement;
-        const btnDark  = document.getElementById("theme-dark");
+        const STORAGE_KEY = "theme";
+        const SOURCE_KEY = "theme-source";
+        const root = document.documentElement;
+        const btnDark = document.getElementById("theme-dark");
         const btnLight = document.getElementById("theme-light");
+        const systemTheme = window.matchMedia
+          ? window.matchMedia("(prefers-color-scheme: dark)")
+          : null;
 
-        function setTheme(theme) {
-          root.setAttribute("data-theme", theme);
-          btnDark.setAttribute("aria-pressed",  theme === "dark"  ? "true" : "false");
-          btnLight.setAttribute("aria-pressed", theme === "light" ? "true" : "false");
-          localStorage.setItem("theme", theme);
+        function isTheme(theme) {
+          return theme === "dark" || theme === "light";
         }
 
-        setTheme(localStorage.getItem("theme") === "light" ? "light" : "dark");
+        function getSystemTheme() {
+          return systemTheme && systemTheme.matches ? "dark" : "light";
+        }
 
-        btnDark.addEventListener("click",  function () { setTheme("dark");  });
-        btnLight.addEventListener("click", function () { setTheme("light"); });
+        function getStoredTheme() {
+          try {
+            const savedTheme = localStorage.getItem(STORAGE_KEY);
+            const savedSource = localStorage.getItem(SOURCE_KEY);
+            return savedSource === "manual" && isTheme(savedTheme) ? savedTheme : null;
+          } catch (error) {
+            return null;
+          }
+        }
+
+        function applyTheme(theme) {
+          root.setAttribute("data-theme", theme);
+          btnDark.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+          btnLight.setAttribute("aria-pressed", theme === "light" ? "true" : "false");
+        }
+
+        function setManualTheme(theme) {
+          try {
+            localStorage.setItem(STORAGE_KEY, theme);
+            localStorage.setItem(SOURCE_KEY, "manual");
+          } catch (error) {
+            // Theme still applies for the current page when storage is unavailable.
+          }
+
+          applyTheme(theme);
+        }
+
+        applyTheme(getStoredTheme() || getSystemTheme());
+
+        if (systemTheme) {
+          const handleSystemThemeChange = function () {
+            if (!getStoredTheme()) {
+              applyTheme(getSystemTheme());
+            }
+          };
+
+          if (typeof systemTheme.addEventListener === "function") {
+            systemTheme.addEventListener("change", handleSystemThemeChange);
+          } else if (typeof systemTheme.addListener === "function") {
+            systemTheme.addListener(handleSystemThemeChange);
+          }
+        }
+
+        btnDark.addEventListener("click", function () { setManualTheme("dark"); });
+        btnLight.addEventListener("click", function () { setManualTheme("light"); });
       })();
     </script>
   </body>

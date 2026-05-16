@@ -33,7 +33,7 @@
 :root {
   --screen-x-small:  480px;   /* phone compact    ≤ 480px  */
   --screen-small:    768px;   /* mobile           ≤ 768px  */
-  --screen-medium:  1200px;   /* compact desktop  ≤ 1200px */
+  --screen-medium:  1024px;   /* compact desktop  ≤ 1024px */
   --screen-large:   1440px;   /* standard desktop ≤ 1440px */
   --screen-x-large: 1920px;   /* expanded desktop ≤ 1920px */
 }
@@ -78,7 +78,7 @@
   --color-base-blue-1200: #dbe0ff;
 
   /* ── Gray scale (dark: near-black → near-white) ──────────────*/
-  --color-base-gray-100:  #18161d;
+  --color-base-gray-100:  #18181a;   /* Figma gray.100 */
   --color-base-gray-200:  #09070d;
   --color-base-gray-300:  #231f2a;
   --color-base-gray-400:  #322e3a;
@@ -109,26 +109,39 @@
 
   /* ── Accent ──────────────────────────────────────────────────*/
   --color-accent-bg:                  #5543e4;   /* blue-900  */
-  --color-accent-fg:                  #8a8aff;   /* blue-1100 */
+  --color-accent-fg:                  #8a8aff;   /* Figma semantic/accent/fg — intro accent, focus, ticker */
+  --color-accent-bg-subtle:           color-mix(in srgb, var(--color-accent-bg) 10%, transparent);
 
   /* ── Highlight ───────────────────────────────────────────────*/
   --color-highlight-bg:               #8eff8e;   /* green-900 */
   --color-highlight-fg:               #8eff8e;   /* green-900 */
-  --color-highlight-fg-on-highlight:  #18161d;   /* gray-100  */
+  --color-highlight-fg-on-highlight:  var(--color-base-gray-100); /* text on green chip */
 
   /* ── Selection ──────────────────────────────────────────────*/
   --color-selection-bg:               #5543e466; /* accent-purple ~40%    */
   --color-selection-fg:               #ffffffcc; /* alpha-invert-800      */
 
   /* ── Neutral ─────────────────────────────────────────────────*/
-  --color-neutral-bg:                 #121426;   /* blue-100              */
+  --color-neutral-bg:                 var(--color-base-gray-100); /* Figma bg.neutral → gray.100 */
   --color-neutral-bg-elevated:        #ffffff1f; /* alpha-invert-100      */
-  --color-neutral-fg:                 #ffffffcc; /* alpha-invert-800      */
-  --color-neutral-fg-muted:           #ffffff9e; /* alpha-invert-600      */
+  --color-neutral-fg:                 #ffffffcc; /* Figma semantic/neutral/fg (≈80% white) */
+  --color-neutral-fg-strong:          #ffffff;   /* base-white — masks / full-contrast glyphs */
+  --color-neutral-fg-muted:           #ffffffcc; /* Figma frame: chrome matches default fg */
   --color-neutral-fg-on-accent:       #ffffffcc; /* alpha-invert-800      */
   --color-neutral-opacity-strong:     #09070dcc; /* alpha-800             */
   --color-neutral-stroke:             #ffffff52; /* alpha-invert-300      */
   --color-neutral-stroke-subtle:      #ffffff14; /* alpha-invert-080      */
+
+  /* Solid inverse hover — legacy alias; chrome / CTA use pill tokens below */
+  --color-neutral-chip-hover-bg:      #09070d;
+  --color-neutral-chip-hover-fg:      #ffffff;
+
+  /* Pill hover — Figma portfolio dark (625:15847 / site about): gray capsule · ink label */
+  --color-control-pill-hover-bg:      #d9d9d9;
+  --color-control-pill-hover-fg:      #09070d;
+
+  /* Idle chrome + CTA glyph/text on charcoal (lighter than semantic/neutral/fg ~#fff cc) */
+  --color-chrome-muted-fg:            #d9d9d9;
 }
 
 
@@ -189,6 +202,7 @@
   /* ── Semantic overrides ──────────────────────────────────────*/
   --color-accent-bg:                  #5543e4;   /* same purple accent           */
   --color-accent-fg:                  #5543e4;   /* solid (no lavender in light) */
+  --color-accent-bg-subtle:           color-mix(in srgb, var(--color-accent-bg) 10%, transparent);
 
   --color-highlight-bg:               #5543e4;   /* purple replaces green        */
   --color-highlight-fg:               #5543e4;
@@ -200,11 +214,17 @@
   --color-neutral-bg:                 #f7f8ff;   /* warm off-white               */
   --color-neutral-bg-elevated:        #09070d1f;
   --color-neutral-fg:                 #09070dcc;
+  --color-neutral-fg-strong:          #09070d;   /* base-gray-1200 — fully opaque; use for mask fills */
   --color-neutral-fg-muted:           #09070d9e;
   --color-neutral-fg-on-accent:       #ffffff;
   --color-neutral-opacity-strong:     #ffffff9e;
   --color-neutral-stroke:             #09070d14;
   --color-neutral-stroke-subtle:      #09070d14;
+
+  --color-control-pill-hover-bg:      #09070dcc;
+  --color-control-pill-hover-fg:      #f7f8ff;
+
+  --color-chrome-muted-fg:           var(--color-neutral-fg);
 }
 
 
@@ -219,15 +239,16 @@
      @font-face / @import lives in base.css or equivalent.
   ────────────────────────────────────────────────────────────── */
   --font-serif: 'Montagu Slab', Georgia, serif;
+  --font-glyph-jp: 'Noto Sans JP', sans-serif;
+  --font-glyph-arrow: 'Noto Sans Math', sans-serif;
   --font-mono:  'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   /* Figma node 368:13282 — ASCII art uses DM Mono Light */
   --font-mono-ascii: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* ── Font weights ────────────────────────────────────────────
-     display / body / inline-link = 300 (Light)
-     body-sm                      = 200 (Extra Light)
-     title                        = 500 (Medium)
-     mono                         = 400 (Regular)
+     display / body-lg / body-md / body-sm = 300 (Light)
+     title                                 = 500 (Medium)
+     mono / UI                             = 400 (Regular)
   ────────────────────────────────────────────────────────────── */
   --font-weight-extra-light: 200;
   --font-weight-light:       300;
@@ -237,68 +258,101 @@
   /* ── Line heights ────────────────────────────────────────────
      Figma unitless multipliers.
   ────────────────────────────────────────────────────────────── */
-  --line-height-tight:  1.2;    /* display, title                    */
-  --line-height-normal: 1.38;   /* body, body-sm, mono, inline-link  */
+  --line-height-tight:  1.2;    /* display                                */
+  --line-height-title:  0.9;    /* title — 90% (Figma title style)        */
+  --line-height-body-lg: 1.4;   /* body-lg                               */
+  --line-height-normal:  1.38;  /* body-md, body-sm, mono                */
 
-  /* ── Letter spacing ──────────────────────────────────────────
-     Figma "4" for mono = 4% of font-size = 0.04em.
+  /* ── Letter spacing (Figma % → em: value / 100) ──────────────
+     display  −1 % → −0.01em
+     title    −1 % → −0.01em
+     body-lg  −3 % → −0.03em
+     body-md  −3 % → −0.03em
+     body-sm   0 % →  0em
+     mono     −4 % → −0.04em
   ────────────────────────────────────────────────────────────── */
-  /* Figma display/title: letterSpacing -1 → −1 % of font-size (see MCP: tracking-[-0.4px] at 40 px) */
-  --letter-spacing-tight: -0.01em; /* display, title   */
-  --letter-spacing-body:   0em;    /* body, inline-link */
-  --letter-spacing-mono:   0.04em; /* Space Mono        */
+  --letter-spacing-tight:   -0.05em; /* section headings / title style (−5%)  */
+  --letter-spacing-body-lg: -0.03em; /* body-lg                     */
+  --letter-spacing-body-md: -0.03em; /* body-md                     */
+  --letter-spacing-body:     0em;    /* body-sm, link                */
+  --letter-spacing-mono:    -0.04em; /* Space Mono (Figma −4 %)     */
+  --letter-spacing-chrome:  -0.04em; /* Header / footer (Figma −4 %) */
+
+  /* Fixed chrome (navbar + bottom bar): Montagu Slab 14px — size tracks --typography-mono */
+  --typography-chrome:       var(--typography-mono);
 }
 
 
 /* ═══════════════════════════════════════════════════════════════
    6. TYPOGRAPHY — RESPONSIVE SIZE SCALE
    Figma "responsive" collection, typography group.
-   :root holds large / x-large values (≥ 1201px).
+   :root holds large values (1025px–1919px).
    Overridden per breakpoint in section 9.
 
    Figma variable name        → CSS custom property
    ─────────────────────────────────────────────────
    typography/display         → --typography-display
    typography/title           → --typography-title
-   typography/body            → --typography-body
+   typography/body lg         → --typography-body-lg
+   typography/body md         → --typography-body-md
    typography/body sm         → --typography-body-sm
+   typography/quote body      → --typography-quote-body
    typography/mono            → --typography-mono
+   typography/chrome          → --typography-chrome (alias of mono size)
+   typography/footnote        → --typography-footnote
    Inline_Link                → --typography-inline-link  (fixed)
 
-   Per-breakpoint values (px):
-   ┌──────────────────────┬────────┬───────┬────────┬───────┬─────────┐
-   │ Token                │ x-lrg  │ large │ medium │ small │ x-small │
-   ├──────────────────────┼────────┼───────┼────────┼───────┼─────────┤
-   │ --typography-display │  40    │  40   │  32    │  28   │  24     │
-   │ --typography-title   │  32    │  32   │  24    │  24   │  20     │
-   │ --typography-body    │  24    │  24   │  20    │  20   │  14     │
-   │ --typography-body-sm │  16    │  16   │  14    │  14   │  12     │
-   │ --typography-mono    │  14    │  14   │  14    │  12   │  12     │
-   │ --typography-inline- │  20    │  20   │  20    │  20   │  20     │
-   │   link               │ (fixed across all breakpoints)            │
-   └──────────────────────┴────────┴───────┴────────┴───────┴─────────┘
+   Per-breakpoint values (px), sourced from Figma responsive frames
+   (501:13561 / 501:13560 / 501:13556 / 501:13563 — portfolio_web site):
+
+   ┌────────────────────────────────┬────────┬───────┬────────┬───────┬─────────┐
+   │ Token                          │ x-lrg  │ large │ medium │ small │ x-small │
+   ├────────────────────────────────┼────────┼───────┼────────┼───────┼─────────┤
+   │ --typography-display           │  88    │  80   │  72    │  64   │  48     │
+   │ --typography-title (sections) │ 140    │ 140   │  96    │  96   │  80     │
+   │ --typography-intro-headline    │  64    │  64   │  64    │  32   │  32     │
+   │ --typography-body-lg           │  32    │  32   │  20    │  20   │  20     │
+   │ --typography-body-md           │  24    │  24   │  20    │  20   │  20     │
+   │ --typography-body-sm           │  20    │  20   │  16    │  16   │  16     │
+   │ --typography-quote-body        │  20    │  20   │  16    │  16   │  16     │
+   │ --typography-mono              │  14    │  14   │  14    │  14   │  14     │
+   │ --typography-chrome (alias)    │  14    │  14   │  14    │  14   │  14     │
+   │ --typography-footnote          │  14    │  12   │  12    │  10   │  10     │
+   │ --typography-inline-link       │  20    │  20   │  20    │  20   │  20     │
+   │                                │ (fixed across all breakpoints)          │
+   └────────────────────────────────┴────────┴───────┴────────┴───────┴─────────┘
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --typography-display:     40px;
-  --typography-title:       32px;
-  --typography-body:        24px;
-  --typography-body-sm:     16px;
-  --typography-mono:        14px;
-  --typography-inline-link: 20px;
-  --typography-footnote:    12px; /* Figma typography/footnote — ASCII art (node 368:13282) */
+  --typography-display:      80px;
+  /* Section headings — Figma typography/title on desktop frames */
+  --typography-title:        140px;
+  /*
+   * Intro hero (“hi, I'm luna …”) — hard-coded separately in Figma from
+   * typography/title (64px ≥769px / 32px ≤768px).
+   */
+  --typography-intro-headline: 64px;
+  --typography-body-lg:      32px;
+  --typography-body:         var(--typography-body-lg); /* backward-compat alias */
+  --typography-body-md:      24px;
+  --typography-body-sm:      20px;
+  /* Feedback quotes, about bio — same scale as body-sm (20 / 20 / 16 / 16) */
+  --typography-quote-body:   20px;
+  --typography-mono:         14px;
+  --typography-inline-link:  20px;
+  --typography-footnote:     12px; /* 12px large/medium; 14px at ≥1920px (x-large) */
 }
 
 
 /* ═══════════════════════════════════════════════════════════════
    7. LAYOUT — SPACING MARGIN
    Figma "responsive" collection — spacing/margins token.
-   :root = large desktop default (1201px–1919px viewport).
+   :root = large desktop default (1025px–1919px viewport).
    Overridden per breakpoint in section 9.
 
    x-large  ≥ 1920px  →  80px   (`get_variable_defs` intro 357:12908)
-   large    1201–1919 →  40px
-   medium   > 768px   →  40px
+   large    1025–1919 →  40px
+   medium   769–1024  →  40px
    small    > 480px   →  24px
    x-small  ≤ 480px   →  16px
    ═══════════════════════════════════════════════════════════════ */
@@ -329,59 +383,70 @@
   /* ── Border radius ───────────────────────────────────────────*/
   --radius-sm: 2px;
   --radius-md: 4px;
+  --radius-chip-pill: 32px; /* Figma button hover capsule (625:15847) */
 
   /* ── Overlay scrim ───────────────────────────────────────────*/
   --overlay: rgba(0, 0, 0, 0.40);
+
+  /* Thanks section (#thanks) padding-top — responsive in section 9 */
+  --spacing-thanks-padding-top: 144px; /* large + x-large (1025px+) */
 }
 
 
 /* ═══════════════════════════════════════════════════════════════
    9. RESPONSIVE OVERRIDES
-   Desktop-first: :root holds large/x-large defaults.
+   Desktop-first: :root holds large defaults.
    Each @media block narrows the scale for smaller viewports.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── medium: 769px – 1200px ──────────────────────────────────── */
-@media (max-width: 1200px) {
+/* ── medium: 769px – 1024px ──────────────────────────────────── */
+@media (max-width: 1024px) {
   :root {
-    --typography-display: 32px;
-    --typography-title:   24px;
-    --typography-body:    20px;
-    --typography-body-sm: 14px;
+    --typography-display:  72px;
+    --typography-title:    96px;
+    --typography-body-lg:  20px;
+    --typography-body-md:  20px;
+    --typography-body-sm:  16px;
+    --typography-quote-body: 16px;
     /* --typography-mono stays 14px */
-    --spacing-margin:     40px;
+    --spacing-margin:      40px;
+    --spacing-thanks-padding-top: 160px;
   }
 }
 
 /* ── small: 481px – 768px ────────────────────────────────────── */
 @media (max-width: 768px) {
   :root {
-    --typography-display: 28px;
-    /* --typography-title   stays 24px */
-    /* --typography-body    stays 20px */
-    /* --typography-body-sm stays 14px */
-    --typography-mono:    12px;
-    --typography-footnote: 10px;
-    --spacing-margin:     24px;
+    --typography-display:   64px;
+    --typography-intro-headline: 32px;
+    /* --typography-title    stays 96px */
+    /* --typography-body-*   inherited from ≤1024 */
+    /* --typography-mono     stays 14px */
+    --typography-footnote:  10px;
+    --spacing-margin:       24px;
+    --spacing-thanks-padding-top: 80px;
   }
 }
 
 /* ── x-small: ≤ 480px ────────────────────────────────────────── */
 @media (max-width: 480px) {
   :root {
-    --typography-display: 24px;
-    --typography-title:   20px;
-    --typography-body:    12px;
-    --typography-body-sm: 12px;
-    /* --typography-mono    stays 12px */
+    --typography-display:   48px;
+    --typography-title:     80px;
+    /* --typography-intro-headline stays 32px */
+    /* --typography-body-*   inherited from ≤1024 */
+    /* --typography-mono     stays 14px */
     /* --typography-footnote stays 10px */
-    --spacing-margin:     16px;
+    --spacing-margin:       16px;
   }
 }
 
 /* ── expanded desktop: Figma mode screen/max-width 1920 (see variables on intro 357:12908) ── */
 @media (min-width: 1920px) {
   :root {
-    --spacing-margin: 80px;
+    --typography-display:  88px;
+    --typography-title:    140px;
+    --typography-footnote: 14px;
+    --spacing-margin:      80px;
   }
 }

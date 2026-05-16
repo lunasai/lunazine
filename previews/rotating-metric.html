@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rotating metric — preview</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/component-rotating-metric.css" />
+
+    <style>
+      /*
+       * sr-only — copied here so the preview page has no dependency on
+       * main.css (which defines it for the full site).
+       */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      body {
+        margin: 0;
+        background: var(--color-neutral-bg);
+        color: var(--color-neutral-fg);
+        font-family: var(--font-mono);
+      }
+
+      .preview-label {
+        padding: var(--space-10) var(--spacing-margin) var(--space-4);
+        font-size: var(--typography-mono);
+        line-height: var(--line-height-normal);
+        letter-spacing: var(--letter-spacing-mono);
+        text-transform: uppercase;
+        color: var(--color-neutral-fg-muted);
+      }
+    </style>
+  </head>
+  <body>
+
+    <!--
+      #metric-badge-star is defined inline in index.html for the full site.
+      In this standalone preview page we include a local copy of that symbol
+      so <use href="#metric-badge-star"> resolves without the main document.
+    -->
+    <svg aria-hidden="true" focusable="false" width="0" height="0" style="display:none">
+      <symbol id="metric-badge-star" viewBox="0 0 20 20">
+        <path d="M9.824 16.288C9.70667 15.5947 9.39733 14.848 8.896 14.048C8.39467 13.2373 7.68 12.4853 6.752 11.792C5.83467 11.0987 4.91733 10.656 4 10.464V9.792C4.90667 9.57867 5.776 9.184 6.608 8.608C7.45067 8.02133 8.15467 7.31733 8.72 6.496C9.296 5.65333 9.664 4.82133 9.824 4H10.496C10.592 4.53333 10.784 5.08267 11.072 5.648C11.36 6.20267 11.728 6.736 12.176 7.248C12.6347 7.74933 13.1467 8.20267 13.712 8.608C14.5547 9.20533 15.4133 9.6 16.288 9.792V10.464C15.7013 10.5813 15.0933 10.8213 14.464 11.184C13.8453 11.5467 13.2693 11.9787 12.736 12.48C12.2027 12.9707 11.7653 13.488 11.424 14.032C10.9227 14.832 10.6133 15.584 10.496 16.288H9.824Z" />
+      </symbol>
+    </svg>
+
+    <p class="preview-label">Rotating metric ticker</p>
+
+    <div class="rotating-metric" role="region" aria-labelledby="rotating-metric-label">
+
+      <span id="rotating-metric-label" class="sr-only">Key design system metrics</span>
+
+      <ul class="sr-only" aria-label="Metrics">
+        <li>Community engagement up 230% in two years</li>
+        <li>Component health hit 94%</li>
+        <li>SUS at 70, above the industry standard of 68</li>
+      </ul>
+
+      <div class="rotating-metric__viewport" aria-hidden="true">
+        <div class="rotating-metric__track">
+
+          <!-- First copy -->
+          <div class="rotating-metric__items">
+            <span class="rotating-metric__sep">
+              <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+                <use href="#metric-badge-star"></use>
+              </svg>
+            </span>
+            <span class="rotating-metric__phrase">
+              <span class="rotating-metric__label">Community engagement up</span>
+              <span class="rotating-metric__badge">230%</span>
+              <span class="rotating-metric__label">in two years</span>
+            </span>
+            <span class="rotating-metric__sep">
+              <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+                <use href="#metric-badge-star"></use>
+              </svg>
+            </span>
+            <span class="rotating-metric__phrase">
+              <span class="rotating-metric__label">Component health hit</span>
+              <span class="rotating-metric__badge">94%</span>
+            </span>
+            <span class="rotating-metric__sep">
+              <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+                <use href="#metric-badge-star"></use>
+              </svg>
+            </span>
+            <span class="rotating-metric__phrase">
+              <span class="rotating-metric__label">SUS at</span>
+              <span class="rotating-metric__badge">70</span>
+              <span class="rotating-metric__label">above the industry standard of 68</span>
+            </span>
+          </div>
+
+          <!-- Second copy (seamless loop) -->
+          <div class="rotating-metric__items">
+            <span class="rotating-metric__sep">
+              <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+                <use href="#metric-badge-star"></use>
+              </svg>
+            </span>
+            <span class="rotating-metric__phrase">
+              <span class="rotating-metric__label">Community engagement up</span>
+              <span class="rotating-metric__badge">230%</span>
+              <span class="rotating-metric__label">in two years</span>
+            </span>
+            <span class="rotating-metric__sep">
+              <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+                <use href="#metric-badge-star"></use>
+              </svg>
+            </span>
+            <span class="rotating-metric__phrase">
+              <span class="rotating-metric__label">Component health hit</span>
+              <span class="rotating-metric__badge">94%</span>
+            </span>
+            <span class="rotating-metric__sep">
+              <svg class="rotating-metric__sep-icon" viewBox="0 0 20 20" focusable="false">
+                <use href="#metric-badge-star"></use>
+              </svg>
+            </span>
+            <span class="rotating-metric__phrase">
+              <span class="rotating-metric__label">SUS at</span>
+              <span class="rotating-metric__badge">70</span>
+              <span class="rotating-metric__label">above the industry standard of 68</span>
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <button type="button" class="rotating-metric__pause" aria-pressed="false" aria-label="Pause metrics ticker">
+        <svg class="rotating-metric__pause-icon" viewBox="0 0 12 12" focusable="false" aria-hidden="true">
+          <rect class="rotating-metric__icon-pause" x="1.5" y="1.5" width="3.5" height="9" rx="0.5"/>
+          <rect class="rotating-metric__icon-pause" x="7"   y="1.5" width="3.5" height="9" rx="0.5"/>
+          <polygon class="rotating-metric__icon-play" points="2,1.5 11,6 2,10.5"/>
+        </svg>
+      </button>
+
+    </div>
+
+    <script src="../js/rotating-metric.js"></script>
+  </body>
+</html>
