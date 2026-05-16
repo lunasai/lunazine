@@ -190,7 +190,6 @@
   font-size:      var(--typography-mono);
   line-height:    var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   font-feature-settings: 'case' 1;
   color: var(--color-neutral-fg);
 }

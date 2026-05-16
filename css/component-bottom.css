@@ -10,19 +10,20 @@
   position: relative;
   width: 100%;
 
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-weight: var(--font-weight-regular);
-  font-size: var(--typography-mono);
+  font-size: var(--typography-chrome);
   line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-chrome);
   white-space: nowrap;
-  color: var(--color-neutral-fg-muted);
+  color: var(--color-neutral-fg);
 }
+
+
 
 .bottom__contact {
   flex: 0 0 auto;
-  color: var(--color-neutral-fg-muted);
+  color: var(--color-neutral-fg);
   position: relative;
 }
 
@@ -35,7 +36,6 @@
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1;
-  text-transform: uppercase;
   white-space: nowrap;
   color: var(--color-neutral-fg);
   background: var(--color-neutral-opacity-strong);
@@ -74,7 +74,6 @@
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1;
-  text-transform: uppercase;
   white-space: nowrap;
   color: var(--color-neutral-fg);
   background: var(--color-neutral-opacity-strong);
@@ -123,31 +122,16 @@
 }
 
 .bottom__mode .button {
-  /* Button component defaults to neutral fg; Bottom uses muted fg */
-  color: var(--color-neutral-fg-muted);
+  /* Figma dark: footer mono matches semantic/neutral/fg */
+  color: var(--color-neutral-fg);
 }
 
-/* Figma Footer Mode Toggle (368:13139): inactive control opacity-80 */
+/* Footer mode toggle — Figma Bottom inactive control ~opacity-30 */
 .bottom__mode .button[aria-pressed="false"] {
-  opacity: 0.8;
+  opacity: 0.3;
 }
 
 .bottom__mode .button[aria-pressed="true"] {
   opacity: 1;
-}
-
-/* Light theme: footer switches to serif (Montagu Slab) + lowercase */
-[data-theme="light"] .bottom {
-  font-family: var(--font-serif);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: -0.04em;
-  text-transform: lowercase;
-}
-
-[data-theme="light"] .bottom__mode .button {
-  font-family: var(--font-serif);
-  font-weight: var(--font-weight-regular);
-  letter-spacing: -0.04em;
-  text-transform: lowercase;
 }
 

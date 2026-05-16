@@ -12,8 +12,6 @@
 
 html {
   scroll-behavior: smooth;
-  /* Serif/body: display lowercase from source copy; mono stacks set their own transform */
-  text-transform: lowercase;
 }
 
 html,
@@ -31,6 +29,14 @@ body {
   margin: 0;
   background: var(--color-neutral-bg);
   color: var(--color-neutral-fg);
+}
+
+/* Dark theme: same font-weight tokens as light, but bright-on-dark rendering
+   reads heavier with default subpixel AA — greyscale smoothing aligns perception
+   with the light reference (incl. Impact mono list + Montagu body). */
+html[data-theme="dark"] {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ─── Text selection ─────────────────────────────────────────── */
@@ -65,7 +71,6 @@ body {
   font-family: var(--font-mono);
   font-size: var(--typography-mono);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   text-decoration: none;
   border-radius: var(--radius-md);
   outline: 2px solid var(--color-accent-fg);
@@ -97,7 +102,6 @@ body {
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   font-feature-settings: "case" 1;
   white-space: nowrap;
 }
@@ -370,6 +374,7 @@ body {
   }
 }
 
+/* Underlined name inherits .intro__title medium weight (not hover-link regular 400) */
 .intro__name {
   -webkit-text-decoration-line: underline;
   text-decoration-line: underline;
@@ -428,14 +433,15 @@ body {
   gap: 10px; /* Figma: 10px — no exact token */
   font-family: var(--font-mono);
   font-weight: var(--font-weight-regular);
+  font-style: normal;
+  font-synthesis: none;
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
 }
 
 .work__detail-arrow {
-  color: var(--color-accent-fg);
+  color: var(--color-neutral-fg);
   flex-shrink: 0;
   line-height: inherit;
 }
@@ -476,7 +482,7 @@ body {
 /* Project copy: body type scale (not section headings) */
 .work__body {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-body-md);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-body-md);
@@ -550,7 +556,6 @@ body {
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   color: var(--color-neutral-fg);
 }
 
@@ -562,7 +567,6 @@ body {
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   color: var(--color-neutral-fg);
 }
 
@@ -630,8 +634,8 @@ body {
 .feedback-card__quote-icon,
 .feedback-card__source-icon {
   flex: 0 0 auto;
-  width: var(--space-6);
-  height: var(--space-6);
+  width: var(--space-4);  /* 16px */
+  height: var(--space-4);
   color: var(--color-neutral-fg);
 }
 
@@ -644,10 +648,10 @@ body {
 .feedback-card__quote p {
   margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-body-md);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-quote-body);
   line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-body-md);
+  letter-spacing: var(--letter-spacing-body);
   color: var(--color-neutral-fg);
 }
 
@@ -667,7 +671,6 @@ body {
   font-size: var(--typography-mono);
   line-height: 1.18; /* no token: Figma mono source line height */
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
 }
 
 /* ─── About section ──────────────────────────────────────────── */
@@ -711,7 +714,8 @@ body {
   position: relative;
   z-index: 2;
   background-color: var(--color-neutral-bg);
-  padding-block: var(--spacing-margin) calc(var(--space-10) * 2);
+  padding-top: var(--spacing-thanks-padding-top);
+  padding-bottom: calc(var(--space-10) * 2);
   box-sizing: border-box;
 }
 
@@ -796,7 +800,7 @@ body {
 .about__content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3); /* 12px */
+  gap: var(--space-10); /* 40px — body to “More about me” CTA */
   padding-top: 0;
   padding-bottom: var(--space-10); /* 40px */
   box-sizing: border-box;
@@ -814,10 +818,10 @@ body {
 
 .about__body {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-body-md);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-quote-body);
   line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-body-md);
+  letter-spacing: var(--letter-spacing-body);
   color: var(--color-neutral-fg);
 }
 
@@ -830,7 +834,6 @@ body {
 }
 
 .about__cta {
-  margin-top: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -850,82 +853,14 @@ body {
 .about__cta-buttons {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch; /* widest row sets column inline-size; pills span full button */
   gap: var(--space-3);
+  width: max-content;
 }
 
-/* Shared icon + text CTA button base */
-.about__cta-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-serif);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-body-sm);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-body-md);
-  cursor: pointer;
-  text-decoration: none;
-  border: none;
-  background: none;
-  padding: 0;
-  color: var(--color-neutral-fg);
-  transition: opacity 150ms ease;
-}
-
-.about__cta-btn:hover {
-  opacity: 0.7;
-}
-
-.about__cta-btn:focus-visible {
-  outline: 2px solid var(--color-accent-bg);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
-/* CV download: dark filled pill */
-.about__cta-btn--cv {
-  background: var(--color-neutral-fg);
-  color: var(--color-neutral-bg);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  border-right: 1px solid transparent;
-}
-
-.about__cta-btn--cv:hover {
-  opacity: 0.85;
-}
-
-/* Match CV pill horizontal inset so icons line up with download glyph */
-.about__cta-btn--email,
-.about__cta-btn--linkedin {
-  padding-inline-start: var(--space-3);
-}
-
-/* Icon sizing */
-.about__cta-icon {
-  flex-shrink: 0;
-  width: 24px; /* no token */
-  height: 24px; /* no token */
-}
-
-.about__copy-feedback {
-  margin: 0;
-  min-height: 1lh;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-footnote);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
-  color: var(--color-neutral-fg-muted);
-}
-
-.about__copy-feedback:empty {
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+.about__cta-buttons > .button.button--cta {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 

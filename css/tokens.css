@@ -78,7 +78,7 @@
   --color-base-blue-1200: #dbe0ff;
 
   /* ── Gray scale (dark: near-black → near-white) ──────────────*/
-  --color-base-gray-100:  #18161d;
+  --color-base-gray-100:  #18181a;   /* Figma gray.100 */
   --color-base-gray-200:  #09070d;
   --color-base-gray-300:  #231f2a;
   --color-base-gray-400:  #322e3a;
@@ -109,32 +109,39 @@
 
   /* ── Accent ──────────────────────────────────────────────────*/
   --color-accent-bg:                  #5543e4;   /* blue-900  */
-  --color-accent-fg:                  #8a8aff;   /* blue-1100 */
+  --color-accent-fg:                  #8a8aff;   /* Figma semantic/accent/fg — intro accent, focus, ticker */
   --color-accent-bg-subtle:           color-mix(in srgb, var(--color-accent-bg) 10%, transparent);
 
   /* ── Highlight ───────────────────────────────────────────────*/
   --color-highlight-bg:               #8eff8e;   /* green-900 */
   --color-highlight-fg:               #8eff8e;   /* green-900 */
-  --color-highlight-fg-on-highlight:  #18161d;   /* gray-100  */
+  --color-highlight-fg-on-highlight:  var(--color-base-gray-100); /* text on green chip */
 
   /* ── Selection ──────────────────────────────────────────────*/
   --color-selection-bg:               #5543e466; /* accent-purple ~40%    */
   --color-selection-fg:               #ffffffcc; /* alpha-invert-800      */
 
   /* ── Neutral ─────────────────────────────────────────────────*/
-  --color-neutral-bg:                 #121426;   /* blue-100              */
+  --color-neutral-bg:                 var(--color-base-gray-100); /* Figma bg.neutral → gray.100 */
   --color-neutral-bg-elevated:        #ffffff1f; /* alpha-invert-100      */
-  --color-neutral-fg:                 #ffffffcc; /* alpha-invert-800      */
-  --color-neutral-fg-strong:          #ffffff;   /* base-white — fully opaque; use for mask fills */
-  --color-neutral-fg-muted:           #ffffff9e; /* alpha-invert-600      */
+  --color-neutral-fg:                 #ffffffcc; /* Figma semantic/neutral/fg (≈80% white) */
+  --color-neutral-fg-strong:          #ffffff;   /* base-white — masks / full-contrast glyphs */
+  --color-neutral-fg-muted:           #ffffffcc; /* Figma frame: chrome matches default fg */
   --color-neutral-fg-on-accent:       #ffffffcc; /* alpha-invert-800      */
   --color-neutral-opacity-strong:     #09070dcc; /* alpha-800             */
   --color-neutral-stroke:             #ffffff52; /* alpha-invert-300      */
   --color-neutral-stroke-subtle:      #ffffff14; /* alpha-invert-080      */
 
-  /* Solid inverse hover (primary nav work / about) — same in light & dark */
+  /* Solid inverse hover — legacy alias; chrome / CTA use pill tokens below */
   --color-neutral-chip-hover-bg:      #09070d;
   --color-neutral-chip-hover-fg:      #ffffff;
+
+  /* Pill hover — Figma portfolio dark (625:15847 / site about): gray capsule · ink label */
+  --color-control-pill-hover-bg:      #d9d9d9;
+  --color-control-pill-hover-fg:      #09070d;
+
+  /* Idle chrome + CTA glyph/text on charcoal (lighter than semantic/neutral/fg ~#fff cc) */
+  --color-chrome-muted-fg:            #d9d9d9;
 }
 
 
@@ -213,6 +220,11 @@
   --color-neutral-opacity-strong:     #ffffff9e;
   --color-neutral-stroke:             #09070d14;
   --color-neutral-stroke-subtle:      #09070d14;
+
+  --color-control-pill-hover-bg:      #09070dcc;
+  --color-control-pill-hover-fg:      #f7f8ff;
+
+  --color-chrome-muted-fg:           var(--color-neutral-fg);
 }
 
 
@@ -236,7 +248,7 @@
   /* ── Font weights ────────────────────────────────────────────
      display / body-lg / body-md / body-sm = 300 (Light)
      title                                 = 500 (Medium)
-     mono / UI caps                        = 400 (Regular)
+     mono / UI                             = 400 (Regular)
   ────────────────────────────────────────────────────────────── */
   --font-weight-extra-light: 200;
   --font-weight-light:       300;
@@ -257,13 +269,17 @@
      body-lg  −3 % → −0.03em
      body-md  −3 % → −0.03em
      body-sm   0 % →  0em
-     mono      4 % →  0.04em
+     mono     −4 % → −0.04em
   ────────────────────────────────────────────────────────────── */
   --letter-spacing-tight:   -0.05em; /* section headings / title style (−5%)  */
   --letter-spacing-body-lg: -0.03em; /* body-lg                     */
   --letter-spacing-body-md: -0.03em; /* body-md                     */
   --letter-spacing-body:     0em;    /* body-sm, link                */
-  --letter-spacing-mono:     0.04em; /* Space Mono                  */
+  --letter-spacing-mono:    -0.04em; /* Space Mono (Figma −4 %)     */
+  --letter-spacing-chrome:  -0.04em; /* Header / footer (Figma −4 %) */
+
+  /* Fixed chrome (navbar + bottom bar): Montagu Slab 14px — size tracks --typography-mono */
+  --typography-chrome:       var(--typography-mono);
 }
 
 
@@ -280,7 +296,9 @@
    typography/body lg         → --typography-body-lg
    typography/body md         → --typography-body-md
    typography/body sm         → --typography-body-sm
+   typography/quote body      → --typography-quote-body
    typography/mono            → --typography-mono
+   typography/chrome          → --typography-chrome (alias of mono size)
    typography/footnote        → --typography-footnote
    Inline_Link                → --typography-inline-link  (fixed)
 
@@ -296,7 +314,9 @@
    │ --typography-body-lg           │  32    │  32   │  20    │  20   │  20     │
    │ --typography-body-md           │  24    │  24   │  20    │  20   │  20     │
    │ --typography-body-sm           │  20    │  20   │  16    │  16   │  16     │
+   │ --typography-quote-body        │  20    │  20   │  16    │  16   │  16     │
    │ --typography-mono              │  14    │  14   │  14    │  14   │  14     │
+   │ --typography-chrome (alias)    │  14    │  14   │  14    │  14   │  14     │
    │ --typography-footnote          │  14    │  12   │  12    │  10   │  10     │
    │ --typography-inline-link       │  20    │  20   │  20    │  20   │  20     │
    │                                │ (fixed across all breakpoints)          │
@@ -316,6 +336,8 @@
   --typography-body:         var(--typography-body-lg); /* backward-compat alias */
   --typography-body-md:      24px;
   --typography-body-sm:      20px;
+  /* Feedback quotes, about bio — same scale as body-sm (20 / 20 / 16 / 16) */
+  --typography-quote-body:   20px;
   --typography-mono:         14px;
   --typography-inline-link:  20px;
   --typography-footnote:     12px; /* 12px large/medium; 14px at ≥1920px (x-large) */
@@ -361,9 +383,13 @@
   /* ── Border radius ───────────────────────────────────────────*/
   --radius-sm: 2px;
   --radius-md: 4px;
+  --radius-chip-pill: 32px; /* Figma button hover capsule (625:15847) */
 
   /* ── Overlay scrim ───────────────────────────────────────────*/
   --overlay: rgba(0, 0, 0, 0.40);
+
+  /* Thanks section (#thanks) padding-top — responsive in section 9 */
+  --spacing-thanks-padding-top: 144px; /* large + x-large (1025px+) */
 }
 
 
@@ -381,8 +407,10 @@
     --typography-body-lg:  20px;
     --typography-body-md:  20px;
     --typography-body-sm:  16px;
+    --typography-quote-body: 16px;
     /* --typography-mono stays 14px */
     --spacing-margin:      40px;
+    --spacing-thanks-padding-top: 160px;
   }
 }
 
@@ -396,6 +424,7 @@
     /* --typography-mono     stays 14px */
     --typography-footnote:  10px;
     --spacing-margin:       24px;
+    --spacing-thanks-padding-top: 80px;
   }
 }
 

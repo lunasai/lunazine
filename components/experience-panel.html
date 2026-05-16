@@ -42,11 +42,24 @@
         <div class="experience-panel__row experience-panel__row--cta" role="listitem">
           <span class="experience-panel__row-label">and more</span>
           <a
-            class="button button--bold"
+            class="button button--cta js-feedback-download"
             href="brand_ref/docs/LunaBorgo_Designer_CV.pdf"
             download="LunaBorgo_Designer_CV.pdf"
             aria-label="Download CV as PDF"
-          >download cv</a>
+          >
+            <span class="button__face button__face--default">
+              <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+                <use href="#figma-pixel-download-sharp"></use>
+              </svg>
+              Download cv
+            </span>
+            <span class="button__face button__face--feedback" aria-live="polite">
+              <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <use href="#figma-pixel-hand-awesome"></use>
+              </svg>
+              <span class="button__feedback-label">downloaded</span>
+            </span>
+          </a>
         </div>
 
       </div>

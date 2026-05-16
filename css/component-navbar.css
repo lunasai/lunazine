@@ -1,7 +1,7 @@
 /*
   component-navbar.css
   Depends on: css/tokens.css
-  Primary nav items (work / about): use `a.button` from css/component-button.css
+  Primary nav (work / about): `a.button.button--chrome` plus css/component-button.css
 */
 
 .navbar {
@@ -19,19 +19,6 @@
   gap: var(--space-2); /* 8px — Figma logo cluster */
   color: var(--color-neutral-fg);
   text-decoration: none;
-}
-
-.navbar__name,
-.navbar__logo-type {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-mono);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--color-neutral-fg);
-  font-feature-settings: "case" 1;
 }
 
 .navbar__logo-mark {
@@ -62,7 +49,6 @@
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1;
-  text-transform: uppercase;
   white-space: nowrap;
   color: var(--color-neutral-fg);
   background: var(--color-neutral-opacity-strong);
@@ -99,17 +85,18 @@
   padding: 0;
 }
 
-/* Primary nav: solid inverse hover (not global accent `.button:hover`) */
-@media (hover: hover) and (pointer: fine) {
-  .navbar__nav .button:hover {
-    background: var(--color-neutral-chip-hover-bg);
-    color: var(--color-neutral-chip-hover-fg);
-  }
-
-  .navbar__nav a.button:visited:hover {
-    color: var(--color-neutral-chip-hover-fg);
-  }
+.navbar__name,
+.navbar__logo-type {
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-chrome);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-chrome);
+  white-space: nowrap;
+  color: var(--color-neutral-fg);
 }
+
+/* Nav chrome buttons: typography + line-height live in css/component-button.css */
 
 .navbar__brand:focus-visible {
   outline: 2px solid var(--color-accent-fg);

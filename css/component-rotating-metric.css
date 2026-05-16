@@ -13,7 +13,7 @@
  *   .rotating-metric__sep       — star separator glyph between phrases
  *   .rotating-metric__sep-icon  — inline SVG inside the separator
  *   .rotating-metric__phrase    — one metric unit: label(s) + badge
- *   .rotating-metric__label     — plain uppercase mono text span
+ *   .rotating-metric__label     — mono sentence-case text span
  *   .rotating-metric__badge     — highlighted pill value (e.g. "230%")
  *   .rotating-metric__pause     — absolute pause/play toggle (WCAG 2.2.2)
  *   .rotating-metric__pause-icon — SVG inside the pause button
@@ -119,7 +119,6 @@
   font-size:      var(--typography-mono);
   line-height:    var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   color: var(--color-accent-fg);
 }
 
@@ -132,7 +131,6 @@
   font-size:      var(--typography-mono);
   line-height:    var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   color: var(--color-accent-fg);
   border-radius: 17px; /* Figma: 17px — no exact token */
   padding: var(--space-1) 2px; /* Figma: 4px / 2px — no exact 2px token */

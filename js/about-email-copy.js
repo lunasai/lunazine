@@ -1,50 +1,61 @@
 (function () {
   "use strict";
 
-  /*
-   * Handles all .js-copy-email buttons with two behaviours:
-   *
-   * 1. Inline swap  — button has data-copied-text="…"
-   *    The button's own text changes to that value, then reverts after 2.8 s.
-   *    Used by the footer "contact me" button.
-   *
-   * 2. External feedback — no data-copied-text
-   *    Confirmation is written to the nearest .about__copy-feedback element.
-   *    Used by the about-section button.
-   */
+  var DEFAULT_MS = 2800;
+
+  function feedbackDuration(el) {
+    var raw = (el && el.getAttribute("data-feedback-ms")) || "";
+    var n = parseInt(raw, 10);
+    return Number.isFinite(n) && n > 0 ? n : DEFAULT_MS;
+  }
+
+  /* Clipboard · Figma status=feedback (thumb + copied) */
   document.querySelectorAll(".js-copy-email").forEach(function (btn) {
-    var email      = (btn.getAttribute("data-email") || "").trim();
-    var copiedText = btn.getAttribute("data-copied-text");
-    var originalText = btn.textContent.trim();
-    var statusEl   = copiedText ? null : document.querySelector(".about__copy-feedback");
-    var hideTimer;
+    var email = (btn.getAttribute("data-email") || "").trim();
+    var feedbackFace = btn.querySelector(".button__face--feedback");
+    if (!feedbackFace) return;
+
+    var labelEl = feedbackFace.querySelector(".button__feedback-label");
+    var okLabel = labelEl ? labelEl.textContent.trim() : "copied";
+    var errorLabel = btn.getAttribute("data-feedback-error") || "couldn't copy";
+    var restoreTimer;
 
     btn.addEventListener("click", async function () {
       if (!email) return;
-      clearTimeout(hideTimer);
+      window.clearTimeout(restoreTimer);
 
       try {
         await navigator.clipboard.writeText(email);
-        if (copiedText !== null) {
-          btn.textContent = copiedText;
-        } else if (statusEl) {
-          statusEl.textContent = "Copied to your clipboard.";
-        }
+        if (labelEl) labelEl.textContent = okLabel;
       } catch {
-        if (copiedText !== null) {
-          btn.textContent = "could not copy";
-        } else if (statusEl) {
-          statusEl.textContent = "Could not copy — select the address above.";
-        }
+        if (labelEl) labelEl.textContent = errorLabel;
       }
 
-      hideTimer = window.setTimeout(function () {
-        if (copiedText !== null) {
-          btn.textContent = originalText;
-        } else if (statusEl) {
-          statusEl.textContent = "";
-        }
-      }, 2800);
+      btn.classList.add("is-feedback");
+      restoreTimer = window.setTimeout(function () {
+        btn.classList.remove("is-feedback");
+        if (labelEl) labelEl.textContent = okLabel;
+      }, feedbackDuration(btn));
+    });
+  });
+
+  /* CV download · Figma status=feedback (thumb + downloaded) */
+  document.querySelectorAll(".js-feedback-download").forEach(function (link) {
+    var feedbackFace = link.querySelector(".button__face--feedback");
+    if (!feedbackFace || link.tagName !== "A") return;
+
+    var labelEl = feedbackFace.querySelector(".button__feedback-label");
+    var okLabel = labelEl ? labelEl.textContent.trim() : "downloaded";
+    var restoreTimer;
+
+    link.addEventListener("click", function () {
+      window.clearTimeout(restoreTimer);
+      if (labelEl) labelEl.textContent = okLabel;
+
+      link.classList.add("is-feedback");
+      restoreTimer = window.setTimeout(function () {
+        link.classList.remove("is-feedback");
+      }, feedbackDuration(link));
     });
   });
 })();

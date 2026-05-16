@@ -3,8 +3,8 @@
   Hover-preview links: native wavy underline (matches Figma text styles) + floating preview card.
 
   Visual language:
-    · Underline: WAVY accent (`--color-accent-fg`); thickness 4% / offset 8.75% (~half prior visual weight;
-      browsers vary wave geometry). Based on Figma tokens on frames such as `501:13560` / `554:27334`.
+    · Underline: WAVY `semantic/accent/bg` (`--color-accent-bg`, #5543e4 on dark) — matches Figma work
+      inline links; thickness 4% / offset 8.75%. Intro “luna” underline uses `--color-accent-fg` in main.css.
     · Card: borderless, sharp corners (--radius-sm), dark surface
     · Motion: preview card scales in; underline colour fades in after scroll-reveal (timing tied to
       main.css `--scroll-reveal-fade-duration`)
@@ -19,6 +19,7 @@
   position: relative;
   cursor: crosshair;
   touch-action: manipulation;
+  font-weight: var(--font-weight-regular);
 
   -webkit-text-decoration-line: underline;
   text-decoration-line: underline;
@@ -35,10 +36,10 @@
 /* ── Focus (keyboard): ring + underline visible immediately ─────── */
 
 .hover-preview-link:focus-visible {
-  outline: 2px solid var(--color-accent-fg);
+  outline: 2px solid var(--color-accent-bg);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
-  text-decoration-color: var(--color-accent-fg);
+  text-decoration-color: var(--color-accent-bg);
   transition-delay: 0s;
 }
 
@@ -46,7 +47,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .hover-preview-link:hover {
-    text-decoration-color: var(--color-accent-fg);
+    text-decoration-color: var(--color-accent-bg);
     transition-delay: 0s;
   }
 }
@@ -54,7 +55,7 @@
 /* ── After scroll-reveal: accent underline fades in (delayed colour) ─ */
 
 .in-view .hover-preview-link {
-  text-decoration-color: var(--color-accent-fg);
+  text-decoration-color: var(--color-accent-bg);
   transition-delay: calc(var(--scroll-reveal-fade-duration, 500ms) + 100ms);
 }
 
@@ -109,7 +110,6 @@
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   text-align: center;
   color: var(--color-neutral-fg);
   pointer-events: none;

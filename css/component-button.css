@@ -2,24 +2,31 @@
   component-button.css
   Depends on: css/tokens.css
 
-  Figma variants observed (node 216:3742):
-  - status: Default | hover
-  - textColor: default | accent
-  - active: boolean (shows 4px indicator)
-  - showIcon: boolean (optional 16px icon)
+  Variants:
+  - `.button` — base mono control; `:hover` uses accent fill (legacy / previews).
+  - `.button.button--chrome` — header/footer / primary nav — Figma dark: idle #d9d9d9
+      (--color-chrome-muted-fg) · hover capsule (--color-control-pill-hover-*).
+  - `.button.button--cta` — about-row + timeline icon links · dark idle (--color-chrome-muted-fg);
+      hover pill same capsule tokens · optional feedback face.
+  - `.button--accent` — accent text / preview filler (see previews/button.html).
+
+  Shared faces — copy / download feedback (Figma streamline-pixel:hand-awesome · 625:18917):
+  - `.button__face`, `.button__face--feedback`, `[hidden]` toggled via JS (.is-feedback on control)
+
+  Figma refs: component 625:15846 · hover 625:15847 · feedback 625:17286
 */
 
 .button {
   appearance: none;
   border: 0;
   background: transparent;
-  padding: var(--space-1) 0; /* 4px top/bottom; horizontal padding is 0 in Figma */
+  padding: var(--space-1) 0; /* 4px top/bottom; horizontal controlled per variant */
   margin: 0;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2); /* 8px */
+  gap: var(--space-2); /* 8px — default mono row */
   height: var(--space-6); /* 24px */
 
   font-family: var(--font-mono);
@@ -27,7 +34,6 @@
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
-  text-transform: uppercase;
   white-space: nowrap;
 
   color: var(--color-neutral-fg);
@@ -42,13 +48,23 @@ a.button:visited {
   color: var(--color-neutral-fg);
 }
 
+[data-theme="dark"] .button.button--chrome,
+[data-theme="dark"] .button.button--cta {
+  color: var(--color-chrome-muted-fg);
+}
+
+[data-theme="dark"] a.button.button--chrome:visited,
+[data-theme="dark"] a.button.button--cta:visited {
+  color: var(--color-chrome-muted-fg);
+}
+
 a.button.button--accent:visited {
   color: var(--color-accent-fg);
 }
 
 .button--accent {
   color: var(--color-accent-fg);
-  /* Figma accent CTAs (e.g. 368:13289, 374:8790): h-[25px] vs default nav button 24px */
+  /* Figma accent CTAs (historical refs): taller than default chrome */
   height: 25px;
   box-sizing: border-box;
 }
@@ -61,7 +77,6 @@ a.button.button--accent:visited {
 
 .button--hover.button--accent,
 .button--accent:hover {
-  /* Figma "hover + accent" uses on-accent text color */
   color: var(--color-neutral-fg-on-accent);
 }
 
@@ -94,52 +109,244 @@ a.button.button--accent:visited {
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--color-accent-fg);
+  outline: 2px solid var(--color-accent-bg);
   outline-offset: 2px;
-  border-radius: var(--radius-md);
-}
-
-/* ── Bold / filled variant: accent-background CTA button ─────────────────── */
-/*    Figma: node 458:3410 "bold button" — filled accent bg, on-accent text   */
-
-.button--bold {
-  position: relative;
-  overflow: hidden;
-  background-color: var(--color-accent-bg);
-  color: var(--color-neutral-fg-on-accent);
   border-radius: var(--radius-sm);
-  height: 25px;
-  padding-inline: var(--space-2);
-  box-sizing: border-box;
 }
 
-/* Hover: white-tint overlay via pseudo-element (token-safe, opacity-only transition) */
-.button--bold::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-color: var(--color-neutral-bg-elevated);
-  border-radius: inherit;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 200ms ease;
+/* ── Faces (default ↔ feedback swap) ─────────────────────────────────── */
+
+.button__face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2); /* 8px — Figma icon + label row */
+}
+
+.button__face--feedback {
+  gap: var(--space-1); /* 4px — Figma status=feedback */
+  display: none;
+}
+
+.button.button--chrome.is-feedback .button__face--default,
+.button.button--cta.is-feedback .button__face--default {
+  display: none;
+}
+
+.button.button--chrome.is-feedback .button__face--feedback,
+.button.button--cta.is-feedback .button__face--feedback {
+  display: inline-flex;
+}
+
+.button__feedback-thumb {
+  width: var(--space-4);  /* 16px */
+  height: var(--space-4); /* 16px */
+  flex: 0 0 auto;
+  display: block;
+  color: currentColor;
+  opacity: 0.8; /* matches Figma fill-opacity on glyph */
+}
+
+/* ── Chrome: navbar + footer controls ─────────────────────────────────── */
+
+.button.button--chrome {
+  box-sizing: border-box;
+  height: auto;
+  min-height: var(--space-6);
+  /* Figma — padding 0; frame 44×24 is text + intrinsic line-box */
+  padding: 0;
+
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-chrome);
+  line-height: 1.18; /* Figma button label */
+  letter-spacing: var(--letter-spacing-chrome);
+
+  border-radius: 0;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-radius 0.15s ease,
+    padding 0.15s ease;
+}
+
+a.button.button--chrome:visited {
+  color: var(--color-neutral-fg);
+}
+
+.button.button--chrome.is-feedback {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  color: var(--color-neutral-fg);
+}
+
+a.button.button--chrome.is-feedback:visited {
+  color: var(--color-neutral-fg);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .button--bold:hover::after {
-    opacity: 1;
+  .button.button--chrome:not(.is-feedback):hover {
+    padding: 0;
+    border-radius: var(--radius-chip-pill);
+    background: var(--color-control-pill-hover-bg);
+    color: var(--color-control-pill-hover-fg);
+  }
+
+  a.button.button--chrome:not(.is-feedback):visited:hover {
+    color: var(--color-control-pill-hover-fg);
   }
 }
 
-.button--bold:focus-visible {
-  outline: 2px solid var(--color-accent-fg);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
+@media (prefers-reduced-motion: reduce) {
+  .button.button--chrome {
+    transition: none;
+  }
 }
 
-a.button--bold,
-a.button--bold:visited {
-  color: var(--color-neutral-fg-on-accent);
-  text-decoration: none;
+/* ── CTA row: icon links (About + panel download · Figma instances 625:18920 / 625:19916) ─ */
+
+.button.button--cta {
+  box-sizing: border-box;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+
+  justify-content: flex-start;
+
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-chrome);
+  line-height: 1.18;
+  letter-spacing: var(--letter-spacing-chrome);
+
+  /* Hover pill + gutter — About row uses equal full-track width (.about__cta-buttons) */
+  transition:
+    background-color 0.38s cubic-bezier(0.25, 0.72, 0.25, 1),
+    color 0.3s cubic-bezier(0.25, 0.72, 0.25, 1),
+    border-radius 0.42s cubic-bezier(0.25, 0.72, 0.25, 1),
+    gap 0.42s cubic-bezier(0.25, 0.72, 0.25, 1);
 }
 
+a.button.button--cta:visited {
+  color: var(--color-neutral-fg);
+}
+
+.button.button--cta.is-feedback {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  color: var(--color-neutral-fg);
+}
+
+a.button.button--cta.is-feedback:visited {
+  color: var(--color-neutral-fg);
+}
+
+[data-theme="dark"] .button.button--chrome.is-feedback,
+[data-theme="dark"] .button.button--cta.is-feedback {
+  color: var(--color-chrome-muted-fg);
+}
+
+[data-theme="dark"] a.button.button--chrome.is-feedback:visited,
+[data-theme="dark"] a.button.button--cta.is-feedback:visited {
+  color: var(--color-chrome-muted-fg);
+}
+
+/* Leading pixel icons only (.button__feedback-thumb is separate) */
+.button.button--cta > svg,
+.button.button--cta .button__face--default svg {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: var(--space-4);
+  height: var(--space-4);
+  max-width: var(--space-4);
+  opacity: 1;
+  overflow: hidden;
+  display: block;
+  transform: translateX(0);
+  transition:
+    max-width 0.42s cubic-bezier(0.25, 0.72, 0.25, 1),
+    opacity 0.34s cubic-bezier(0.25, 0.72, 0.25, 1),
+    transform 0.42s cubic-bezier(0.25, 0.72, 0.25, 1);
+}
+
+.button.button--cta .button__face--default {
+  transition: gap 0.42s cubic-bezier(0.25, 0.72, 0.25, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button.button--cta:not(.is-feedback):hover {
+    padding: 0;
+    border-radius: var(--radius-chip-pill);
+    background: var(--color-control-pill-hover-bg);
+    color: var(--color-control-pill-hover-fg);
+    justify-content: center;
+    gap: 0;
+  }
+
+  .button.button--cta:not(.is-feedback):hover .button__face--default {
+    justify-content: center;
+    gap: 0;
+  }
+
+  .button.button--cta:not(.is-feedback):hover > svg,
+  .button.button--cta:not(.is-feedback):hover .button__face--default > svg {
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-3px);
+    pointer-events: none;
+  }
+
+  a.button.button--cta:not(.is-feedback):visited:hover {
+    color: var(--color-control-pill-hover-fg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button.button--cta {
+    transition: none;
+  }
+
+  .button.button--cta > svg,
+  .button.button--cta .button__face--default svg {
+    transition: none;
+    transform: none;
+  }
+
+  .button.button--cta .button__face--default {
+    transition: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+  .button.button--cta:not(.is-feedback):hover > svg,
+  .button.button--cta:not(.is-feedback):hover .button__face--default > svg {
+    transform: none;
+  }
+}
+
+/* Dark mode — base mono accent hover excludes chrome / CTA (pill tokens above) ─ */
+@media (hover: hover) and (pointer: fine) {
+  [data-theme="dark"] .button--hover:not(.button--chrome):not(.button--cta),
+  [data-theme="dark"] .button:hover:not(.button--chrome):not(.button--cta) {
+    background: var(--color-accent-fg);
+    color: var(--color-neutral-bg);
+  }
+
+  [data-theme="dark"] a.button:visited:hover:not(.button--chrome):not(.button--cta),
+  [data-theme="dark"] a.button.button--accent:visited:hover:not(.button--chrome) {
+    color: var(--color-neutral-bg);
+  }
+
+  [data-theme="dark"] .button--hover.button--accent:not(.button--cta),
+  [data-theme="dark"] .button--accent:hover:not(.button--cta) {
+    color: var(--color-neutral-bg);
+  }
+
+  [data-theme="dark"] .button--hover:not(.button--chrome):not(.button--cta) .button__indicator,
+  [data-theme="dark"] .button:hover:not(.button--chrome):not(.button--cta) .button__indicator {
+    background: var(--color-neutral-bg);
+  }
+}

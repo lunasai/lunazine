@@ -1,18 +1,33 @@
 <!-- component-button.html -->
 <!-- Requires: css/tokens.css and css/component-button.css -->
 
-<!-- Default -->
+<!-- Mono default (preview / legacy) -->
 <button class="button" type="button">contact</button>
 
-<!-- Default + active (indicator) -->
 <button class="button" type="button">
   <span class="button__indicator" aria-hidden="true"></span>
   contact
 </button>
 
-<!-- Accent -->
 <button class="button button--accent" type="button">contact</button>
 
-<!-- Hover (force state for static preview) -->
-<button class="button button--hover" type="button">contact</button>
+<!-- Chrome (navbar · footer · Figma 625:15846 / hover 625:15847) -->
+<a class="button button--chrome" href="#">work</a>
 
+<button type="button" class="button button--chrome js-copy-email" data-email="you@example.com">
+  <span class="button__face button__face--default">email me</span>
+  <span class="button__face button__face--feedback" aria-live="polite">
+    <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <use href="#figma-pixel-hand-awesome"></use>
+    </svg>
+    <span class="button__feedback-label">copied</span>
+  </span>
+</button>
+
+<!-- CTA icon row (About) + optional download feedback -->
+<a class="button button--cta" href="#">
+  <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><use href="#figma-pixel-download-sharp"></use></svg>
+  Download cv
+</a>
+
+<button class="button button--hover" type="button">contact</button>

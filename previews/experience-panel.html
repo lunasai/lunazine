@@ -7,7 +7,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montagu+Slab:opsz,wght@16..144,300..500&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="../css/tokens.css" />
     <link rel="stylesheet" href="../css/component-button.css" />
@@ -56,6 +56,18 @@
   </head>
   <body>
 
+    <svg class="svg-symbol-sprite" aria-hidden="true" focusable="false" width="0" height="0">
+      <symbol id="figma-pixel-download-sharp" viewBox="0 0 18 18">
+        <path fill="currentColor" d="M18 12V16H16V12H18ZM18 16V18H0V16H18ZM2 12V16H0V12H2ZM10 0V14H8V0H10Z"/>
+        <path fill="currentColor" d="M4 8V10H14V8H4ZM6 10V12H8V10H6ZM10 10V12H12V10H10Z"/>
+        <path fill="currentColor" d="M12 8V10H14V8H12Z"/>
+      </symbol>
+      <symbol id="figma-pixel-hand-awesome" viewBox="0 0 16 16">
+        <path fill="currentColor" d="M5.3325 4.9525H6.0975V5.7125H5.3325V4.9525ZM4.5725 14.1V6.4775H5.3325V5.7125H4.5725V4.95H1.5225V15.615H4.5725V14.855H6.1V14.1H4.5725ZM3.8075 8H3.05V6.48H3.81L3.8075 8ZM6.0975 4.1925H6.8575V4.9525H6.0975V4.1925ZM6.8575 1.1425H7.6175V4.1925H6.8575V1.1425ZM7.6175 6.4775H8.3825V7.2375H7.6175V6.4775ZM7.6175 0.3825H9.1425V1.1425H7.6175V0.3825ZM8.3825 5.7125H9.1425V6.4775H8.3825V5.7125ZM8.3825 8.7625H9.1425V10.2875H8.3825V8.7625ZM8.3825 11.0475H9.1425V12.5725H8.3825V11.0475ZM9.1425 1.1425H9.9025V1.9025H9.1425V1.1425ZM9.1425 4.9525H9.9025V5.7125H9.1425V4.9525ZM9.9025 1.9025H10.6675V4.9525H9.9025V1.9025ZM9.9025 5.7125H13.7125V6.4775H9.9025V5.7125ZM10.6675 14.0975H9.9025V14.8575H6.0975V15.6175H12.1925V14.8575H10.6675V14.0975ZM9.1425 12.5725V14.0975H9.9025V13.3325H12.9525V14.0975H13.7125V12.5725H9.1425ZM12.1925 14.0975H12.9525V14.8575H12.1925V14.0975Z"/>
+        <path fill="currentColor" d="M13.7125 7.9975H9.9025V6.4775H9.1425V8.7625H13.7125V10.2875H9.1425V11.0475H13.7125V12.5725H14.4775V6.4775H13.7125V7.9975Z"/>
+      </symbol>
+    </svg>
+
     <p class="preview-label">Experience panel</p>
 
     <div class="preview-frame">
@@ -89,11 +101,24 @@
               <div class="experience-panel__row experience-panel__row--cta is-visible" role="listitem">
                 <span class="experience-panel__row-label">and more</span>
                 <a
-                  class="button button--bold"
+                  class="button button--cta js-feedback-download"
                   href="../brand_ref/docs/LunaBorgo_Designer_CV.pdf"
                   download="LunaBorgo_Designer_CV.pdf"
                   aria-label="Download CV as PDF"
-                >download cv</a>
+                >
+                  <span class="button__face button__face--default">
+                    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-download-sharp"></use>
+                    </svg>
+                    download cv
+                  </span>
+                  <span class="button__face button__face--feedback" aria-live="polite">
+                    <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-hand-awesome"></use>
+                    </svg>
+                    <span class="button__feedback-label">downloaded</span>
+                  </span>
+                </a>
               </div>
 
             </div>
@@ -102,6 +127,8 @@
 
       </aside>
     </div>
+
+    <script src="../js/about-email-copy.js" defer></script>
 
   </body>
 </html>

@@ -118,7 +118,7 @@
     touchHint.setAttribute('aria-live', 'polite');
     touchHint.hidden = true;
     touchHint.textContent =
-      'tap highlighted phrases for a preview · tap outside to close';
+      'Tap highlighted phrases for a preview · tap outside to close';
     document.body.appendChild(touchHint);
 
     touchHintIo = new IntersectionObserver(

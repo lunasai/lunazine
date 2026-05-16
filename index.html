@@ -94,6 +94,11 @@
         <path fill="currentColor" d="M4 8V10H14V8H4ZM6 10V12H8V10H6ZM10 10V12H12V10H10Z"/>
         <path fill="currentColor" d="M12 8V10H14V8H12Z"/>
       </symbol>
+      <!-- Figma streamline-pixel hand-awesome · feedback glyph (625:17286) -->
+      <symbol id="figma-pixel-hand-awesome" viewBox="0 0 16 16">
+        <path fill="currentColor" d="M5.3325 4.9525H6.0975V5.7125H5.3325V4.9525ZM4.5725 14.1V6.4775H5.3325V5.7125H4.5725V4.95H1.5225V15.615H4.5725V14.855H6.1V14.1H4.5725ZM3.8075 8H3.05V6.48H3.81L3.8075 8ZM6.0975 4.1925H6.8575V4.9525H6.0975V4.1925ZM6.8575 1.1425H7.6175V4.1925H6.8575V1.1425ZM7.6175 6.4775H8.3825V7.2375H7.6175V6.4775ZM7.6175 0.3825H9.1425V1.1425H7.6175V0.3825ZM8.3825 5.7125H9.1425V6.4775H8.3825V5.7125ZM8.3825 8.7625H9.1425V10.2875H8.3825V8.7625ZM8.3825 11.0475H9.1425V12.5725H8.3825V11.0475ZM9.1425 1.1425H9.9025V1.9025H9.1425V1.1425ZM9.1425 4.9525H9.9025V5.7125H9.1425V4.9525ZM9.9025 1.9025H10.6675V4.9525H9.9025V1.9025ZM9.9025 5.7125H13.7125V6.4775H9.9025V5.7125ZM10.6675 14.0975H9.9025V14.8575H6.0975V15.6175H12.1925V14.8575H10.6675V14.0975ZM9.1425 12.5725V14.0975H9.9025V13.3325H12.9525V14.0975H13.7125V12.5725H9.1425ZM12.1925 14.0975H12.9525V14.8575H12.1925V14.0975Z"/>
+        <path fill="currentColor" d="M13.7125 7.9975H9.9025V6.4775H9.1425V8.7625H13.7125V10.2875H9.1425V11.0475H13.7125V12.5725H14.4775V6.4775H13.7125V7.9975Z"/>
+      </symbol>
     </svg>
 
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -108,13 +113,13 @@
               <use id="moon-logo-use" href="#moon-full-moon" />
             </svg>
           </span>
-          <span class="navbar__logo-type">product & systems designer</span>
+          <span class="navbar__logo-type">product &amp; systems designer</span>
         </a>
 
         <nav class="navbar__nav" aria-label="Primary navigation">
           <ul class="navbar__nav-list">
-            <li><a class="button" href="#work">work</a></li>
-            <li><a class="button" href="#about">about</a></li>
+            <li><a class="button button--chrome" href="#work">work</a></li>
+            <li><a class="button button--chrome" href="#about">about</a></li>
           </ul>
         </nav>
       </header>
@@ -125,18 +130,25 @@
       <footer class="bottom" aria-label="Footer status bar">
         <button
           type="button"
-          class="button bottom__contact js-copy-email"
+          class="button button--chrome bottom__contact js-copy-email"
           data-email="lunaborgo@gmail.com"
-          data-copied-text="email copied"
           aria-label="Copy email lunaborgo@gmail.com to clipboard"
-          data-tooltip="tap to copy"
-        >email me</button>
+          data-tooltip="Tap to copy"
+        >
+          <span class="button__face button__face--default">email me</span>
+          <span class="button__face button__face--feedback" aria-live="polite">
+            <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <use href="#figma-pixel-hand-awesome"></use>
+            </svg>
+            <span class="button__feedback-label">copied</span>
+          </span>
+        </button>
 
-        <time class="bottom__time" datetime="22:00:00" data-tooltip="luna's current timezone">22:00:00 AMS</time>
+        <time class="bottom__time" datetime="22:00:00" data-tooltip="Luna's current timezone">22:00:00 AMS</time>
 
         <div class="bottom__mode" aria-label="Theme toggle">
-          <button class="button" type="button" aria-pressed="false" id="theme-light" aria-label="Switch to light mode">light</button>
-          <button class="button" type="button" aria-pressed="true" id="theme-dark" aria-label="Switch to dark mode">dark</button>
+          <button class="button button--chrome" type="button" aria-pressed="false" id="theme-light" aria-label="Switch to light mode">light</button>
+          <button class="button button--chrome" type="button" aria-pressed="true" id="theme-dark" aria-label="Switch to dark mode">dark</button>
         </div>
       </footer>
     </div>
@@ -151,10 +163,10 @@
           <div class="col-content intro__content">
             <div class="intro__text">
               <p class="intro__title">
-                hi, I’m <span class="intro__name" data-preview-id="intro-luna" tabindex="0">luna</span> <span class="intro__glyph intro__glyph--jp" aria-hidden="true" lang="ja">シ</span> a designer focused on brand expression and scalable digital experiences <span class="intro__glyph intro__glyph--arrow" aria-hidden="true">⤳</span> I build systems for teams that need to design at scale without losing their soul.
+                Hi, I&rsquo;m <span class="intro__name" data-preview-id="intro-luna" tabindex="0">Luna</span> <span class="intro__glyph intro__glyph--jp" aria-hidden="true" lang="ja">シ</span> a designer focused on brand expression and scalable digital experiences <span class="intro__glyph intro__glyph--arrow" aria-hidden="true">⤳</span> I build systems for teams that need to design at scale without losing their soul.
               </p>
               <p class="intro__body">
-                for over twelve years, I've helped brands to turn creative vision into real experiences while building shared design languages that brings teams together.
+                For over twelve years, I&rsquo;ve helped brands to turn creative vision into real experiences while building shared design languages that bring teams together.
               </p>
             </div>
           </div>
@@ -172,14 +184,14 @@
       <!-- WORK: Heineken + Adidas merged into one editorial section -->
       <section class="section section--work" id="work" aria-labelledby="work-heading">
         <div class="page-grid">
-          <h2 class="work__title col-full" id="work-heading">recent work</h2>
+          <h2 class="work__title col-full" id="work-heading">Recent work</h2>
           <div class="work__projects col-work-content">
 
             <div class="work__project">
               <h2 class="sr-only">Heineken</h2>
               <div class="work__body">
-                <p>i joined Heineken in 2024, when we merged 40 regional B2B platforms into a unified global product ecosystem. This major organisational transformation required a shared language that was flexible enough to scale across diverse markets.</p>
-                <p>in that scenario, I founded <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">crate</span> &ndash; Heineken&rsquo;s global B2B design system. Shaping it from <span class="hover-preview-link" data-preview-id="crate-tokens" tabindex="0">design tokens</span> and workflows to most recently, AI automations. I also led <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">the brand application</span> track and design culture, setting up frameworks and rituals that connected product, engineering, marketing and brand.</p>
+                <p>I joined Heineken in 2024, when we merged 40 regional B2B platforms into a unified global product ecosystem. This major organisational transformation required a shared language that was flexible enough to scale across diverse markets.</p>
+                <p>In that scenario, I founded <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">Crate</span> &ndash; Heineken&rsquo;s global B2B design system. Shaping it from <span class="hover-preview-link" data-preview-id="crate-tokens" tabindex="0">design tokens</span> and workflows to most recently, AI automations. I also led <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">the brand application</span> track and design culture, setting up frameworks and rituals that connected product, engineering, marketing and brand.</p>
                 <p>I enabled rapid scaling from 6 to over 245 contributors in two years while keeping a strong design culture.</p>
               </div>
               <div class="impact-list work__project__impact">
@@ -195,7 +207,7 @@
                   </li>
                   <li class="metric-item">
                     <span class="metric-item__block" aria-hidden="true"></span>
-                    <span class="metric-item__text">voluntary adoption by 4 Heineken OpCos</span>
+                    <span class="metric-item__text">Voluntary adoption by 4 Heineken OpCos</span>
                   </li>
                   <li class="metric-item">
                     <span class="metric-item__block" aria-hidden="true"></span>
@@ -208,20 +220,20 @@
             <div class="work__project">
               <h2 class="sr-only">Adidas</h2>
               <div class="work__body">
-                <p>before that, at Adidas, I partnered with data science and engineering to design a <span class="hover-preview-link" data-preview-id="adidas-recommendations" tabindex="0">unified product recommendation framework</span>.</p>
-                <p>what started as a quick experiment grew into a cross-team effort to build a reusable component and recommendation framework that blends smart algorithms with editorial input.</p>
-                <p>we replaced 10+ scattered carousels with <span class="hover-preview-link" data-preview-id="adidas-shared-component" tabindex="0">one shared component</span>, supporting 36 variations and driving significant yearly revenue.</p>
+                <p>Before that, at Adidas, I partnered with data science and engineering to design a <span class="hover-preview-link" data-preview-id="adidas-recommendations" tabindex="0">unified product recommendation framework</span>.</p>
+                <p>What started as a quick experiment grew into a cross-team effort to build a reusable component and recommendation framework that blends smart algorithms with editorial input.</p>
+                <p>We replaced 10+ scattered carousels with <span class="hover-preview-link" data-preview-id="adidas-shared-component" tabindex="0">one shared component</span>, supporting 36 variations and driving significant yearly revenue.</p>
               </div>
               <div class="impact-list work__project__impact">
                 <p class="impact-list__label">Impact</p>
                 <ul class="work__metrics">
                   <li class="metric-item">
                     <span class="metric-item__block" aria-hidden="true"></span>
-                    <span class="metric-item__text">increased AOV by <span class="sr-only">confidential percentage</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">%%</span></span></span>
+                    <span class="metric-item__text">Increased AOV by <span class="sr-only">confidential percentage</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">%%</span></span></span>
                   </li>
                   <li class="metric-item">
                     <span class="metric-item__block" aria-hidden="true"></span>
-                    <span class="metric-item__text">generating <span class="sr-only">confidential annual revenue</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">€€.M/year</span></span></span>
+                    <span class="metric-item__text">Generating <span class="sr-only">confidential annual revenue</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">€€.M/year</span></span></span>
                   </li>
                   <li class="metric-item">
                     <span class="metric-item__block" aria-hidden="true"></span>
@@ -241,7 +253,7 @@
       <section class="section section--feedback" id="feedback" aria-labelledby="feedback-heading">
         <div class="page-grid">
           <div class="col-full feedback__inner">
-            <h2 class="feedback__title" id="feedback-heading">what they say</h2>
+            <h2 class="feedback__title" id="feedback-heading">What they say</h2>
 
             <div class="feedback__quotes" role="list" aria-label="Feedback quotes">
               <figure class="feedback-card" role="listitem">
@@ -255,7 +267,7 @@
                   <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                     <use href="#figma-pixel-linkedin"></use>
                   </svg>
-                  <cite>Nicole Akin &ndash; Group Director at Walmart</cite>
+                  <cite>Nicole Akin &ndash; Group director at Walmart</cite>
                 </figcaption>
               </figure>
 
@@ -270,7 +282,7 @@
                   <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                     <use href="#figma-pixel-linkedin"></use>
                   </svg>
-                  <cite>Jesse de Jong &ndash; Design Lead at Heineken</cite>
+                  <cite>Jesse de Jong &ndash; Design lead at Heineken</cite>
                 </figcaption>
               </figure>
 
@@ -285,7 +297,7 @@
                   <svg class="feedback-card__source-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                     <use href="#figma-pixel-linkedin"></use>
                   </svg>
-                  <cite>Andrew Silfkin &ndash; Senior Designer</cite>
+                  <cite>Andrew Silfkin &ndash; Senior designer</cite>
                 </figcaption>
               </figure>
             </div>
@@ -297,7 +309,7 @@
       <section class="section section--about" id="about" aria-label="About">
         <div class="about__scroll">
         <div class="page-grid">
-          <h2 class="about__label col-full">what I say</h2>
+          <h2 class="about__label col-full">What I say</h2>
           <!-- Main copy + CTA (reads first on all viewports) -->
           <div class="col-about about__content">
             <div class="about__body">
@@ -306,45 +318,59 @@
               <p>Away from screens, I&rsquo;m a person that shoots on film, listens to loud music, reads a bunch of books while drinking a bunch of coffee, maintain an ever-evolving Japan itinerary I may or may not act on and enjoy living in Amsterdam with a husband (whom I&rsquo;ve already converted into a designer) and two cats (still working on those).</p>
             </div>
             <div class="about__cta">
-              <p class="about__cta-label">more about me:</p>
+              <p class="about__cta-label">More about me:</p>
               <div class="about__cta-buttons">
                 <a
-                  class="about__cta-btn about__cta-btn--cv"
+                  class="button button--cta js-feedback-download"
                   href="brand_ref/docs/LunaBorgo_Designer_CV.pdf"
                   download="LunaBorgo_Designer_CV.pdf"
                   aria-label="Download CV as PDF"
                 >
-                  <svg class="about__cta-icon about__cta-icon--download" width="24" height="24" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
-                    <use href="#figma-pixel-download-sharp"></use>
-                  </svg>
-                  download cv
+                  <span class="button__face button__face--default">
+                    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-download-sharp"></use>
+                    </svg>
+                    Download cv
+                  </span>
+                  <span class="button__face button__face--feedback" aria-live="polite">
+                    <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-hand-awesome"></use>
+                    </svg>
+                    <span class="button__feedback-label">downloaded</span>
+                  </span>
                 </a>
                 <button
                   type="button"
-                  class="about__cta-btn about__cta-btn--email js-copy-email"
+                  class="button button--cta js-copy-email"
                   data-email="lunaborgo@gmail.com"
-                  data-copied-text="email copied"
                   aria-label="Copy email lunaborgo@gmail.com to clipboard"
                 >
-                  <svg class="about__cta-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <use href="#figma-pixel-email-open"></use>
-                  </svg>
-                  get in touch
+                  <span class="button__face button__face--default">
+                    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-email-open"></use>
+                    </svg>
+                    Get in touch
+                  </span>
+                  <span class="button__face button__face--feedback" aria-live="polite">
+                    <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <use href="#figma-pixel-hand-awesome"></use>
+                    </svg>
+                    <span class="button__feedback-label">copied</span>
+                  </span>
                 </button>
                 <a
-                  class="about__cta-btn about__cta-btn--linkedin"
+                  class="button button--cta"
                   href="https://www.linkedin.com/in/lunaborgo"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Connect on LinkedIn"
                 >
-                  <svg class="about__cta-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <use href="#figma-pixel-linkedin"></use>
                   </svg>
-                  connect
+                  Connect
                 </a>
               </div>
-              <p class="about__copy-feedback" role="status" aria-live="polite"></p>
             </div>
           </div>
 
@@ -356,10 +382,10 @@
       <section class="section section--thanks" id="thanks" aria-label="Sign-off">
         <div class="page-grid">
           <div class="col-full thanks__inner">
-            <h2 class="thanks__title">thanks for the visit.</h2>
+            <h2 class="thanks__title">Thanks for the visit.</h2>
             <div class="thanks__body">
-              <p class="thanks__body-p">if you&rsquo;d like to see more of my work, wanna partner for a project or just chat about design, send me a mail! I&rsquo;d love to hear from you ^^</p>
-              <p class="thanks__signoff">love, luna</p>
+              <p class="thanks__body-p">If you&rsquo;d like to see more of my work, wanna partner for a project or just chat about design, send me a mail! I&rsquo;d love to hear from you ^^</p>
+              <p class="thanks__signoff">Love, Luna</p>
               <pre class="about__ascii thanks__cat" aria-hidden="true">
        _
        \*-.

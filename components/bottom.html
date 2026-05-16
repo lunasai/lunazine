@@ -1,21 +1,27 @@
 <!-- component-bottom.html -->
-<!-- Requires: css/tokens.css and css/component-bottom.css -->
+<!-- Requires: css/tokens.css, css/component-button.css, css/component-bottom.css -->
 
 <footer class="bottom" aria-label="Footer status bar">
   <button
     type="button"
-    class="button bottom__contact js-copy-email"
+    class="button button--chrome bottom__contact js-copy-email"
     data-email="lunaborgo@gmail.com"
-    data-copied-text="email copied"
     aria-label="Copy email lunaborgo@gmail.com to clipboard"
-    data-tooltip="tap to copy"
-  >email me</button>
+    data-tooltip="Tap to copy"
+  >
+    <span class="button__face button__face--default">email me</span>
+    <span class="button__face button__face--feedback" aria-live="polite">
+      <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <use href="#figma-pixel-hand-awesome"></use>
+      </svg>
+      <span class="button__feedback-label">copied</span>
+    </span>
+  </button>
 
-  <time class="bottom__time" datetime="22:00:00" data-tooltip="luna's current timezone">22:00:00 AMS</time>
+  <time class="bottom__time" datetime="22:00:00" data-tooltip="Luna's current timezone">22:00:00 AMS</time>
 
   <div class="bottom__mode" aria-label="Theme toggle">
-    <button class="button" type="button" aria-pressed="true">dark</button>
-    <button class="button" type="button" aria-pressed="false">light</button>
+    <button class="button button--chrome" type="button" aria-pressed="false">light</button>
+    <button class="button button--chrome" type="button" aria-pressed="true">dark</button>
   </div>
 </footer>
-

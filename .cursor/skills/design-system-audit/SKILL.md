@@ -43,7 +43,8 @@ Use `--color-*` **semantic tokens** in all component and layout CSS.
 
 | Text is… | `font-family` | `font-size` | `font-weight` |
 |---|---|---|---|
-| `text-transform: uppercase` | `var(--font-mono)` | `var(--typography-mono)` | 400 |
+| Mono UI / labels | `var(--font-mono)` | `var(--typography-mono)` | 400 |
+| Fixed chrome (header + footer) | `var(--font-serif)` | `var(--typography-chrome)` (14px) | 400 |
 | Heading / display | `var(--font-serif)` | `var(--typography-display)` | 300 Light |
 | Title / section header | `var(--font-serif)` | `var(--typography-title)` | 500 Medium |
 | Large body / intro | `var(--font-serif)` | `var(--typography-body-lg)` | 300 Light |
@@ -61,6 +62,7 @@ Use `--color-*` **semantic tokens** in all component and layout CSS.
 | `--typography-body-md` | 24px | 24px | 20px | 20px | 20px |
 | `--typography-body-sm` | 20px | 20px | 14px | 14px | 14px |
 | `--typography-mono` | 14px | 14px | 14px | 14px | 14px |
+| `--typography-chrome` | 14px (alias of mono) | — | — | — | — |
 | `--typography-footnote` | 14px | 12px | 12px | 10px | 10px |
 
 `--typography-body` is a backward-compat alias for `--typography-body-lg`; use `--typography-body-lg` in new code.
@@ -71,7 +73,9 @@ Use `--color-*` **semantic tokens** in all component and layout CSS.
 - `--typography-body-lg`: `font-weight: var(--font-weight-light)` (300); `line-height: var(--line-height-body-lg)` (1.4); `letter-spacing: var(--letter-spacing-body-lg)` (-0.03em).
 - `--typography-body-md`: `font-weight: var(--font-weight-light)` (300); `line-height: var(--line-height-normal)` (1.38); `letter-spacing: var(--letter-spacing-body-md)` (−0.03em).
 - `--typography-body-sm`: `font-weight: var(--font-weight-light)` (300); `line-height: var(--line-height-normal)` (1.38); `letter-spacing: var(--letter-spacing-body)` (0em).
-- Mono: always `text-transform: uppercase`; `letter-spacing: var(--letter-spacing-mono)` (0.04em).
+- **Letter case:** sentence case in markup everywhere — no `text-transform` on `html` or body copy. Proper nouns capitalised in source.
+- Fixed chrome (`.navbar`, `.bottom`, nav/footer `.button`): `letter-spacing: var(--letter-spacing-chrome)` (−0.04em); same in light and dark — no theme-specific font overrides.
+- Mono: `letter-spacing: var(--letter-spacing-mono)` (−0.04em).
 - Minimum font size anywhere: **10px**.
 - No hardcoded `font-family` strings — use tokens only.
 
@@ -82,6 +86,8 @@ Use `--color-*` **semantic tokens** in all component and layout CSS.
 Scale: `--space-1` (4px) · `--space-2` (8px) · `--space-3` (12px) · `--space-4` (16px) · `--space-5` (20px) · `--space-6` (24px) · `--space-8` (32px) · `--space-10` (40px) · `--space-12` (48px)
 
 Page margins: `--spacing-margin` (responsive: 24px mobile → 40px desktop → 80px x-large).
+
+Thanks section top padding: `--spacing-thanks-padding-top` — 144px (large / x-large) · 160px (medium, ≤1024px) · 80px (small / x-small, ≤768px).
 
 Breakpoints — use literal `px` in `@media` (CSS variables can't be used there):
 
