@@ -866,7 +866,8 @@ html[data-theme="dark"] {
 
 /* ─── Pixel pile footer ──────────────────────────────────────────
    Full-width canvas block at the very bottom of <main>, below
-   .section--thanks. The JS inserts a <canvas> and runs the sand sim.
+   .section--thanks. JS inserts a <canvas> whose height tracks the
+   viewport (innerHeight) for the falling-sand simulation.
    ──────────────────────────────────────────────────────────────── */
 
 .pixel-pile-footer {

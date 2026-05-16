@@ -34,9 +34,9 @@
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ─── Handover bridge ──────────────────────────────────────────────────────────
-  // Cursor trail calls this when a particle enters the pile physics band (viewport
-  // bottom · PILE_HEIGHT). Airborne pile grains draw on the trail canvas so they
-  // stay visible above sections like .section--thanks (z-index stacking).
+  // Cursor trail hands off when a grain enters the pile band: full viewport height
+  // anchored to the footer (see pileBandHeightPx). Airborne grains draw on the
+  // trail canvas so they stay visible above sections like .section--thanks.
 
   let onParticleHandover = null;
 
@@ -265,19 +265,38 @@
   // Canvas inside .pixel-pile-footer that runs a falling-sand simulation.
   // ═══════════════════════════════════════════════════════════════════════════════
 
-  const PILE_HEIGHT      = 600;
   const MAX_PILE_PARTICLES = 2000;
   const HOVER_RADIUS     = 40;
   const HOVER_PROBABILITY = 0.08;
   const PEAK_RATIO       = 0.03; // starting dome: barely visible bump at center
 
-  const gridH = Math.ceil(PILE_HEIGHT / DOT_SIZE);
+  /** Pile simulation band height (px), pinned to viewport bottom — tracks innerHeight. */
+  let pileBandHeightPx = Math.round(window.innerHeight);
+  /** Last committed grid dimensions (for resize + localStorage invalidation). */
+  let cachedGridW = 0;
+  let cachedGridH = 0;
+
+  function syncPileBandHeightFromViewport() {
+    pileBandHeightPx = Math.round(window.innerHeight);
+  }
+
+  function getGridH() {
+    return Math.max(1, Math.ceil(pileBandHeightPx / DOT_SIZE));
+  }
+
+  function getGridW() {
+    if (!pileGrid) return 0;
+    const gh = getGridH();
+    return gh ? Math.round(pileGrid.length / gh) : 0;
+  }
 
   const pileContainer = document.querySelector(".pixel-pile-footer");
   if (!pileContainer) {
     requestAnimationFrame(trailOnlyFrame);
     return;
   }
+
+  syncPileBandHeightFromViewport();
 
   const pileCanvas = document.createElement("canvas");
   Object.assign(pileCanvas.style, {
@@ -286,7 +305,7 @@
     top:           "auto",
     left:          "0",
     width:         "100%",
-    height:        PILE_HEIGHT + "px",
+    height:        pileBandHeightPx + "px",
     pointerEvents: "none",
     zIndex:        "-1",
   });
@@ -299,18 +318,15 @@
 
   // ── Grid helpers ──────────────────────────────────────────────────────────────
 
-  function getGridW() {
-    return pileGrid ? Math.round(pileGrid.length / gridH) : 0;
-  }
-
   function initPile(gridW) {
-    const grid     = new Uint8Array(gridW * gridH);
-    const peakCells = Math.floor(gridH * PEAK_RATIO);
+    const gh        = getGridH();
+    const grid      = new Uint8Array(gridW * gh);
+    const peakCells = Math.floor(gh * PEAK_RATIO);
 
     for (let c = 0; c < gridW; c++) {
       const xNorm = (2 * c) / gridW - 1;
       const h = Math.round(peakCells * Math.sqrt(Math.max(0, 1 - xNorm * xNorm)));
-      for (let r = gridH - 1; r >= gridH - h; r--) {
+      for (let r = gh - 1; r >= gh - h; r--) {
         grid[r * gridW + c] = 1;
       }
     }
@@ -324,7 +340,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         w:    getGridW(),
-        h:    gridH,
+        h:    getGridH(),
         data: Array.from(pileGrid),
       }));
     } catch (e) {
@@ -333,21 +349,31 @@
   }
 
   function resizePile() {
-    const w        = Math.max(1, Math.round(pileContainer.getBoundingClientRect().width));
-    const newGridW = Math.ceil(w / DOT_SIZE);
-    const prevGridW = getGridW();
+    syncPileBandHeightFromViewport();
+
+    const w         = Math.max(1, Math.round(pileContainer.getBoundingClientRect().width));
+    const newGridW  = Math.ceil(w / DOT_SIZE);
+    const newGridH  = getGridH();
 
     pileCanvas.width  = w;
-    pileCanvas.height = PILE_HEIGHT;
-    pileCanvas.style.height = PILE_HEIGHT + "px";
+    pileCanvas.height = pileBandHeightPx;
+    pileCanvas.style.height = pileBandHeightPx + "px";
 
-    // Try to restore a saved grid whose dimensions still match
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw);
-        if (saved && saved.w === newGridW && saved.h === gridH) {
+        const expectedLen = newGridW * newGridH;
+        if (
+          saved &&
+          saved.w === newGridW &&
+          saved.h === newGridH &&
+          Array.isArray(saved.data) &&
+          saved.data.length === expectedLen
+        ) {
           pileGrid = new Uint8Array(saved.data);
+          cachedGridW = newGridW;
+          cachedGridH = newGridH;
           return;
         }
       }
@@ -355,12 +381,16 @@
       // Ignore parse errors
     }
 
-    // Width changed — saved state is no longer valid
-    if (prevGridW !== 0 && prevGridW !== newGridW) {
+    if (
+      (cachedGridW !== 0 && cachedGridW !== newGridW) ||
+      (cachedGridH !== 0 && cachedGridH !== newGridH)
+    ) {
       localStorage.removeItem(STORAGE_KEY);
     }
 
     pileGrid = initPile(newGridW);
+    cachedGridW = newGridW;
+    cachedGridH = newGridH;
   }
 
   resizePile();
@@ -369,6 +399,9 @@
   const ro = new ResizeObserver(resizePile);
   ro.observe(pileContainer);
   window.addEventListener("resize", resizePile);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", resizePile);
+  }
 
   // Persist the grid every 5 s (saving every frame would be too expensive)
   setInterval(savePileGrid, 5000);
@@ -377,14 +410,15 @@
 
   function handleHover(clientX, clientY) {
     if (reducedMotion || !pileGrid) return;
-    const rect     = pileContainer.getBoundingClientRect();
-    const canvasTop = rect.bottom - PILE_HEIGHT;
-    const x        = clientX - rect.left;
-    const y        = clientY - canvasTop;
-    const gridW = getGridW();
-    const color = getTrailColor();
+    const rect      = pileContainer.getBoundingClientRect();
+    const canvasTop = rect.bottom - pileBandHeightPx;
+    const x         = clientX - rect.left;
+    const y         = clientY - canvasTop;
+    const gridW     = getGridW();
+    const gh        = getGridH();
+    const color     = getTrailColor();
 
-    for (let r = 0; r < gridH; r++) {
+    for (let r = 0; r < gh; r++) {
       for (let c = 0; c < gridW; c++) {
         if (pileGrid[r * gridW + c] === 0) continue;
 
@@ -421,7 +455,7 @@
 
   window.addEventListener("mousemove", (e) => {
     const rect      = pileContainer.getBoundingClientRect();
-    const canvasTop = rect.bottom - PILE_HEIGHT;
+    const canvasTop = rect.bottom - pileBandHeightPx;
     if (
       e.clientX >= rect.left && e.clientX <= rect.right &&
       e.clientY >= canvasTop && e.clientY <= rect.bottom
@@ -434,7 +468,7 @@
     if (!e.touches[0]) return;
     const { clientX, clientY } = e.touches[0];
     const rect      = pileContainer.getBoundingClientRect();
-    const canvasTop = rect.bottom - PILE_HEIGHT;
+    const canvasTop = rect.bottom - pileBandHeightPx;
     if (
       clientX >= rect.left && clientX <= rect.right &&
       clientY >= canvasTop && clientY <= rect.bottom
@@ -451,7 +485,7 @@
     const rect = pileContainer.getBoundingClientRect();
     pileParticles.push({
       trueX:    p.trueX - rect.left,
-      trueY:    Math.max(0, p.trueY - (rect.bottom - PILE_HEIGHT)),
+      trueY:    Math.max(0, p.trueY - (rect.bottom - pileBandHeightPx)),
       vx:       p.vx,
       vy:       p.vy,
       age:      0,
@@ -467,8 +501,9 @@
   function drawStaticPile() {
     if (!pileGrid) return;
     const gw    = getGridW();
+    const gh    = getGridH();
     const color = getTrailColor();
-    for (let r = 0; r < gridH; r++) {
+    for (let r = 0; r < gh; r++) {
       for (let c = 0; c < gw; c++) {
         if (pileGrid[r * gw + c] === 1) {
           const bayerVal = BAYER_8X8[(r % 8) * 8 + (c % 8)] / 64.0;
@@ -484,6 +519,7 @@
     if (!pileGrid) return;
 
     const currentGridW = getGridW();
+    const gh           = getGridH();
 
     for (let i = pileParticles.length - 1; i >= 0; i--) {
       const p = pileParticles[i];
@@ -498,7 +534,7 @@
       const gridC = Math.floor(drawX / DOT_SIZE);
       const gridR = Math.floor(drawY / DOT_SIZE);
 
-      let landed = gridR >= gridH - 1;
+      let landed = gridR >= gh - 1;
       if (!landed && gridC >= 0 && gridC < currentGridW) {
         const checkR = Math.max(0, gridR);
         if (
@@ -510,7 +546,7 @@
       }
 
       if (landed) {
-        let targetR = Math.min(Math.max(0, gridR), gridH - 1);
+        let targetR = Math.min(Math.max(0, gridR), gh - 1);
         while (targetR > 0 && pileGrid[targetR * currentGridW + gridC] === 1) targetR--;
         if (gridC >= 0 && gridC < currentGridW) pileGrid[targetR * currentGridW + gridC] = 1;
         pileParticles.splice(i, 1);
@@ -520,7 +556,7 @@
     }
 
     const leftFirst = Math.random() > 0.5;
-    for (let r = gridH - 2; r >= 0; r--) {
+    for (let r = gh - 2; r >= 0; r--) {
       for (let c = 0; c < currentGridW; c++) {
         if (pileGrid[r * currentGridW + c] !== 1) continue;
 
@@ -551,7 +587,7 @@
 
   function drawPileAirborneOnTrail() {
     const rect      = pileContainer.getBoundingClientRect();
-    const canvasTop = rect.bottom - PILE_HEIGHT;
+    const canvasTop = rect.bottom - pileBandHeightPx;
 
     for (let i = 0; i < pileParticles.length; i++) {
       const p = pileParticles[i];
@@ -570,11 +606,12 @@
 
     const w  = pileCanvas.width;
     const gw = getGridW();
-    pileCtx.clearRect(0, 0, w, PILE_HEIGHT);
+    const gh = getGridH();
+    pileCtx.clearRect(0, 0, w, pileBandHeightPx);
 
     const color = getTrailColor();
 
-    for (let r = 0; r < gridH; r++) {
+    for (let r = 0; r < gh; r++) {
       for (let c = 0; c < gw; c++) {
         if (pileGrid[r * gw + c] === 1) {
           const bayerVal = BAYER_8X8[(r % 8) * 8 + (c % 8)] / 64.0;
@@ -589,7 +626,7 @@
   function unifiedFrame() {
     const footerEl   = document.querySelector(".pixel-pile-footer");
     const footerRect = footerEl ? footerEl.getBoundingClientRect() : null;
-    const pileBandTop = footerRect ? footerRect.bottom - PILE_HEIGHT : Infinity;
+    const pileBandTop = footerRect ? footerRect.bottom - pileBandHeightPx : Infinity;
 
     simulateTrailParticlesForFrame(footerRect, pileBandTop);
     pilePhysicsStep();
