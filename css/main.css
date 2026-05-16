@@ -5,13 +5,13 @@
 */
 
 /* ─── Document scroll ──────────────────────────────────────
-   Native smooth scroll. Sections use min-height: 100svh so
-   they fill the viewport and grow with content as needed.
-   Soft snapping with custom easing is handled by scroll-snap.js.
+   Smooth scrolling is handled by Lenis (see lenis-smooth-scroll.js).
+   Keep scroll-behavior auto so Lenis + ScrollTrigger stay in sync.
+   Sections use min-height: 100svh so they fill the viewport.
    ────────────────────────────────────────────────────────── */
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 html,

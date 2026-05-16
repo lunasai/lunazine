@@ -21,7 +21,11 @@
       // Ignore history failures (e.g. file://)
     }
 
-    intro.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (window.__lenis) {
+      window.__lenis.scrollTo("#intro");
+    } else {
+      intro.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   brandTexts.forEach(function (el) {
