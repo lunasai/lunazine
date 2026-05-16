@@ -391,17 +391,6 @@ html[data-theme="dark"] {
 
 /* ─── Work sections ──────────────────────────────────────────── */
 
-/* Content column: cols 3–10 on desktop, expands on mobile */
-.col-work-content {
-  grid-column: 3 / span 8;
-}
-
-@media (max-width: 1024px) {
-  .col-work-content {
-    grid-column: 1 / span 12;
-  }
-}
-
 /* Section heading — full-width, sits directly in the 12-col grid */
 .work__title {
   margin: 0 0 var(--space-10) 0;
@@ -420,30 +409,40 @@ html[data-theme="dark"] {
   gap: 88px;
 }
 
-/* Single project: body + Impact — stacked on small screens; 2-col grid on desktop (Figma work frames) */
+/*
+ * Single project: matches Figma node 625:22913 — two stacked full-bleed 12-col rows:
+ *   Row A: body in cols 3–10 (span 8)
+ *   Row B: Impact in cols 9–12 (span 4), below body with 24px gap
+ */
 .work__project {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-6); /* Figma gap-[24px] between intro grids */
 }
 
-@media (min-width: 1025px) {
-  .work__project {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(200px, 1fr);
-    gap: 0 var(--grid-gutter);
-    align-items: start;
-  }
+.work__project__grid-row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+  width: 100%;
+  box-sizing: border-box;
+}
 
-  .work__body {
-    min-width: 0;
-  }
+.work__project__grid-row--body .work__body {
+  grid-column: 3 / span 8;
+  min-width: 0;
+}
 
-  /* Impact sits alongside copy, bottom-aligned to the text block (matches Figma right rail) */
-  .work__project__impact {
-    align-self: end;
-    width: 100%;
-    min-width: 0;
+.work__project__grid-row--impact .work__project__impact {
+  grid-column: 9 / span 4;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .work__project__grid-row--body .work__body,
+  .work__project__grid-row--impact .work__project__impact {
+    grid-column: 1 / -1;
   }
 }
 
@@ -916,7 +915,7 @@ html[data-theme="dark"] {
    Canvas 768px · margin 24px · col ≈ 45.3px
    Key changes vs medium:
      · Intro uses the shared fixed-chrome safe area
-     · Work col-work-content expands to cols 2–11
+     · Work project rows span full grid; body + Impact stack full-width (≤1024px)
      · About hero inset drops to 64px (Figma Project Info y=64)
      · About content keeps the medium full 12-column span
    ─────────────────────────────────────────────────────────────── */
@@ -932,7 +931,7 @@ html[data-theme="dark"] {
    Typography scale adjustments handled entirely by tokens.css
    (title shrinks further; body-lg remains 24px).
    Intro uses the shared fixed-chrome safe area.
-   Work layout unchanged — col-work-content stays at cols 2–11 (≤768px breakpoint).
+   Work layout: project body + Impact use stacked 12-col rows (full bleed within section grid).
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .section--feedback {
