@@ -121,6 +121,7 @@ a.button.button--accent:visited {
   align-items: center;
   justify-content: center;
   gap: var(--space-2); /* 8px — Figma icon + label row */
+  pointer-events: none; /* clicks land on the control (<a>/<button>), not inner spans */
 }
 
 .button__face--feedback {
