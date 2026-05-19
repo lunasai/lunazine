@@ -26,23 +26,23 @@
     },
     "src": "./assets/previews/generated/eazle-brand-390w.png"
   },
-  "adidas-recommendations": {
-    "alt": "Unified product recommendation framework preview",
+  "adidas-shared-recommendation-approach": {
+    "alt": "Shared recommendation approach preview",
     "sources": {
-      "avif": "./assets/previews/generated/adidas-recommendations-390w.avif 390w, ./assets/previews/generated/adidas-recommendations-780w.avif 780w, ./assets/previews/generated/adidas-recommendations-1560w.avif 1560w",
-      "webp": "./assets/previews/generated/adidas-recommendations-390w.webp 390w, ./assets/previews/generated/adidas-recommendations-780w.webp 780w, ./assets/previews/generated/adidas-recommendations-1560w.webp 1560w",
-      "png": "./assets/previews/generated/adidas-recommendations-390w.png 390w, ./assets/previews/generated/adidas-recommendations-780w.png 780w, ./assets/previews/generated/adidas-recommendations-1560w.png 1560w"
+      "avif": "./assets/previews/generated/adidas-shared-recommendation-approach-390w.avif 390w, ./assets/previews/generated/adidas-shared-recommendation-approach-780w.avif 780w, ./assets/previews/generated/adidas-shared-recommendation-approach-1560w.avif 1560w",
+      "webp": "./assets/previews/generated/adidas-shared-recommendation-approach-390w.webp 390w, ./assets/previews/generated/adidas-shared-recommendation-approach-780w.webp 780w, ./assets/previews/generated/adidas-shared-recommendation-approach-1560w.webp 1560w",
+      "png": "./assets/previews/generated/adidas-shared-recommendation-approach-390w.png 390w, ./assets/previews/generated/adidas-shared-recommendation-approach-780w.png 780w, ./assets/previews/generated/adidas-shared-recommendation-approach-1560w.png 1560w"
     },
-    "src": "./assets/previews/generated/adidas-recommendations-390w.png"
+    "src": "./assets/previews/generated/adidas-shared-recommendation-approach-390w.png"
   },
-  "adidas-shared-component": {
-    "alt": "Shared carousel component preview",
+  "adidas-curated-recommendations": {
+    "alt": "Curated, human-led recommendations preview",
     "sources": {
-      "avif": "./assets/previews/generated/adidas-shared-component-390w.avif 390w, ./assets/previews/generated/adidas-shared-component-780w.avif 780w, ./assets/previews/generated/adidas-shared-component-1560w.avif 1560w",
-      "webp": "./assets/previews/generated/adidas-shared-component-390w.webp 390w, ./assets/previews/generated/adidas-shared-component-780w.webp 780w, ./assets/previews/generated/adidas-shared-component-1560w.webp 1560w",
-      "png": "./assets/previews/generated/adidas-shared-component-390w.png 390w, ./assets/previews/generated/adidas-shared-component-780w.png 780w, ./assets/previews/generated/adidas-shared-component-1560w.png 1560w"
+      "avif": "./assets/previews/generated/adidas-curated-recommendations-390w.avif 390w, ./assets/previews/generated/adidas-curated-recommendations-780w.avif 780w, ./assets/previews/generated/adidas-curated-recommendations-1560w.avif 1560w",
+      "webp": "./assets/previews/generated/adidas-curated-recommendations-390w.webp 390w, ./assets/previews/generated/adidas-curated-recommendations-780w.webp 780w, ./assets/previews/generated/adidas-curated-recommendations-1560w.webp 1560w",
+      "png": "./assets/previews/generated/adidas-curated-recommendations-390w.png 390w, ./assets/previews/generated/adidas-curated-recommendations-780w.png 780w, ./assets/previews/generated/adidas-curated-recommendations-1560w.png 1560w"
     },
-    "src": "./assets/previews/generated/adidas-shared-component-390w.png"
+    "src": "./assets/previews/generated/adidas-curated-recommendations-390w.png"
   },
   "me": {
     "alt": "Portrait of Luna Borgo",

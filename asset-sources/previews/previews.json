@@ -11,13 +11,13 @@
     "source": "brand application.png",
     "alt": "Brand application track preview"
   },
-  "adidas-recommendations": {
-    "source": "product recommendation framework.png",
-    "alt": "Unified product recommendation framework preview"
+  "adidas-shared-recommendation-approach": {
+    "source": "shared recommendation approach.png",
+    "alt": "Shared recommendation approach preview"
   },
-  "adidas-shared-component": {
-    "source": "one shared component.png",
-    "alt": "Shared carousel component preview"
+  "adidas-curated-recommendations": {
+    "source": "curated human-led recommendations.png",
+    "alt": "Curated, human-led recommendations preview"
   },
   "me": {
     "source": "me.jpeg",

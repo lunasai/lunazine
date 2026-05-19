@@ -107,25 +107,25 @@ html[data-theme="dark"] {
 }
 
 /* ─── Fixed chrome ──────────────────────────────────────────────
-   Both bars sit exactly --spacing-margin (40px large) from the
-   viewport edge, matching the Figma frame inset. Left/right
-   mirror the grid margin. Transparent — page scrolls behind.
+   Inset from viewport via --spacing-chrome-inset (40px at large+;
+   grid --spacing-margin may grow to 80px on x-large). Transparent —
+   page scrolls behind.
    ────────────────────────────────────────────────────────────── */
 
 .site-header,
 .site-footer {
   position: fixed;
-  left:  var(--spacing-margin);
-  right: var(--spacing-margin);
+  left:  var(--spacing-chrome-inset);
+  right: var(--spacing-chrome-inset);
   z-index: 100;
 }
 
 .site-header {
-  top: var(--spacing-margin);
+  top: var(--spacing-chrome-inset);
 }
 
 .site-footer {
-  bottom: var(--spacing-margin);
+  bottom: var(--spacing-chrome-inset);
 }
 
 /* ─── Scrollable site body ──────────────────────────────────────
@@ -670,7 +670,7 @@ html[data-theme="dark"] {
 
 .feedback-card__source {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-2);
   margin-top: var(--space-2);
 }

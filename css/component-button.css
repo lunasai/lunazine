@@ -211,7 +211,9 @@ a.button.button--chrome.is-feedback:visited {
   box-sizing: border-box;
   height: auto;
   min-height: 0;
-  padding: 0;
+  padding-inline: 0;
+  /* Reserve hover pill vertical padding — width still grows on :hover only */
+  padding-block: var(--space-1);
 
   justify-content: flex-start;
 
@@ -280,7 +282,6 @@ a.button.button--cta.is-feedback:visited {
 /* Figma hover: no leading icon, pill shrink-wraps label (text centered in capsule) */
 @media (hover: hover) and (pointer: fine) {
   .button.button--cta:not(.is-feedback):hover {
-    padding-block: var(--space-1);
     padding-inline: var(--space-2);
     border-radius: var(--radius-chip-pill);
     background: var(--color-control-pill-hover-bg);
@@ -310,7 +311,6 @@ a.button.button--cta.is-feedback:visited {
 /* Touch-primary: no :hover — mirror pill while pressed */
 @media (hover: none) {
   .button.button--cta:not(.is-feedback):active {
-    padding-block: var(--space-1);
     padding-inline: var(--space-2);
     border-radius: var(--radius-chip-pill);
     background: var(--color-control-pill-hover-bg);

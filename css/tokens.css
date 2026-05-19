@@ -355,10 +355,15 @@
    medium   769–1024  →  40px
    small    > 480px   →  24px
    x-small  ≤ 480px   →  16px
+
+   --spacing-chrome-inset: fixed header/footer only; follows margin except
+   x-large, where it stays 40px (--space-10).
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
   --spacing-margin: 40px;
+  /* Fixed header/footer viewport inset; capped at 40px on x-large (see section 9) */
+  --spacing-chrome-inset: var(--spacing-margin);
 }
 
 
@@ -448,5 +453,6 @@
     --typography-title:    140px;
     --typography-footnote: 14px;
     --spacing-margin:      80px;
+    --spacing-chrome-inset: var(--space-10); /* 40px — grid margin grows; chrome stays large-desktop */
   }
 }
