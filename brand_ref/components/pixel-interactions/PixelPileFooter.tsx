@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback, type ReactNode } from "react"
-import { GRAVITY, DRAG_X, getTrailColor, setParticleHandoverCallback } from "./cursorDitherUtils"
+import { getTrailColor, setParticleHandoverCallback } from "./cursorDitherUtils"
 import type { HandoverParticle } from "./cursorDitherUtils"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -32,14 +32,25 @@ interface PixelPileFooterProps {
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
+// NOT used by index.html — production site loads js/pixel-interactions.js.
+// Edit that file to tune the live pile; keep these in sync for brand_ref only.
 
-const MAX_PARTICLES = 2000
-
-/** Pixels within this radius of the cursor get disturbed on hover. */
-const HOVER_RADIUS = 40
-
-/** Probability (0–1) that an in-range pixel is ejected per frame on hover. Lower = slower erosion. */
-const HOVER_PROBABILITY = 0.08
+const MAX_PARTICLES = 10000
+const HOVER_RADIUS = 72
+const HOVER_PROBABILITY = 0.24
+const PILE_GRAVITY = 0.25
+const PILE_DRAG_X = 0.93
+const HOVER_JITTER = 5
+const HOVER_SWIPE_SCALE = 0.24
+const HOVER_BAT_IMPULSE = 0.4
+const HOVER_SPEED_CHANCE_MAX = 0.14
+const HOVER_SPEED_CHANCE_K = 0.038
+const AIR_KICK_RADIUS = 32
+const AIR_KICK_SWIPE = 0.06
+const DEPTH_EJECT_BIAS = 0.42
+const MAX_LAUNCH_SPEED = 8
+const SWIPE_SMOOTHING = 0.38
+const ARC_CROSS_DAMP = 0.42
 
 // Bayer 8×8 ordered dither matrix — gives the static pixel pile its stippled look.
 const BAYER_8X8 = [
@@ -126,18 +137,124 @@ export function PixelPileFooter({
       return g && gridH >= 1 ? g.length / gridH : 0
     }
 
-    // ── Hover Interaction ─────────────────────────────────────────────────
+    // ── Hover (swipe scoop) — keep in sync with js/pixel-interactions.js ──
 
-    const handleHover = (clientX: number, clientY: number) => {
-      if (reducedMotion || !gridRef.current || !containerRef.current) return
-
-      const rect = containerRef.current.getBoundingClientRect()
+    let pointerX = 0
+    let pointerY = 0
+    let swipeVx = 0
+    let swipeVy = 0
+    let swipeSpeed = 0
+    let pointerActive = false
+    let hoverLastX: number | null = null
+    let hoverLastY: number | null = null
+    const updatePointer = (clientX: number, clientY: number) => {
+      const rect = container.getBoundingClientRect()
       const x = clientX - rect.left
       const y = clientY - rect.top
+      if (hoverLastX !== null) {
+        const rawDx = x - hoverLastX
+        const rawDy = y - hoverLastY
+        swipeVx = swipeVx * (1 - SWIPE_SMOOTHING) + rawDx * SWIPE_SMOOTHING
+        swipeVy = swipeVy * (1 - SWIPE_SMOOTHING) + rawDy * SWIPE_SMOOTHING
+        swipeSpeed = Math.hypot(swipeVx, swipeVy)
+      } else {
+        swipeVx = 0
+        swipeVy = 0
+        swipeSpeed = 0
+      }
+      hoverLastX = x
+      hoverLastY = y
+      pointerX = x
+      pointerY = y
+      pointerActive = true
+    }
+
+    const clearPointer = () => {
+      pointerActive = false
+      hoverLastX = null
+      hoverLastY = null
+      swipeVx = 0
+      swipeVy = 0
+      swipeSpeed = 0
+    }
+
+    const columnDepthFromTop = (grid: Uint8Array, gridW: number, r: number, c: number) => {
+      let topR = -1
+      for (let rr = 0; rr <= r; rr++) {
+        if (grid[rr * gridW + c] === 1) {
+          topR = rr
+          break
+        }
+      }
+      return topR < 0 ? 0 : r - topR
+    }
+
+    const clampLaunch = (vx: number, vy: number) => {
+      let speed = Math.hypot(vx, vy)
+      if (speed > MAX_LAUNCH_SPEED && speed > 0) {
+        const scale = MAX_LAUNCH_SPEED / speed
+        vx *= scale
+        vy *= scale
+      }
+      if (Math.abs(swipeVx) > Math.abs(swipeVy) * 1.2) vy *= ARC_CROSS_DAMP
+      else if (Math.abs(swipeVy) > Math.abs(swipeVx) * 1.2) vx *= ARC_CROSS_DAMP
+      return { vx, vy }
+    }
+
+    const ejectVelocity = (pxX: number, pxY: number) => {
+      const dx = pxX - pointerX
+      const dy = pxY - pointerY
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      const nx = dist > 0 ? dx / dist : 0
+      const ny = dist > 0 ? dy / dist : 0
+      const jitterX = (Math.random() - 0.5) * HOVER_JITTER
+      const jitterY = (Math.random() - 0.5) * HOVER_JITTER
+      return clampLaunch(
+        jitterX + swipeVx * HOVER_SWIPE_SCALE + nx * HOVER_BAT_IMPULSE,
+        jitterY + swipeVy * HOVER_SWIPE_SCALE + ny * HOVER_BAT_IMPULSE
+      )
+    }
+
+    const sandSettleStep = (grid: Uint8Array, gridW: number) => {
+      const leftFirst = Math.random() > 0.5
+      for (let r = gridH - 2; r >= 0; r--) {
+        for (let c = 0; c < gridW; c++) {
+          if (grid[r * gridW + c] !== 1) continue
+          const below = (r + 1) * gridW + c
+          const belowL = (r + 1) * gridW + (c - 1)
+          const belowR = (r + 1) * gridW + (c + 1)
+          if (grid[below] === 0) {
+            grid[r * gridW + c] = 0
+            grid[below] = 1
+          } else {
+            const canL = c > 0 && grid[belowL] === 0
+            const canR = c < gridW - 1 && grid[belowR] === 0
+            if (canL && canR) {
+              grid[r * gridW + c] = 0
+              grid[leftFirst ? belowL : belowR] = 1
+            } else if (canL) {
+              grid[r * gridW + c] = 0
+              grid[belowL] = 1
+            } else if (canR) {
+              grid[r * gridW + c] = 0
+              grid[belowR] = 1
+            }
+          }
+        }
+      }
+    }
+
+    const handleHover = (clientX: number, clientY: number) => {
+      if (reducedMotion || !gridRef.current) return
+      updatePointer(clientX, clientY)
+
       const grid = gridRef.current
       const particles = particlesRef.current
       const color = getTrailColor()
       const gridW = gridWFor()
+      const baseChance =
+        HOVER_PROBABILITY +
+        Math.min(swipeSpeed * HOVER_SPEED_CHANCE_K, HOVER_SPEED_CHANCE_MAX)
 
       for (let r = 0; r < gridH; r++) {
         for (let c = 0; c < gridW; c++) {
@@ -145,42 +262,59 @@ export function PixelPileFooter({
 
           const pxX = c * dotSize + dotSize / 2
           const pxY = r * dotSize + dotSize / 2
-          const dx = pxX - x
-          const dy = pxY - y
+          const dx = pxX - pointerX
+          const dy = pxY - pointerY
+          const dist = Math.sqrt(dx * dx + dy * dy)
 
-          if (dx * dx + dy * dy < HOVER_RADIUS * HOVER_RADIUS) {
-            if (Math.random() < HOVER_PROBABILITY) {
-              grid[r * gridW + c] = 0
+          if (dist >= HOVER_RADIUS) continue
 
-              const dist = Math.sqrt(dx * dx + dy * dy)
-              const nx = dist > 0 ? dx / dist : (Math.random() - 0.5)
-              const ny = dist > 0 ? dy / dist : -1
+          const t = 1 - dist / HOVER_RADIUS
+          const depth = columnDepthFromTop(grid, gridW, r, c)
+          const ejectChance =
+            baseChance * t * t * Math.pow(DEPTH_EJECT_BIAS, depth)
 
-              if (particles.length < MAX_PARTICLES) {
-                particles.push({
-                  trueX: pxX,
-                  trueY: pxY,
-                  vx: nx * 1 + (Math.random() - 0.5) * 2,
-                  vy: ny * 1 - 1,
-                  age: 0,
-                  lifetime: 80 + Math.floor(Math.random() * 100),
-                  ...color,
-                })
-              }
+          if (Math.random() < ejectChance) {
+            grid[r * gridW + c] = 0
+            if (particles.length < MAX_PARTICLES) {
+              const vel = ejectVelocity(pxX, pxY)
+              particles.push({
+                trueX: pxX,
+                trueY: pxY,
+                vx: vel.vx,
+                vy: vel.vy,
+                age: 0,
+                lifetime: 55 + Math.floor(Math.random() * 75),
+                ...color,
+              })
             }
           }
         }
       }
     }
 
-    const onMouseMove = (e: MouseEvent) => handleHover(e.clientX, e.clientY)
+    const onPointerMove = (clientX: number, clientY: number) => {
+      const rect = container.getBoundingClientRect()
+      if (
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom
+      ) {
+        handleHover(clientX, clientY)
+      } else {
+        clearPointer()
+      }
+    }
+
+    const onMouseMove = (e: MouseEvent) => onPointerMove(e.clientX, e.clientY)
     const onTouchMove = (e: TouchEvent) => {
-      if (e.touches[0]) handleHover(e.touches[0].clientX, e.touches[0].clientY)
+      if (e.touches[0]) onPointerMove(e.touches[0].clientX, e.touches[0].clientY)
     }
 
     if (!reducedMotion) {
-      container.addEventListener("mousemove", onMouseMove)
-      container.addEventListener("touchmove", onTouchMove)
+      window.addEventListener("mousemove", onMouseMove, { passive: true })
+      window.addEventListener("touchmove", onTouchMove, { passive: true })
+      window.addEventListener("mouseleave", clearPointer, { passive: true })
     }
 
     // ── Particle Handover (from CursorDitherTrail) ────────────────────────
@@ -214,14 +348,31 @@ export function PixelPileFooter({
       ctx.clearRect(0, 0, w, height)
 
       const color = getTrailColor()
+      const particles = particlesRef.current
+
+      if (
+        pointerActive &&
+        swipeSpeed > 0.4 &&
+        (Math.abs(swipeVx) > 0.08 || Math.abs(swipeVy) > 0.08)
+      ) {
+        const kickR2 = AIR_KICK_RADIUS * AIR_KICK_RADIUS
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i]
+          const dx = p.trueX - pointerX
+          const dy = p.trueY - pointerY
+          if (dx * dx + dy * dy < kickR2) {
+            p.vx += swipeVx * AIR_KICK_SWIPE
+            p.vy += swipeVy * AIR_KICK_SWIPE
+          }
+        }
+      }
 
       // 1. Update & draw in-flight particles
-      const particles = particlesRef.current
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]
         p.age++
-        p.vy += GRAVITY
-        p.vx *= DRAG_X
+        p.vy += PILE_GRAVITY
+        p.vx *= PILE_DRAG_X
         p.trueX += p.vx
         p.trueY += p.vy
 
@@ -253,35 +404,11 @@ export function PixelPileFooter({
         }
       }
 
-      // 2. Falling-sand simulation — pixels settle downward/diagonally
-      const leftFirst = Math.random() > 0.5
-      for (let r = gridH - 2; r >= 0; r--) {
-        for (let c = 0; c < currentGridW; c++) {
-          if (grid[r * currentGridW + c] !== 1) continue
+      sandSettleStep(grid, currentGridW)
 
-          const below = (r + 1) * currentGridW + c
-          const belowL = (r + 1) * currentGridW + (c - 1)
-          const belowR = (r + 1) * currentGridW + (c + 1)
-
-          if (grid[below] === 0) {
-            grid[r * currentGridW + c] = 0
-            grid[below] = 1
-          } else {
-            const canL = c > 0 && grid[belowL] === 0
-            const canR = c < currentGridW - 1 && grid[belowR] === 0
-            if (canL && canR) {
-              grid[r * currentGridW + c] = 0
-              grid[leftFirst ? belowL : belowR] = 1
-            } else if (canL) {
-              grid[r * currentGridW + c] = 0
-              grid[belowL] = 1
-            } else if (canR) {
-              grid[r * currentGridW + c] = 0
-              grid[belowR] = 1
-            }
-          }
-        }
-      }
+      swipeVx *= 0.88
+      swipeVy *= 0.88
+      swipeSpeed = Math.hypot(swipeVx, swipeVy)
 
       // 3. Draw the pile with Bayer dither alpha modulation
       for (let r = 0; r < gridH; r++) {
@@ -322,8 +449,9 @@ export function PixelPileFooter({
     return () => {
       ro.disconnect()
       window.removeEventListener("resize", resizeCanvas)
-      container.removeEventListener("mousemove", onMouseMove)
-      container.removeEventListener("touchmove", onTouchMove)
+      window.removeEventListener("mousemove", onMouseMove)
+      window.removeEventListener("touchmove", onTouchMove)
+      window.removeEventListener("mouseleave", clearPointer)
       setParticleHandoverCallback(null)
       cancelAnimationFrame(rafIdRef.current)
     }

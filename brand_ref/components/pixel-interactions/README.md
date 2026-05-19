@@ -46,6 +46,8 @@ export function App() {
 
 That's it. Pixels fall from clicks, land in the mountain, hover erodes the pile.
 
+**Tuning hover / explosion / gravity feel:** see [`docs/pixel-pile-tuning.md`](../../../docs/pixel-pile-tuning.md) (production values live in `js/pixel-interactions.js`).
+
 ---
 
 ## How it works
@@ -126,8 +128,10 @@ All constants are in `cursorDitherUtils.ts` and at the top of each component fil
 | --------------------- | ----------------- | ------------------------------------------------- |
 | `GRAVITY`             | utils             | Fall speed (px/frame²). Higher = faster drop.     |
 | `DRAG_X`              | utils             | Horizontal damping (0–1). Lower = tighter spread. |
-| `HOVER_RADIUS`        | PixelPileFooter   | How close the cursor must be to erode pixels.     |
-| `HOVER_PROBABILITY`   | PixelPileFooter   | Fraction of in-range pixels ejected per frame.    |
+| `HOVER_RADIUS`        | PixelPileFooter   | Detonation disc radius (px); uniform chance inside. |
+| `HOVER_PROBABILITY`   | PixelPileFooter   | Per-frame ejection chance anywhere in the disc. |
+| `PILE_GRAVITY`        | PixelPileFooter   | Gravity for airborne pile grains (stronger than trail). |
+| `PILE_DRAG_X`         | PixelPileFooter   | Horizontal damping for pile grains (lower = wilder). |
 | `PARTICLES_PER_EVENT` | CursorDitherTrail | Pixels spawned per click/move event.              |
 
 

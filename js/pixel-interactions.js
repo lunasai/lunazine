@@ -265,10 +265,24 @@
   // Canvas inside .pixel-pile-footer that runs a falling-sand simulation.
   // ═══════════════════════════════════════════════════════════════════════════════
 
-  const MAX_PILE_PARTICLES = 2000;
-  const HOVER_RADIUS     = 40;
-  const HOVER_PROBABILITY = 0.08;
-  const PEAK_RATIO       = 0.03; // starting dome: barely visible bump at center
+  /* Hover / pile physics — see docs/pixel-pile-tuning.md */
+  const MAX_PILE_PARTICLES       = 10000;
+  const HOVER_RADIUS             = 72;
+  const HOVER_PROBABILITY        = 0.24;
+  const PILE_GRAVITY             = 0.25;
+  const PILE_DRAG_X              = 0.93;
+  const HOVER_JITTER             = 5;
+  const HOVER_SWIPE_SCALE        = 0.24;
+  const HOVER_BAT_IMPULSE        = 0.5;  /* half-strength contact pop — vibe without full blast */
+  const HOVER_SPEED_CHANCE_MAX   = 0.14;
+  const HOVER_SPEED_CHANCE_K     = 0.038;
+  const AIR_KICK_RADIUS          = 32;
+  const AIR_KICK_SWIPE           = 0.06;
+  const DEPTH_EJECT_BIAS         = 0.42; /* deeper grains in a column eject less */
+  const MAX_LAUNCH_SPEED         = 8;
+  const SWIPE_SMOOTHING          = 0.38;
+  const ARC_CROSS_DAMP           = 0.42; /* softer than 0.32 — more arc on fast swipes */
+  const PEAK_RATIO               = 0.03;
 
   /** Pile simulation band height (px), pinned to viewport bottom — tracks innerHeight. */
   let pileBandHeightPx = Math.round(window.innerHeight);
@@ -307,7 +321,7 @@
     width:         "100%",
     height:        pileBandHeightPx + "px",
     pointerEvents: "none",
-    zIndex:        "-1",
+    zIndex:        "0",
   });
   pileContainer.insertBefore(pileCanvas, pileContainer.firstChild);
 
@@ -315,6 +329,16 @@
 
   let pileGrid     = null;
   const pileParticles = [];
+
+  /** Pile-local pointer + swipe (updated on move; decayed each frame for air kicks). */
+  let pilePointerX     = 0;
+  let pilePointerY     = 0;
+  let pileSwipeVx      = 0;
+  let pileSwipeVy      = 0;
+  let pileSwipeSpeed   = 0;
+  let pilePointerActive = false;
+  let pileHoverLastX   = null;
+  let pileHoverLastY   = null;
 
   // ── Grid helpers ──────────────────────────────────────────────────────────────
 
@@ -351,7 +375,7 @@
   function resizePile() {
     syncPileBandHeightFromViewport();
 
-    const w         = Math.max(1, Math.round(pileContainer.getBoundingClientRect().width));
+    const w         = Math.max(1, Math.round(window.innerWidth));
     const newGridW  = Math.ceil(w / DOT_SIZE);
     const newGridH  = getGridH();
 
@@ -406,17 +430,143 @@
   // Persist the grid every 5 s (saving every frame would be too expensive)
   setInterval(savePileGrid, 5000);
 
-  // ── Hover interaction ──────────────────────────────────────────────────────────
+  // ── Hover interaction (swipe + bat — cat-playing-with-sand feel) ───────────────
+
+  function pileLocalFromClient(clientX, clientY) {
+    const rect      = pileContainer.getBoundingClientRect();
+    const canvasTop = rect.bottom - pileBandHeightPx;
+    return {
+      x: clientX - rect.left,
+      y: clientY - canvasTop,
+      rect,
+      canvasTop,
+    };
+  }
+
+  function isClientInPileBand(clientX, clientY) {
+    const { x, y, rect, canvasTop } = pileLocalFromClient(clientX, clientY);
+    return (
+      clientX >= rect.left && clientX <= rect.right &&
+      clientY >= canvasTop && clientY <= rect.bottom
+    );
+  }
+
+  function updatePilePointer(clientX, clientY) {
+    const { x, y } = pileLocalFromClient(clientX, clientY);
+    if (pileHoverLastX !== null) {
+      const rawDx = x - pileHoverLastX;
+      const rawDy = y - pileHoverLastY;
+      pileSwipeVx =
+        pileSwipeVx * (1 - SWIPE_SMOOTHING) + rawDx * SWIPE_SMOOTHING;
+      pileSwipeVy =
+        pileSwipeVy * (1 - SWIPE_SMOOTHING) + rawDy * SWIPE_SMOOTHING;
+      pileSwipeSpeed = Math.hypot(pileSwipeVx, pileSwipeVy);
+    } else {
+      pileSwipeVx = 0;
+      pileSwipeVy = 0;
+      pileSwipeSpeed = 0;
+    }
+    pileHoverLastX    = x;
+    pileHoverLastY    = y;
+    pilePointerX      = x;
+    pilePointerY      = y;
+    pilePointerActive = true;
+  }
+
+  /** Rows below the topmost grain in this column (0 = surface grain). */
+  function columnDepthFromTop(gridW, r, c) {
+    let topR = -1;
+    for (let rr = 0; rr <= r; rr++) {
+      if (pileGrid[rr * gridW + c] === 1) {
+        topR = rr;
+        break;
+      }
+    }
+    return topR < 0 ? 0 : r - topR;
+  }
+
+  function clampLaunchVelocity(vx, vy) {
+    let speed = Math.hypot(vx, vy);
+    if (speed > MAX_LAUNCH_SPEED && speed > 0) {
+      const scale = MAX_LAUNCH_SPEED / speed;
+      vx *= scale;
+      vy *= scale;
+    }
+    /* Arcs: dominant swipe axis stays; cross-axis is heavily damped. */
+    if (Math.abs(pileSwipeVx) > Math.abs(pileSwipeVy) * 1.2) {
+      vy *= ARC_CROSS_DAMP;
+    } else if (Math.abs(pileSwipeVy) > Math.abs(pileSwipeVx) * 1.2) {
+      vx *= ARC_CROSS_DAMP;
+    }
+    return { vx, vy };
+  }
+
+  function clearPilePointer() {
+    pilePointerActive = false;
+    pileHoverLastX    = null;
+    pileHoverLastY    = null;
+    pileSwipeVx       = 0;
+    pileSwipeVy       = 0;
+    pileSwipeSpeed    = 0;
+  }
+
+  function ejectVelocityFromSwipe(pxX, pxY, cursorX, cursorY) {
+    const dx   = pxX - cursorX;
+    const dy   = pxY - cursorY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const nx   = dist > 0 ? dx / dist : 0;
+    const ny   = dist > 0 ? dy / dist : 0;
+    const jitterX = (Math.random() - 0.5) * HOVER_JITTER;
+    const jitterY = (Math.random() - 0.5) * HOVER_JITTER;
+    return clampLaunchVelocity(
+      jitterX + pileSwipeVx * HOVER_SWIPE_SCALE + nx * HOVER_BAT_IMPULSE,
+      jitterY + pileSwipeVy * HOVER_SWIPE_SCALE + ny * HOVER_BAT_IMPULSE
+    );
+  }
+
+  function pileSandSettleStep(gridW, gh) {
+    const leftFirst = Math.random() > 0.5;
+    for (let r = gh - 2; r >= 0; r--) {
+      for (let c = 0; c < gridW; c++) {
+        if (pileGrid[r * gridW + c] !== 1) continue;
+
+        const below  = (r + 1) * gridW + c;
+        const belowL = (r + 1) * gridW + (c - 1);
+        const belowR = (r + 1) * gridW + (c + 1);
+
+        if (pileGrid[below] === 0) {
+          pileGrid[r * gridW + c] = 0;
+          pileGrid[below] = 1;
+        } else {
+          const canL = c > 0                && pileGrid[belowL] === 0;
+          const canR = c < gridW - 1        && pileGrid[belowR] === 0;
+          if (canL && canR) {
+            pileGrid[r * gridW + c] = 0;
+            pileGrid[leftFirst ? belowL : belowR] = 1;
+          } else if (canL) {
+            pileGrid[r * gridW + c] = 0;
+            pileGrid[belowL] = 1;
+          } else if (canR) {
+            pileGrid[r * gridW + c] = 0;
+            pileGrid[belowR] = 1;
+          }
+        }
+      }
+    }
+  }
 
   function handleHover(clientX, clientY) {
     if (reducedMotion || !pileGrid) return;
-    const rect      = pileContainer.getBoundingClientRect();
-    const canvasTop = rect.bottom - pileBandHeightPx;
-    const x         = clientX - rect.left;
-    const y         = clientY - canvasTop;
-    const gridW     = getGridW();
-    const gh        = getGridH();
-    const color     = getTrailColor();
+    updatePilePointer(clientX, clientY);
+
+    const gridW = getGridW();
+    const gh    = getGridH();
+    const color = getTrailColor();
+    const chanceBoost = Math.min(
+      pileSwipeSpeed * HOVER_SPEED_CHANCE_K,
+      HOVER_SPEED_CHANCE_MAX
+    );
+    const baseChance = HOVER_PROBABILITY + chanceBoost;
 
     for (let r = 0; r < gh; r++) {
       for (let c = 0; c < gridW; c++) {
@@ -424,58 +574,57 @@
 
         const pxX = c * DOT_SIZE + DOT_SIZE / 2;
         const pxY = r * DOT_SIZE + DOT_SIZE / 2;
-        const dx  = pxX - x;
-        const dy  = pxY - y;
+        const dx   = pxX - pilePointerX;
+        const dy   = pxY - pilePointerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dx * dx + dy * dy < HOVER_RADIUS * HOVER_RADIUS) {
-          if (Math.random() < HOVER_PROBABILITY) {
-            pileGrid[r * gridW + c] = 0;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const nx   = dist > 0 ? dx / dist : (Math.random() - 0.5);
-            const ny   = dist > 0 ? dy / dist : -1;
+        if (dist >= HOVER_RADIUS) continue;
 
-            if (pileParticles.length < MAX_PILE_PARTICLES) {
-              pileParticles.push({
-                trueX:    pxX,
-                trueY:    pxY,
-                vx:       nx + (Math.random() - 0.5) * 2,
-                vy:       ny - 1,
-                age:      0,
-                lifetime: 80 + Math.floor(Math.random() * 100),
-                r:        color.r,
-                g:        color.g,
-                b:        color.b,
-              });
-            }
+        const t = 1 - dist / HOVER_RADIUS;
+        const depth = columnDepthFromTop(gridW, r, c);
+        const ejectChance =
+          baseChance * t * t * Math.pow(DEPTH_EJECT_BIAS, depth);
+
+        if (Math.random() < ejectChance) {
+          pileGrid[r * gridW + c] = 0;
+
+          if (pileParticles.length < MAX_PILE_PARTICLES) {
+            const vel = ejectVelocityFromSwipe(pxX, pxY, pilePointerX, pilePointerY);
+            pileParticles.push({
+              trueX:    pxX,
+              trueY:    pxY,
+              vx:       vel.vx,
+              vy:       vel.vy,
+              age:      0,
+              lifetime: 55 + Math.floor(Math.random() * 75),
+              r:        color.r,
+              g:        color.g,
+              b:        color.b,
+            });
           }
         }
       }
     }
   }
 
-  window.addEventListener("mousemove", (e) => {
-    const rect      = pileContainer.getBoundingClientRect();
-    const canvasTop = rect.bottom - pileBandHeightPx;
-    if (
-      e.clientX >= rect.left && e.clientX <= rect.right &&
-      e.clientY >= canvasTop && e.clientY <= rect.bottom
-    ) {
-      handleHover(e.clientX, e.clientY);
+  function onPilePointerMove(clientX, clientY) {
+    if (isClientInPileBand(clientX, clientY)) {
+      handleHover(clientX, clientY);
+    } else {
+      clearPilePointer();
     }
-  });
+  }
+
+  window.addEventListener("mousemove", (e) => {
+    onPilePointerMove(e.clientX, e.clientY);
+  }, { passive: true });
 
   window.addEventListener("touchmove", (e) => {
     if (!e.touches[0]) return;
-    const { clientX, clientY } = e.touches[0];
-    const rect      = pileContainer.getBoundingClientRect();
-    const canvasTop = rect.bottom - pileBandHeightPx;
-    if (
-      clientX >= rect.left && clientX <= rect.right &&
-      clientY >= canvasTop && clientY <= rect.bottom
-    ) {
-      handleHover(clientX, clientY);
-    }
-  });
+    onPilePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  window.addEventListener("mouseleave", clearPilePointer, { passive: true });
 
   // ── Particle handover from trail ───────────────────────────────────────────────
 
@@ -521,11 +670,28 @@
     const currentGridW = getGridW();
     const gh           = getGridH();
 
+    if (
+      pilePointerActive &&
+      pileSwipeSpeed > 0.4 &&
+      (Math.abs(pileSwipeVx) > 0.08 || Math.abs(pileSwipeVy) > 0.08)
+    ) {
+      const kickR2 = AIR_KICK_RADIUS * AIR_KICK_RADIUS;
+      for (let i = 0; i < pileParticles.length; i++) {
+        const p  = pileParticles[i];
+        const dx = p.trueX - pilePointerX;
+        const dy = p.trueY - pilePointerY;
+        if (dx * dx + dy * dy < kickR2) {
+          p.vx += pileSwipeVx * AIR_KICK_SWIPE;
+          p.vy += pileSwipeVy * AIR_KICK_SWIPE;
+        }
+      }
+    }
+
     for (let i = pileParticles.length - 1; i >= 0; i--) {
       const p = pileParticles[i];
       p.age++;
-      p.vy    += GRAVITY;
-      p.vx    *= DRAG_X;
+      p.vy    += PILE_GRAVITY;
+      p.vx    *= PILE_DRAG_X;
       p.trueX += p.vx;
       p.trueY += p.vy;
 
@@ -555,34 +721,11 @@
       }
     }
 
-    const leftFirst = Math.random() > 0.5;
-    for (let r = gh - 2; r >= 0; r--) {
-      for (let c = 0; c < currentGridW; c++) {
-        if (pileGrid[r * currentGridW + c] !== 1) continue;
+    pileSandSettleStep(currentGridW, gh);
 
-        const below  = (r + 1) * currentGridW + c;
-        const belowL = (r + 1) * currentGridW + (c - 1);
-        const belowR = (r + 1) * currentGridW + (c + 1);
-
-        if (pileGrid[below] === 0) {
-          pileGrid[r * currentGridW + c] = 0;
-          pileGrid[below] = 1;
-        } else {
-          const canL = c > 0                   && pileGrid[belowL] === 0;
-          const canR = c < currentGridW - 1    && pileGrid[belowR] === 0;
-          if (canL && canR) {
-            pileGrid[r * currentGridW + c] = 0;
-            pileGrid[leftFirst ? belowL : belowR] = 1;
-          } else if (canL) {
-            pileGrid[r * currentGridW + c] = 0;
-            pileGrid[belowL] = 1;
-          } else if (canR) {
-            pileGrid[r * currentGridW + c] = 0;
-            pileGrid[belowR] = 1;
-          }
-        }
-      }
-    }
+    pileSwipeVx    *= 0.88;
+    pileSwipeVy    *= 0.88;
+    pileSwipeSpeed  = Math.hypot(pileSwipeVx, pileSwipeVy);
   }
 
   function drawPileAirborneOnTrail() {

@@ -99,3 +99,7 @@ This runs `assets:optimize` first, then copies everything to `dist/`.
 ## QA Docs
 
 Responsive and accessibility QA reports are in `docs/qa/`, covering breakpoints 480px, 768px, 1024px, 1440px, and 1920px.
+
+## Pixel pile tuning
+
+Hover explosion, gravity, and pile constants are documented in [`docs/pixel-pile-tuning.md`](docs/pixel-pile-tuning.md) (source of truth: `js/pixel-interactions.js`).

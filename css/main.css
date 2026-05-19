@@ -726,7 +726,8 @@ html[data-theme="dark"] {
 .section--thanks {
   position: relative;
   z-index: 2;
-  background-color: var(--color-neutral-bg);
+  /* Transparent so the pixel-pile band (z-index 1) can show through when scrolled to the footer */
+  background-color: transparent;
   padding-top: var(--spacing-thanks-padding-top);
   padding-bottom: calc(var(--space-10) * 2);
   box-sizing: border-box;
@@ -890,16 +891,19 @@ html[data-theme="dark"] {
 
 
 /* ─── Pixel pile footer ──────────────────────────────────────────
-   Full-width canvas block at the very bottom of <main>, below
-   .section--thanks. JS inserts a <canvas> whose height tracks the
-   viewport (innerHeight) for the falling-sand simulation.
+   End of <main> (document flow), full width. JS inserts a <canvas>
+   (position: absolute; bottom: 0) whose height tracks innerHeight;
+   the band grows upward from the footer — only visible when scrolled
+   to the page bottom, not pinned to the viewport.
    ──────────────────────────────────────────────────────────────── */
 
 .pixel-pile-footer {
   position: relative;
   width: 100%;
-  height: 60px;
+  height: 0;
   overflow: visible;
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
