@@ -8,6 +8,7 @@
     "dev": "vite",
     "assets:optimize": "node ./scripts/optimize-assets.mjs",
     "sync:moon": "node ./scripts/sync-moon-sprite.mjs",
+    "sync:cv": "node ./scripts/sync-cv.mjs",
     "build": "npm run assets:optimize && node ./scripts/build.mjs",
     "favicons": "node ./scripts/generate-favicons.mjs",
     "preview": "serve dist -p 4173"
