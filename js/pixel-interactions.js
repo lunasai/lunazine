@@ -268,9 +268,9 @@
   /* Hover / pile physics — see docs/pixel-pile-tuning.md */
   const MAX_PILE_PARTICLES       = 10000;
   const HOVER_RADIUS             = 72;
-  const HOVER_PROBABILITY        = 0.24;
+  const HOVER_PROBABILITY        = 0.32;
   const PILE_GRAVITY             = 0.25;
-  const PILE_DRAG_X              = 0.93;
+  const PILE_DRAG_X              = 0.96;
   const HOVER_JITTER             = 5;
   const HOVER_SWIPE_SCALE        = 0.24;
   const HOVER_BAT_IMPULSE        = 0.5;  /* half-strength contact pop — vibe without full blast */
@@ -278,10 +278,12 @@
   const HOVER_SPEED_CHANCE_K     = 0.038;
   const AIR_KICK_RADIUS          = 32;
   const AIR_KICK_SWIPE           = 0.06;
-  const DEPTH_EJECT_BIAS         = 0.42; /* deeper grains in a column eject less */
+  const DEPTH_EJECT_BIAS         = 0.82; /* closer to 1 = deep grains eject almost as easily */
   const MAX_LAUNCH_SPEED         = 8;
   const SWIPE_SMOOTHING          = 0.38;
-  const ARC_CROSS_DAMP           = 0.42; /* softer than 0.32 — more arc on fast swipes */
+  const ARC_CROSS_DAMP           = 0.72; /* looser arcs — less vertical kill on horizontal swipes */
+  const LAUNCH_LIFT_ON_SWIPE     = 0.45; /* upward nudge when swipe is mostly horizontal */
+  const LAND_SEARCH_COLS         = 2;    /* place grain in nearest empty cell ±N columns */
   const PEAK_RATIO               = 0.03;
 
   /** Pile simulation band height (px), pinned to viewport bottom — tracks innerHeight. */
@@ -518,10 +520,37 @@
     const ny   = dist > 0 ? dy / dist : 0;
     const jitterX = (Math.random() - 0.5) * HOVER_JITTER;
     const jitterY = (Math.random() - 0.5) * HOVER_JITTER;
-    return clampLaunchVelocity(
-      jitterX + pileSwipeVx * HOVER_SWIPE_SCALE + nx * HOVER_BAT_IMPULSE,
-      jitterY + pileSwipeVy * HOVER_SWIPE_SCALE + ny * HOVER_BAT_IMPULSE
-    );
+    let vx = jitterX + pileSwipeVx * HOVER_SWIPE_SCALE + nx * HOVER_BAT_IMPULSE;
+    let vy = jitterY + pileSwipeVy * HOVER_SWIPE_SCALE + ny * HOVER_BAT_IMPULSE;
+    if (Math.abs(pileSwipeVx) > Math.abs(pileSwipeVy) * 1.1) {
+      vy -= LAUNCH_LIFT_ON_SWIPE;
+    }
+    return clampLaunchVelocity(vx, vy);
+  }
+
+  /** Lowest empty cell near impact (±LAND_SEARCH_COLS), not only one column. */
+  function placeLandedGrain(gridW, gh, gridR, gridC) {
+    let bestR = -1;
+    let bestC = gridC;
+    let bestScore = Infinity;
+
+    for (let dc = -LAND_SEARCH_COLS; dc <= LAND_SEARCH_COLS; dc++) {
+      const tc = gridC + dc;
+      if (tc < 0 || tc >= gridW) continue;
+
+      let targetR = Math.min(Math.max(0, gridR), gh - 1);
+      while (targetR > 0 && pileGrid[targetR * gridW + tc] === 1) targetR--;
+      if (pileGrid[targetR * gridW + tc] === 1) continue;
+
+      const score = Math.abs(dc) * 2 + Math.abs(targetR - gridR);
+      if (score < bestScore) {
+        bestScore = score;
+        bestR = targetR;
+        bestC = tc;
+      }
+    }
+
+    if (bestR >= 0) pileGrid[bestR * gridW + bestC] = 1;
   }
 
   function pileSandSettleStep(gridW, gh) {
@@ -555,6 +584,41 @@
     }
   }
 
+  /** Same-row slide when supported below — breaks rigid vertical towers. */
+  function pileSandSpreadStep(gridW, gh) {
+    for (let r = gh - 2; r >= 0; r--) {
+      for (let c = 0; c < gridW; c++) {
+        if (pileGrid[r * gridW + c] !== 1) continue;
+        if (pileGrid[(r + 1) * gridW + c] !== 1) continue;
+
+        const canL =
+          c > 0 &&
+          pileGrid[r * gridW + (c - 1)] === 0 &&
+          pileGrid[(r + 1) * gridW + (c - 1)] === 0;
+        const canR =
+          c < gridW - 1 &&
+          pileGrid[r * gridW + (c + 1)] === 0 &&
+          pileGrid[(r + 1) * gridW + (c + 1)] === 0;
+
+        if (canL && canR) {
+          if (Math.random() > 0.5) {
+            pileGrid[r * gridW + c] = 0;
+            pileGrid[r * gridW + (c - 1)] = 1;
+          } else {
+            pileGrid[r * gridW + c] = 0;
+            pileGrid[r * gridW + (c + 1)] = 1;
+          }
+        } else if (canL) {
+          pileGrid[r * gridW + c] = 0;
+          pileGrid[r * gridW + (c - 1)] = 1;
+        } else if (canR) {
+          pileGrid[r * gridW + c] = 0;
+          pileGrid[r * gridW + (c + 1)] = 1;
+        }
+      }
+    }
+  }
+
   function handleHover(clientX, clientY) {
     if (reducedMotion || !pileGrid) return;
     updatePilePointer(clientX, clientY);
@@ -583,7 +647,7 @@
         const t = 1 - dist / HOVER_RADIUS;
         const depth = columnDepthFromTop(gridW, r, c);
         const ejectChance =
-          baseChance * t * t * Math.pow(DEPTH_EJECT_BIAS, depth);
+          baseChance * t * Math.pow(DEPTH_EJECT_BIAS, depth);
 
         if (Math.random() < ejectChance) {
           pileGrid[r * gridW + c] = 0;
@@ -711,16 +775,16 @@
         }
       }
 
-      if (landed) {
-        let targetR = Math.min(Math.max(0, gridR), gh - 1);
-        while (targetR > 0 && pileGrid[targetR * currentGridW + gridC] === 1) targetR--;
-        if (gridC >= 0 && gridC < currentGridW) pileGrid[targetR * currentGridW + gridC] = 1;
+      if (landed && gridC >= 0 && gridC < currentGridW) {
+        placeLandedGrain(currentGridW, gh, gridR, gridC);
         pileParticles.splice(i, 1);
       } else if (p.age >= p.lifetime) {
         pileParticles.splice(i, 1);
       }
     }
 
+    pileSandSettleStep(currentGridW, gh);
+    pileSandSpreadStep(currentGridW, gh);
     pileSandSettleStep(currentGridW, gh);
 
     pileSwipeVx    *= 0.88;

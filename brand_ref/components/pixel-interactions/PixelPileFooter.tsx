@@ -37,9 +37,9 @@ interface PixelPileFooterProps {
 
 const MAX_PARTICLES = 10000
 const HOVER_RADIUS = 72
-const HOVER_PROBABILITY = 0.24
+const HOVER_PROBABILITY = 0.32
 const PILE_GRAVITY = 0.25
-const PILE_DRAG_X = 0.93
+const PILE_DRAG_X = 0.96
 const HOVER_JITTER = 5
 const HOVER_SWIPE_SCALE = 0.24
 const HOVER_BAT_IMPULSE = 0.4
@@ -47,10 +47,12 @@ const HOVER_SPEED_CHANCE_MAX = 0.14
 const HOVER_SPEED_CHANCE_K = 0.038
 const AIR_KICK_RADIUS = 32
 const AIR_KICK_SWIPE = 0.06
-const DEPTH_EJECT_BIAS = 0.42
+const DEPTH_EJECT_BIAS = 0.82
 const MAX_LAUNCH_SPEED = 8
 const SWIPE_SMOOTHING = 0.38
-const ARC_CROSS_DAMP = 0.42
+const ARC_CROSS_DAMP = 0.72
+const LAUNCH_LIFT_ON_SWIPE = 0.45
+const LAND_SEARCH_COLS = 2
 
 // Bayer 8×8 ordered dither matrix — gives the static pixel pile its stippled look.
 const BAYER_8X8 = [
@@ -209,10 +211,35 @@ export function PixelPileFooter({
       const ny = dist > 0 ? dy / dist : 0
       const jitterX = (Math.random() - 0.5) * HOVER_JITTER
       const jitterY = (Math.random() - 0.5) * HOVER_JITTER
-      return clampLaunch(
-        jitterX + swipeVx * HOVER_SWIPE_SCALE + nx * HOVER_BAT_IMPULSE,
-        jitterY + swipeVy * HOVER_SWIPE_SCALE + ny * HOVER_BAT_IMPULSE
-      )
+      let vx = jitterX + swipeVx * HOVER_SWIPE_SCALE + nx * HOVER_BAT_IMPULSE
+      let vy = jitterY + swipeVy * HOVER_SWIPE_SCALE + ny * HOVER_BAT_IMPULSE
+      if (Math.abs(swipeVx) > Math.abs(swipeVy) * 1.1) vy -= LAUNCH_LIFT_ON_SWIPE
+      return clampLaunch(vx, vy)
+    }
+
+    const placeLandedGrain = (
+      grid: Uint8Array,
+      gridW: number,
+      gridR: number,
+      gridC: number
+    ) => {
+      let bestR = -1
+      let bestC = gridC
+      let bestScore = Infinity
+      for (let dc = -LAND_SEARCH_COLS; dc <= LAND_SEARCH_COLS; dc++) {
+        const tc = gridC + dc
+        if (tc < 0 || tc >= gridW) continue
+        let targetR = Math.min(Math.max(0, gridR), gridH - 1)
+        while (targetR > 0 && grid[targetR * gridW + tc] === 1) targetR--
+        if (grid[targetR * gridW + tc] === 1) continue
+        const score = Math.abs(dc) * 2 + Math.abs(targetR - gridR)
+        if (score < bestScore) {
+          bestScore = score
+          bestR = targetR
+          bestC = tc
+        }
+      }
+      if (bestR >= 0) grid[bestR * gridW + bestC] = 1
     }
 
     const sandSettleStep = (grid: Uint8Array, gridW: number) => {
@@ -239,6 +266,38 @@ export function PixelPileFooter({
               grid[r * gridW + c] = 0
               grid[belowR] = 1
             }
+          }
+        }
+      }
+    }
+
+    const sandSpreadStep = (grid: Uint8Array, gridW: number) => {
+      for (let r = gridH - 2; r >= 0; r--) {
+        for (let c = 0; c < gridW; c++) {
+          if (grid[r * gridW + c] !== 1) continue
+          if (grid[(r + 1) * gridW + c] !== 1) continue
+          const canL =
+            c > 0 &&
+            grid[r * gridW + (c - 1)] === 0 &&
+            grid[(r + 1) * gridW + (c - 1)] === 0
+          const canR =
+            c < gridW - 1 &&
+            grid[r * gridW + (c + 1)] === 0 &&
+            grid[(r + 1) * gridW + (c + 1)] === 0
+          if (canL && canR) {
+            if (Math.random() > 0.5) {
+              grid[r * gridW + c] = 0
+              grid[r * gridW + (c - 1)] = 1
+            } else {
+              grid[r * gridW + c] = 0
+              grid[r * gridW + (c + 1)] = 1
+            }
+          } else if (canL) {
+            grid[r * gridW + c] = 0
+            grid[r * gridW + (c - 1)] = 1
+          } else if (canR) {
+            grid[r * gridW + c] = 0
+            grid[r * gridW + (c + 1)] = 1
           }
         }
       }
@@ -271,7 +330,7 @@ export function PixelPileFooter({
           const t = 1 - dist / HOVER_RADIUS
           const depth = columnDepthFromTop(grid, gridW, r, c)
           const ejectChance =
-            baseChance * t * t * Math.pow(DEPTH_EJECT_BIAS, depth)
+            baseChance * t * Math.pow(DEPTH_EJECT_BIAS, depth)
 
           if (Math.random() < ejectChance) {
             grid[r * gridW + c] = 0
@@ -390,10 +449,8 @@ export function PixelPileFooter({
           }
         }
 
-        if (landed) {
-          let targetR = Math.min(Math.max(0, gridR), gridH - 1)
-          while (targetR > 0 && grid[targetR * currentGridW + gridC] === 1) targetR--
-          if (gridC >= 0 && gridC < currentGridW) grid[targetR * currentGridW + gridC] = 1
+        if (landed && gridC >= 0 && gridC < currentGridW) {
+          placeLandedGrain(grid, currentGridW, gridR, gridC)
           particles.splice(i, 1)
         } else if (p.age >= p.lifetime) {
           particles.splice(i, 1)
@@ -404,6 +461,8 @@ export function PixelPileFooter({
         }
       }
 
+      sandSettleStep(grid, currentGridW)
+      sandSpreadStep(grid, currentGridW)
       sandSettleStep(grid, currentGridW)
 
       swipeVx *= 0.88

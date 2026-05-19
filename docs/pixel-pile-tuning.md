@@ -29,10 +29,12 @@ Current behavior model (as implemented):
 - **Swipe impulse (smoothed):** EMA on pointer delta — timing / slow-in-out, not raw snap.
 - **Any cell in disc** can eject (no surface-only cap).
 - **Depth bias:** `ejectChance *= DEPTH_EJECT_BIAS^depth` — top of column easy, deep grains rare.
-- **Quadratic falloff:** Softer at disc center, stronger at edges (`t²`).
+- **Linear disc falloff:** `t` from cursor to edge (not `t²`).
 - **Launch cap + arc bias:** Speed limited; cross-axis damped (`ARC_CROSS_DAMP`) but not as harsh as the ultra-soft pass.
 - **Half bat + light air kick:** Contact pop and mid-flight nudge at ~50% of the old aggressive preset.
-- **Sand settle:** Runs once per frame — mass follows gravity into scooped gaps.
+- **Sand settle + spread:** Gravity settle, sideways spread (angle-of-repose lite), settle again.
+- **Looser landing:** Grains snap to nearest empty cell within ±`LAND_SEARCH_COLS` columns.
+- **Looser launch:** Higher `ARC_CROSS_DAMP`, horizontal swipe lift (`LAUNCH_LIFT_ON_SWIPE`).
 
 ### Disney principles mapped
 
@@ -262,7 +264,9 @@ Document the values you ship when you change feel, so humans and AI know what �
 
 | Date | `HOVER_RADIUS` | `HOVER_PROBABILITY` | Notes |
 |------|----------------|---------------------|-------|
-| 2026-05-19 | 72 | 0.24 | No surface/budget; depth bias `0.42`; launch physics unchanged |
+| 2026-05-19 | 72 | 0.32 | Looser launch/land/settle — less vertical tower on horizontal swipe |
+| 2026-05-19 | 72 | 0.32 | Looser dig: depth bias `0.82`, linear `t` falloff |
+| 2026-05-19 | 72 | 0.24 | No surface/budget; depth bias `0.42` (too solid) |
 | 2026-05-19 | 64 | 0.17 | More eject volume (budget 56) — edit `js/pixel-interactions.js`, not TSX |
 | 2026-05-19 | 60 | 0.13 | More eject volume only (budget 42); launch physics unchanged |
 | 2026-05-19 | 54 | 0.095 | Balanced playful: half bat (0.4), light air kick, more budget/swipe |
