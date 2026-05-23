@@ -360,8 +360,6 @@
     hide();
   }
 
-  initTouchHintIfNeeded();
-
   /* ── Preload preview images when the work section enters view ────
      Waits until the manifest is ready, then creates hidden Image objects
      for the best format the browser supports (avif → webp → jpg/png).

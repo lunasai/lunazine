@@ -92,47 +92,6 @@
   border-radius: var(--radius-sm);
 }
 
-/* ── One-time touch hint (#preview-touch-hint, toggled in hover-preview.js) ─── */
-
-.preview-touch-hint {
-  position: fixed;
-  left: 50%;
-  bottom: max(16px, env(safe-area-inset-bottom, 0px));
-  z-index: 350;
-  transform: translate(-50%, 120%);
-  max-width: calc(100vw - (var(--spacing-margin) * 2));
-
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-neutral-stroke);
-  background: var(--color-neutral-bg);
-
-  font-family: var(--font-mono);
-  font-size: var(--typography-mono);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  text-align: center;
-  color: var(--color-neutral-fg);
-  pointer-events: none;
-
-  opacity: 0;
-  transition:
-    opacity 220ms ease,
-    transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.preview-touch-hint.is-visible {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .preview-touch-hint {
-    transition: opacity 120ms ease;
-    transform: translate(-50%, 0);
-  }
-}
 
 /* ── Floating preview card ──────────────────────────────────────── */
 
