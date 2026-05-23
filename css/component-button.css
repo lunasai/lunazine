@@ -48,15 +48,6 @@ a.button:visited {
   color: var(--color-neutral-fg);
 }
 
-[data-theme="dark"] .button.button--chrome,
-[data-theme="dark"] .button.button--cta {
-  color: var(--color-chrome-muted-fg);
-}
-
-[data-theme="dark"] a.button.button--chrome:visited,
-[data-theme="dark"] a.button.button--cta:visited {
-  color: var(--color-chrome-muted-fg);
-}
 
 a.button.button--accent:visited {
   color: var(--color-accent-fg);
@@ -157,7 +148,7 @@ a.button.button--accent:visited {
   /* Figma — padding 0; frame 44×24 is text + intrinsic line-box */
   padding: 0;
 
-  font-family: var(--font-serif);
+  font-family: var(--font-brand);
   font-weight: var(--font-weight-regular);
   font-size: var(--typography-chrome);
   line-height: 1.18; /* Figma button label */
@@ -218,7 +209,7 @@ a.button.button--chrome.is-feedback:visited {
 
   justify-content: flex-start;
 
-  font-family: var(--font-serif);
+  font-family: var(--font-brand);
   font-weight: var(--font-weight-regular);
   font-size: var(--typography-chrome);
   line-height: 1.18;
@@ -248,15 +239,6 @@ a.button.button--cta.is-feedback:visited {
   color: var(--color-neutral-fg);
 }
 
-[data-theme="dark"] .button.button--chrome.is-feedback,
-[data-theme="dark"] .button.button--cta.is-feedback {
-  color: var(--color-chrome-muted-fg);
-}
-
-[data-theme="dark"] a.button.button--chrome.is-feedback:visited,
-[data-theme="dark"] a.button.button--cta.is-feedback:visited {
-  color: var(--color-chrome-muted-fg);
-}
 
 /* Leading pixel icons only (.button__feedback-thumb is separate) */
 .button.button--cta > svg,
@@ -368,26 +350,3 @@ a.button.button--cta.is-feedback:visited {
   }
 }
 
-/* Dark mode — base mono accent hover excludes chrome / CTA (pill tokens above) ─ */
-@media (hover: hover) and (pointer: fine) {
-  [data-theme="dark"] .button--hover:not(.button--chrome):not(.button--cta),
-  [data-theme="dark"] .button:hover:not(.button--chrome):not(.button--cta) {
-    background: var(--color-accent-fg);
-    color: var(--color-neutral-bg);
-  }
-
-  [data-theme="dark"] a.button:visited:hover:not(.button--chrome):not(.button--cta),
-  [data-theme="dark"] a.button.button--accent:visited:hover:not(.button--chrome) {
-    color: var(--color-neutral-bg);
-  }
-
-  [data-theme="dark"] .button--hover.button--accent:not(.button--cta),
-  [data-theme="dark"] .button--accent:hover:not(.button--cta) {
-    color: var(--color-neutral-bg);
-  }
-
-  [data-theme="dark"] .button--hover:not(.button--chrome):not(.button--cta) .button__indicator,
-  [data-theme="dark"] .button:hover:not(.button--chrome):not(.button--cta) .button__indicator {
-    background: var(--color-neutral-bg);
-  }
-}

@@ -87,7 +87,7 @@
 
 .navbar__name,
 .navbar__logo-type {
-  font-family: var(--font-serif);
+  font-family: var(--font-brand);
   font-weight: var(--font-weight-regular);
   font-size: var(--typography-chrome);
   line-height: var(--line-height-normal);

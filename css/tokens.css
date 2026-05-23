@@ -11,14 +11,13 @@
  *
  * Structure:
  *   1.  Breakpoints
- *   2.  Base color primitives (dark mode default)
- *   3.  Semantic color tokens (dark mode default)
- *   4.  Base color primitives — light mode overrides
- *   5.  Typography: font families & properties
- *   6.  Typography: responsive size scale
- *   7.  Layout: spacing margin
- *   8.  Spacing scale, radii, structural sizes
- *   9.  Responsive overrides
+ *   2.  Base color primitives (new-brand — single mode)
+ *   3.  Semantic color tokens (new-brand — single mode)
+ *   4.  Typography: font families & properties
+ *   5.  Typography: responsive size scale
+ *   6.  Layout: spacing margin
+ *   7.  Spacing scale, radii, structural sizes
+ *   8.  Responsive overrides
  */
 
 
@@ -40,14 +39,14 @@
 
 
 /* ═══════════════════════════════════════════════════════════════
-   2. BASE COLOR PRIMITIVES — DARK MODE (default)
-   Figma "colors" collection, Mode: dark.
+   2. BASE COLOR PRIMITIVES — NEW-BRAND (single mode)
+   Figma "colors" collection, Mode: new-brand.
    Raw palette swatches — use semantic aliases in components.
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
 
-  /* ── Alpha (dark-tinted overlays) ────────────────────────────*/
+  /* ── Alpha (dark-tinted — text on light surface) ─────────────*/
   --color-base-alpha-040: #09070d0a;
   --color-base-alpha-080: #09070d14;
   --color-base-alpha-100: #09070d1f;
@@ -55,7 +54,7 @@
   --color-base-alpha-600: #09070d9e;
   --color-base-alpha-800: #09070dcc;
 
-  /* ── Alpha-invert (light-tinted overlays) ────────────────────*/
+  /* ── Alpha-invert (light-tinted overlays, for light surfaces) ─*/
   --color-base-alpha-invert-040: #ffffff0a;
   --color-base-alpha-invert-080: #ffffff14;
   --color-base-alpha-invert-100: #ffffff1f;
@@ -63,112 +62,7 @@
   --color-base-alpha-invert-600: #ffffff9e;
   --color-base-alpha-invert-800: #ffffffcc;
 
-  /* ── Blue scale (dark: deep navy → purple → lavender) ────────*/
-  --color-base-blue-100:  #121426;
-  --color-base-blue-200:  #060713;
-  --color-base-blue-300:  #1f1e4e;
-  --color-base-blue-400:  #292370;
-  --color-base-blue-500:  #312d81;
-  --color-base-blue-600:  #3b3890;
-  --color-base-blue-700:  #4a30d3;
-  --color-base-blue-800:  #4745a5;
-  --color-base-blue-900:  #5543e4;
-  --color-base-blue-1000: #5552c4;
-  --color-base-blue-1100: #8a8aff;
-  --color-base-blue-1200: #dbe0ff;
-
-  /* ── Gray scale (dark: near-black → near-white) ──────────────*/
-  --color-base-gray-100:  #18181a;   /* Figma gray.100 */
-  --color-base-gray-200:  #09070d;
-  --color-base-gray-300:  #231f2a;
-  --color-base-gray-400:  #322e3a;
-  --color-base-gray-500:  #2b2732;
-  --color-base-gray-600:  #3b3743;
-  --color-base-gray-700:  #494551;
-  --color-base-gray-800:  #625e6b;
-  --color-base-gray-900:  #706b79;
-  --color-base-gray-1000: #b6b1bf;
-  --color-base-gray-1100: #efedf4;
-  --color-base-gray-1200: #ffffff;
-
-  /* ── Green ───────────────────────────────────────────────────*/
-  --color-base-green-900: #8eff8e;
-
-  /* ── White ───────────────────────────────────────────────────*/
-  --color-base-white: #ffffff;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   3. SEMANTIC COLOR TOKENS — DARK MODE (default)
-   Figma "colors" collection, Mode: dark — semantic group.
-   Use these in components and layout, not the base primitives.
-   ═══════════════════════════════════════════════════════════════ */
-
-:root {
-
-  /* ── Accent ──────────────────────────────────────────────────*/
-  --color-accent-bg:                  #5543e4;   /* blue-900  */
-  --color-accent-fg:                  #8a8aff;   /* Figma semantic/accent/fg — intro accent, focus, ticker */
-  --color-accent-bg-subtle:           color-mix(in srgb, var(--color-accent-bg) 10%, transparent);
-
-  /* ── Highlight ───────────────────────────────────────────────*/
-  --color-highlight-bg:               #8eff8e;   /* green-900 */
-  --color-highlight-fg:               #8eff8e;   /* green-900 */
-  --color-highlight-fg-on-highlight:  var(--color-base-gray-100); /* text on green chip */
-
-  /* ── Selection ──────────────────────────────────────────────*/
-  --color-selection-bg:               #5543e466; /* accent-purple ~40%    */
-  --color-selection-fg:               #ffffffcc; /* alpha-invert-800      */
-
-  /* ── Neutral ─────────────────────────────────────────────────*/
-  --color-neutral-bg:                 var(--color-base-gray-100); /* Figma bg.neutral → gray.100 */
-  --color-neutral-bg-elevated:        #ffffff1f; /* alpha-invert-100      */
-  --color-neutral-fg:                 #ffffffcc; /* Figma semantic/neutral/fg (≈80% white) */
-  --color-neutral-fg-strong:          #ffffff;   /* base-white — masks / full-contrast glyphs */
-  --color-neutral-fg-muted:           #ffffffcc; /* Figma frame: chrome matches default fg */
-  --color-neutral-fg-on-accent:       #ffffffcc; /* alpha-invert-800      */
-  --color-neutral-opacity-strong:     #09070dcc; /* alpha-800             */
-  --color-neutral-stroke:             #ffffff52; /* alpha-invert-300      */
-  --color-neutral-stroke-subtle:      #ffffff14; /* alpha-invert-080      */
-
-  /* Solid inverse hover — legacy alias; chrome / CTA use pill tokens below */
-  --color-neutral-chip-hover-bg:      #09070d;
-  --color-neutral-chip-hover-fg:      #ffffff;
-
-  /* Pill hover — Figma portfolio dark (625:15847 / site about): gray capsule · ink label */
-  --color-control-pill-hover-bg:      #d9d9d9;
-  --color-control-pill-hover-fg:      #09070d;
-
-  /* Idle chrome + CTA glyph/text on charcoal (lighter than semantic/neutral/fg ~#fff cc) */
-  --color-chrome-muted-fg:            #d9d9d9;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   4. BASE COLOR PRIMITIVES + SEMANTIC — LIGHT MODE OVERRIDES
-   Figma "colors" collection, Mode: light.
-   Apply via data-theme="light" on <html> or <body>.
-   ═══════════════════════════════════════════════════════════════ */
-
-[data-theme="light"] {
-
-  /* ── Alpha (light mode: alpha and alpha-invert swap roles) ───*/
-  --color-base-alpha-040: #ffffff0a;
-  --color-base-alpha-080: #ffffff14;
-  --color-base-alpha-100: #ffffff1f;
-  --color-base-alpha-300: #ffffff52;
-  --color-base-alpha-600: #ffffff9e;
-  --color-base-alpha-800: #ffffffcc;
-
-  --color-base-alpha-invert-040: #09070d0a;
-  --color-base-alpha-invert-080: #09070d14;
-  --color-base-alpha-invert-100: #09070d1f;
-  --color-base-alpha-invert-300: #09070d52;
-  --color-base-alpha-invert-600: #09070d9e;
-  --color-base-alpha-invert-800: #09070dcc;
-
-  /* ── Blue scale (light: near-white pastels → deep navy) ──────*/
+  /* ── Blue / navy scale ───────────────────────────────────────*/
   --color-base-blue-100:  #fdfdff;
   --color-base-blue-200:  #f7f8ff;
   --color-base-blue-300:  #eff1ff;
@@ -182,8 +76,8 @@
   --color-base-blue-1100: #4937ca;
   --color-base-blue-1200: #28246d;
 
-  /* ── Gray scale (light: near-white → near-black) ─────────────*/
-  --color-base-gray-100:  #fcfcfd;
+  /* ── Gray scale (near-white → near-black) ────────────────────*/
+  --color-base-gray-100:  #fefaf1;   /* warm cream — new-brand bg */
   --color-base-gray-200:  #faf9fc;
   --color-base-gray-300:  #f1eff4;
   --color-base-gray-400:  #e9e7ed;
@@ -196,40 +90,65 @@
   --color-base-gray-1100: #211e25;
   --color-base-gray-1200: #09070d;
 
-  /* ── Green (same in both modes) ──────────────────────────────*/
-  /* --color-base-green-900: #8eff8e */
+  /* ── Red scale ───────────────────────────────────────────────*/
+  --color-base-red-900: #d93a3e;
 
-  /* ── Semantic overrides ──────────────────────────────────────*/
-  --color-accent-bg:                  #5543e4;   /* same purple accent           */
-  --color-accent-fg:                  #5543e4;   /* solid (no lavender in light) */
-  --color-accent-bg-subtle:           color-mix(in srgb, var(--color-accent-bg) 10%, transparent);
+  /* ── Yellow scale ────────────────────────────────────────────*/
+  --color-base-yellow-900: #fedb97;
 
-  --color-highlight-bg:               #5543e4;   /* purple replaces green        */
-  --color-highlight-fg:               #5543e4;
-  --color-highlight-fg-on-highlight:  #28246d;   /* navy on purple               */
-
-  --color-selection-bg:               #5543e433; /* accent-purple ~20% on white  */
-  --color-selection-fg:               #09070dcc; /* alpha-invert-800             */
-
-  --color-neutral-bg:                 #f7f8ff;   /* warm off-white               */
-  --color-neutral-bg-elevated:        #09070d1f;
-  --color-neutral-fg:                 #09070dcc;
-  --color-neutral-fg-strong:          #09070d;   /* base-gray-1200 — fully opaque; use for mask fills */
-  --color-neutral-fg-muted:           #09070d9e;
-  --color-neutral-fg-on-accent:       #ffffff;
-  --color-neutral-opacity-strong:     #ffffff9e;
-  --color-neutral-stroke:             #09070d14;
-  --color-neutral-stroke-subtle:      #09070d14;
-
-  --color-control-pill-hover-bg:      #09070dcc;
-  --color-control-pill-hover-fg:      #f7f8ff;
-
-  --color-chrome-muted-fg:           var(--color-neutral-fg);
+  /* ── White ───────────────────────────────────────────────────*/
+  --color-base-white: #ffffff;
 }
 
 
 /* ═══════════════════════════════════════════════════════════════
-   5. TYPOGRAPHY — FONT FAMILIES & PROPERTIES
+   3. SEMANTIC COLOR TOKENS — NEW-BRAND (single mode)
+   Figma "colors" collection, Mode: new-brand — semantic group.
+   Use these in components and layout, not the base primitives.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Accent ──────────────────────────────────────────────────*/
+  --color-accent-bg:                  #d93a3e;   /* red — CTAs, active indicators, badges */
+  --color-accent-fg:                  #d93a3e;   /* red — inline links, name underline    */
+  --color-accent-bg-subtle:           #fedb97;   /* warm yellow — subtle accent surface   */
+
+  /* ── Highlight ───────────────────────────────────────────────*/
+  --color-highlight-bg:               #d93a3e;   /* red */
+  --color-highlight-fg:               #d93a3e;   /* red */
+  --color-highlight-fg-on-highlight:  #28246d;   /* navy on red surface */
+
+  /* ── Selection ──────────────────────────────────────────────*/
+  --color-selection-bg:               #d93a3e33; /* red ~20% */
+  --color-selection-fg:               #09070dcc; /* near-black */
+
+  /* ── Neutral ─────────────────────────────────────────────────*/
+  --color-neutral-bg:                 #fefaf1;   /* warm cream/parchment          */
+  --color-neutral-bg-elevated:        #09070d1f; /* alpha-100                     */
+  --color-neutral-fg:                 #09070dcc; /* near-black ~80%               */
+  --color-neutral-fg-strong:          #09070d;   /* fully opaque — masks / glyphs */
+  --color-neutral-fg-muted:           #09070d9e; /* near-black ~62%               */
+  --color-neutral-fg-on-accent:       #ffffff;   /* white text on red surface     */
+  --color-neutral-opacity-strong:     #09070d9e; /* alpha-600                     */
+  --color-neutral-stroke:             #09070d14; /* alpha-080                     */
+  --color-neutral-stroke-subtle:      #09070d14; /* alpha-080                     */
+
+  /* Solid inverse hover */
+  --color-neutral-chip-hover-bg:      #09070d;
+  --color-neutral-chip-hover-fg:      #ffffff;
+
+  /* Pill hover — ink capsule on cream */
+  --color-control-pill-hover-bg:      #09070dcc;
+  --color-control-pill-hover-fg:      #fefaf1;
+
+  /* Chrome idle text */
+  --color-chrome-muted-fg:            var(--color-neutral-fg);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   4. TYPOGRAPHY — FONT FAMILIES & PROPERTIES
    Figma type style definitions.
    ═══════════════════════════════════════════════════════════════ */
 
@@ -238,22 +157,31 @@
   /* ── Font families ───────────────────────────────────────────
      @font-face / @import lives in base.css or equivalent.
   ────────────────────────────────────────────────────────────── */
-  --font-serif: 'Montagu Slab', Georgia, serif;
+  /* Body / heading serif — Fraunces variable (WONK axis enabled via font-variation-settings) */
+  --font-serif: 'Fraunces', Georgia, serif;
+  /* Fixed chrome (navbar + footer) — Montagu Slab brand identity font */
+  --font-brand: 'Montagu Slab', Georgia, serif;
   --font-glyph-jp: 'Noto Sans JP', sans-serif;
   --font-glyph-arrow: 'Noto Sans Math', sans-serif;
   --font-mono:  'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   /* Figma node 368:13282 — ASCII art uses DM Mono Light */
   --font-mono-ascii: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
+  /* ── Font variation settings ─────────────────────────────────
+     Fraunces: SOFT 100 (fully rounded) + WONK 1 (quirky letterforms)
+  ────────────────────────────────────────────────────────────── */
+  --font-variation-serif: 'SOFT' 100, 'WONK' 1;
+
   /* ── Font weights ────────────────────────────────────────────
      display / body-lg / body-md / body-sm = 300 (Light)
-     title                                 = 500 (Medium)
+     title / section headings              = 600 (SemiBold)
      mono / UI                             = 400 (Regular)
   ────────────────────────────────────────────────────────────── */
   --font-weight-extra-light: 200;
   --font-weight-light:       300;
   --font-weight-regular:     400;
   --font-weight-medium:      500;
+  --font-weight-semibold:    600;
 
   /* ── Line heights ────────────────────────────────────────────
      Figma unitless multipliers.
@@ -271,10 +199,10 @@
      body-sm   0 % →  0em
      mono     −4 % → −0.04em
   ────────────────────────────────────────────────────────────── */
-  --letter-spacing-tight:   -0.05em; /* section headings / title style (−5%)  */
+  --letter-spacing-tight:   -0.03em; /* section headings / title style (−3%)  */
   --letter-spacing-body-lg: -0.03em; /* body-lg                     */
   --letter-spacing-body-md: -0.03em; /* body-md                     */
-  --letter-spacing-body:     0em;    /* body-sm, link                */
+  --letter-spacing-body:    -0.03em; /* body-sm, link                */
   --letter-spacing-mono:    -0.04em; /* Space Mono (Figma −4 %)     */
   --letter-spacing-chrome:  -0.04em; /* Header / footer (Figma −4 %) */
 
@@ -284,7 +212,7 @@
 
 
 /* ═══════════════════════════════════════════════════════════════
-   6. TYPOGRAPHY — RESPONSIVE SIZE SCALE
+   5. TYPOGRAPHY — RESPONSIVE SIZE SCALE
    Figma "responsive" collection, typography group.
    :root holds large values (1025px–1919px).
    Overridden per breakpoint in section 9.
@@ -345,7 +273,7 @@
 
 
 /* ═══════════════════════════════════════════════════════════════
-   7. LAYOUT — SPACING MARGIN
+   6. LAYOUT — SPACING MARGIN
    Figma "responsive" collection — spacing/margins token.
    :root = large desktop default (1025px–1919px viewport).
    Overridden per breakpoint in section 9.
@@ -368,7 +296,7 @@
 
 
 /* ═══════════════════════════════════════════════════════════════
-   8. SPACING SCALE, RADII, STRUCTURAL SIZES
+   7. SPACING SCALE, RADII, STRUCTURAL SIZES
    Project-specific tokens not sourced from Figma variables.
    ═══════════════════════════════════════════════════════════════ */
 
@@ -399,7 +327,7 @@
 
 
 /* ═══════════════════════════════════════════════════════════════
-   9. RESPONSIVE OVERRIDES
+   8. RESPONSIVE OVERRIDES
    Desktop-first: :root holds large defaults.
    Each @media block narrows the scale for smaller viewports.
    ═══════════════════════════════════════════════════════════════ */

@@ -5,49 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Luna Borgo</title>
 
-    <script>
-      (function () {
-        const STORAGE_KEY = "theme";
-        const SOURCE_KEY = "theme-source";
-        const root = document.documentElement;
-
-        function isTheme(theme) {
-          return theme === "dark" || theme === "light";
-        }
-
-        function getSystemTheme() {
-          return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-        }
-
-        function getStoredTheme() {
-          try {
-            const savedTheme = localStorage.getItem(STORAGE_KEY);
-            const savedSource = localStorage.getItem(SOURCE_KEY);
-
-            if (savedSource === "manual" && isTheme(savedTheme)) {
-              return savedTheme;
-            }
-
-            if (savedTheme === "light") {
-              localStorage.setItem(SOURCE_KEY, "manual");
-              return savedTheme;
-            }
-
-            localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem(SOURCE_KEY);
-          } catch (error) {
-            return null;
-          }
-
-          return null;
-        }
-
-        root.setAttribute("data-theme", getStoredTheme() || getSystemTheme());
-      })();
-    </script>
-
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
     <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
@@ -55,7 +12,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Montagu+Slab:opsz,wght@16..144,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0;0,9..144,100..900,0..100,1;1,9..144,100..900,0..100,0;1,9..144,100..900,0..100,1&family=Montagu+Slab:opsz,wght@16..144,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&text=%E3%82%B7&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math:wght@400&text=%E2%A4%B3&display=swap" rel="stylesheet">
 
@@ -173,10 +130,20 @@
 
         <time class="bottom__time" datetime="22:00:00" data-tooltip="Luna's current timezone">22:00:00 AMS</time>
 
-        <div class="bottom__mode" aria-label="Theme toggle">
-          <button class="button button--chrome" type="button" aria-pressed="false" id="theme-light" aria-label="Switch to light mode">light</button>
-          <button class="button button--chrome" type="button" aria-pressed="true" id="theme-dark" aria-label="Switch to dark mode">dark</button>
-        </div>
+        <a
+          class="button button--chrome bottom__download js-feedback-download"
+          href="/assets/cv/LunaBorgo_Designer_CV.pdf"
+          download="LunaBorgo_Designer_CV.pdf"
+          aria-label="Download CV as PDF"
+        >
+          <span class="button__face button__face--default">download cv</span>
+          <span class="button__face button__face--feedback" aria-live="polite">
+            <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <use href="#figma-pixel-hand-awesome"></use>
+            </svg>
+            <span class="button__feedback-label">downloaded</span>
+          </span>
+        </a>
       </footer>
     </div>
 
@@ -189,11 +156,16 @@
         <div class="page-grid">
           <div class="col-content intro__content">
             <div class="intro__text">
-              <p class="intro__title">
-                Hi, I&rsquo;m <span class="intro__name" data-preview-id="intro-luna" tabindex="0">Luna</span> <span class="intro__glyph intro__glyph--jp" aria-hidden="true" lang="ja">シ</span> I build systems for teams that need to design at scale without losing their soul.
-              </p>
+              <div class="intro__title">
+                <p class="intro__title-greeting">
+                  Hi, I&rsquo;m <span class="intro__name" data-preview-id="intro-luna" tabindex="0">Luna</span> <span class="intro__glyph intro__glyph--jp" aria-hidden="true" lang="ja">シ</span>
+                </p>
+                <p class="intro__title-headline">
+                  I build systems for teams that need to design at scale without losing their soul.
+                </p>
+              </div>
               <p class="intro__body">
-                For over twelve years, I&rsquo;ve helped brands to turn creative vision into real experiences while building shared design languages that bring teams together.
+                For over twelve years, I&rsquo;ve helped brands to turn creative vision into real experiences while building shared design languages that brings teams together.
               </p>
             </div>
           </div>
@@ -218,9 +190,9 @@
               <h2 class="sr-only">Heineken</h2>
               <div class="work__project__grid-row work__project__grid-row--body">
                 <div class="work__body">
-                  <p>I joined Heineken in 2022, when we merged 40 regional B2B platforms into a unified global product ecosystem. This major organisational transformation required a shared language that was flexible enough to scale across diverse markets.</p>
-                  <p>In that scenario, I founded <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">Crate</span> &ndash; Heineken&rsquo;s global B2B design system. Shaping it from <span class="hover-preview-link" data-preview-id="crate-tokens" tabindex="0">design tokens</span> and workflows to most recently, AI automations. I also led <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">the brand application</span> track and design culture, setting up frameworks and rituals that connected product, engineering, marketing and brand.</p>
-                  <p>I enabled rapid scaling from 6 to over 235 contributors in two years while keeping a strong design culture.</p>
+                  <p>I joined Heineken in 2024, when we merged 40 regional B2B platforms into a unified global product ecosystem. This major organizational transformation required a shared language that was flexible enough to scale across diverse markets.</p>
+                  <p>in that scenario, I founded <span class="hover-preview-link" data-preview-id="crate-design-system" tabindex="0">crate</span> &ndash; Heineken&rsquo;s global b2b design system. Shaping it from <span class="hover-preview-link" data-preview-id="crate-tokens" tabindex="0">design tokens</span> and workflows to most recently, AI automations. I also led <span class="hover-preview-link" data-preview-id="eazle-brand" tabindex="0">the brand application</span> track and design culture, setting up frameworks and rituals that connected product, engineering, marketing and brand.</p>
+                  <p>I enabled rapid scaling from 6 to over 245 contributors in two years while keeping a strong design culture.</p>
                 </div>
               </div>
               <div class="work__project__grid-row work__project__grid-row--impact">
@@ -252,9 +224,9 @@
               <h2 class="sr-only">Adidas</h2>
               <div class="work__project__grid-row work__project__grid-row--body">
                 <div class="work__body">
-                  <p>Before that, I redesigned key product recommendation flows on adidas.com, building on earlier experiments and grounding decisions in cross-functional discovery with engineering and data science.</p>
-                  <p>What started as a quick experiment grew into a <span class="hover-preview-link" data-preview-id="adidas-shared-recommendation-approach" tabindex="0">shared recommendation approach</span> to how placement, logic, and editorial inputs fit together, so teams could align on one coherent model. We replaced 10+ scattered carousels with one configurable pattern supporting 36 variations.</p>
-                  <p>I also advocated for <span class="hover-preview-link" data-preview-id="adidas-curated-recommendations" tabindex="0">curated, human-led recommendations</span> &ndash; stories from athletes and creators, as a trust and brand layer alongside algorithmic merchandising.</p>
+                  <p>Before that, at Adidas, I partnered with data science and engineering to design a unified <span class="hover-preview-link" data-preview-id="adidas-shared-recommendation-approach" tabindex="0">product recommendation framework</span>.</p>
+                  <p>What started as a quick experiment grew into a cross-team effort to build a reusable component and recommendation framework that blends smart algorithms with editorial input.</p>
+                  <p>We replaced 10+ scattered carousels with <span class="hover-preview-link" data-preview-id="adidas-curated-recommendations" tabindex="0">one shared component</span>, supporting 36 variations and driving significant yearly revenue.</p>
                 </div>
               </div>
               <div class="work__project__grid-row work__project__grid-row--impact">
@@ -456,71 +428,5 @@
     <script src="./js/moon-phase.js" defer></script>
     <script src="./js/navbar-home.js" defer></script>
 
-    <script>
-      (function () {
-        const STORAGE_KEY = "theme";
-        const SOURCE_KEY = "theme-source";
-        const root = document.documentElement;
-        const btnDark = document.getElementById("theme-dark");
-        const btnLight = document.getElementById("theme-light");
-        const systemTheme = window.matchMedia
-          ? window.matchMedia("(prefers-color-scheme: dark)")
-          : null;
-
-        function isTheme(theme) {
-          return theme === "dark" || theme === "light";
-        }
-
-        function getSystemTheme() {
-          return systemTheme && systemTheme.matches ? "dark" : "light";
-        }
-
-        function getStoredTheme() {
-          try {
-            const savedTheme = localStorage.getItem(STORAGE_KEY);
-            const savedSource = localStorage.getItem(SOURCE_KEY);
-            return savedSource === "manual" && isTheme(savedTheme) ? savedTheme : null;
-          } catch (error) {
-            return null;
-          }
-        }
-
-        function applyTheme(theme) {
-          root.setAttribute("data-theme", theme);
-          btnDark.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
-          btnLight.setAttribute("aria-pressed", theme === "light" ? "true" : "false");
-        }
-
-        function setManualTheme(theme) {
-          try {
-            localStorage.setItem(STORAGE_KEY, theme);
-            localStorage.setItem(SOURCE_KEY, "manual");
-          } catch (error) {
-            // Theme still applies for the current page when storage is unavailable.
-          }
-
-          applyTheme(theme);
-        }
-
-        applyTheme(getStoredTheme() || getSystemTheme());
-
-        if (systemTheme) {
-          const handleSystemThemeChange = function () {
-            if (!getStoredTheme()) {
-              applyTheme(getSystemTheme());
-            }
-          };
-
-          if (typeof systemTheme.addEventListener === "function") {
-            systemTheme.addEventListener("change", handleSystemThemeChange);
-          } else if (typeof systemTheme.addListener === "function") {
-            systemTheme.addListener(handleSystemThemeChange);
-          }
-        }
-
-        btnDark.addEventListener("click", function () { setManualTheme("dark"); });
-        btnLight.addEventListener("click", function () { setManualTheme("light"); });
-      })();
-    </script>
   </body>
 </html>

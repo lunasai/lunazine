@@ -19,14 +19,16 @@
   position: relative;
   cursor: crosshair;
   touch-action: manipulation;
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-semibold);
+  font-variation-settings: var(--font-variation-serif);
+  color: var(--color-accent-fg);
 
   -webkit-text-decoration-line: underline;
   text-decoration-line: underline;
-  -webkit-text-decoration-style: wavy;
-  text-decoration-style: wavy;
+  -webkit-text-decoration-style: dotted;
+  text-decoration-style: dotted;
   text-decoration-color: transparent;
-  text-decoration-thickness: 4%;
+  text-decoration-thickness: 6%;
   text-underline-offset: 8.75%;
 
   transition: text-decoration-color 0.48s cubic-bezier(0.22, 1, 0.36, 1);

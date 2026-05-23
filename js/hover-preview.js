@@ -362,6 +362,79 @@
 
   initTouchHintIfNeeded();
 
+  /* ── Preload preview images when the work section enters view ────
+     Waits until the manifest is ready, then creates hidden Image objects
+     for the best format the browser supports (avif → webp → jpg/png).
+     This runs once per session and fires before the user has a chance
+     to hover, so images are already decoded by the time they're needed.
+  ───────────────────────────────────────────────────────────────── */
+
+  function preloadManifestImages(data) {
+    var supportsAvif = false;
+    var supportsWebp = false;
+
+    /* Quick canvas-based format sniff (sync, no network) */
+    try {
+      var c = document.createElement('canvas');
+      c.width = c.height = 1;
+      supportsAvif = c.toDataURL('image/avif').indexOf('data:image/avif') === 0;
+    } catch (e) {}
+    try {
+      var c2 = document.createElement('canvas');
+      c2.width = c2.height = 1;
+      supportsWebp = c2.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+    } catch (e) {}
+
+    Object.keys(data).forEach(function (id) {
+      var entry   = data[id];
+      var sources = entry.sources || {};
+      /* Pick smallest modern format available in the manifest */
+      var src = (supportsAvif && sources.avif)
+        ? sources.avif.split(',')[0].trim().split(' ')[0]   /* first srcset descriptor */
+        : (supportsWebp && sources.webp)
+          ? sources.webp.split(',')[0].trim().split(' ')[0]
+          : (entry.src || '');
+
+      if (!src) return;
+      var img   = new Image();
+      img.decoding = 'async';
+      img.src   = src;
+    });
+  }
+
+  var preloadIo = null;
+  var preloadDone = false;
+
+  function schedulePreload() {
+    if (preloadDone) return;
+    var section = document.getElementById('work') || document.querySelector('[data-preview-id]');
+    if (!section) return;
+
+    preloadIo = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          preloadIo.disconnect();
+          preloadIo   = null;
+          preloadDone = true;
+
+          /* If manifest is already loaded, preload now; otherwise wait for it */
+          if (manifest) {
+            preloadManifestImages(manifest);
+          } else {
+            manifestPending.push(function () {
+              preloadManifestImages(manifest);
+            });
+          }
+        });
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0 }
+    );
+    preloadIo.observe(section);
+  }
+
+  schedulePreload();
+
   /* ── Bind to all elements with data-preview-id ───────────────── */
 
   var links = document.querySelectorAll('[data-preview-id]');
@@ -396,11 +469,12 @@
     'scroll',
     function () {
       if (!activeLink) return;
-      if (positionAnchorEl) {
-        repositionFromAnchor();
-      } else {
-        hide();
+      /* During scroll (including Lenis smooth-scroll events) anchor the card
+         to the hovered element so it repositions rather than disappears. */
+      if (!positionAnchorEl) {
+        positionAnchorEl = activeLink;
       }
+      repositionFromAnchor();
     },
     { passive: true }
   );

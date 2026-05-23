@@ -10,7 +10,7 @@
   position: relative;
   width: 100%;
 
-  font-family: var(--font-serif);
+  font-family: var(--font-brand);
   font-weight: var(--font-weight-regular);
   font-size: var(--typography-chrome);
   line-height: var(--line-height-normal);
@@ -113,25 +113,8 @@
   }
 }
 
-.bottom__mode {
-  flex: 1 0 0;
-  min-width: 0;
-  display: inline-flex;
-  justify-content: flex-end;
-  gap: var(--space-2); /* 8px */
-}
-
-.bottom__mode .button {
-  /* Figma dark: footer mono matches semantic/neutral/fg */
-  color: var(--color-neutral-fg);
-}
-
-/* Footer mode toggle — Figma Bottom inactive control ~opacity-30 */
-.bottom__mode .button[aria-pressed="false"] {
-  opacity: 0.3;
-}
-
-.bottom__mode .button[aria-pressed="true"] {
-  opacity: 1;
+.bottom__download {
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 

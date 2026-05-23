@@ -29,15 +29,11 @@ body {
   margin: 0;
   background: var(--color-neutral-bg);
   color: var(--color-neutral-fg);
+  /* Apply Fraunces WONK axis globally — inherits to all serif elements.
+     Non-variable fonts (Space Mono, Montagu Slab) silently ignore unknown axes. */
+  font-variation-settings: var(--font-variation-serif);
 }
 
-/* Dark theme: same font-weight tokens as light, but bright-on-dark rendering
-   reads heavier with default subpixel AA — greyscale smoothing aligns perception
-   with the light reference (incl. Impact mono list + Montagu body). */
-html[data-theme="dark"] {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 /* ─── Text selection ─────────────────────────────────────────── */
 
@@ -273,6 +269,7 @@ html[data-theme="dark"] {
   .intro__name {
     animation: none;
     text-decoration-color: var(--color-accent-fg);
+    color: var(--color-accent-fg);
   }
 }
 
@@ -313,7 +310,7 @@ html[data-theme="dark"] {
 }
 
 .intro__body {
-  animation: intro-fade-up 812ms cubic-bezier(0.22, 1, 0.36, 1) 487ms both;
+  animation: intro-fade-up 812ms cubic-bezier(0.22, 1, 0.36, 1) 580ms both;
 }
 
 .intro__text {
@@ -328,14 +325,23 @@ html[data-theme="dark"] {
   text-wrap: pretty;
 }
 
+/* Two-paragraph title structure: greeting + headline */
+.intro__title p {
+  margin: 0;
+}
+
+.intro__title p.intro__title-greeting {
+  margin-bottom: var(--space-6); /* 24px gap between greeting and headline */
+}
+
 .intro__title {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--typography-intro-headline);
   /* Figma: intro headline size is decoupled from section typography/title;
      line-height follows flowing hero copy (leading-none in file). */
   line-height: 1;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--letter-spacing-tight);
   margin: 0;
 }
 
@@ -364,8 +370,8 @@ html[data-theme="dark"] {
   margin: 0;
 }
 
-/* "luna" name: same wavy underline recipe as .hover-preview-link (keeps parity when tuning thickness). */
-@keyframes intro-name-wavy-color {
+/* "luna" name: dotted underline matches .hover-preview-link (keeps parity when tuning thickness). */
+@keyframes intro-name-underline-reveal {
   from {
     text-decoration-color: transparent;
   }
@@ -374,16 +380,17 @@ html[data-theme="dark"] {
   }
 }
 
-/* Underlined name inherits .intro__title medium weight (not hover-link regular 400) */
+/* Underlined name — dotted accent underline that fades in after title animation */
 .intro__name {
+  color: var(--color-accent-fg);
   -webkit-text-decoration-line: underline;
   text-decoration-line: underline;
-  -webkit-text-decoration-style: wavy;
-  text-decoration-style: wavy;
+  -webkit-text-decoration-style: dotted;
+  text-decoration-style: dotted;
   text-decoration-thickness: 4%;
   text-underline-offset: 8.75%;
   text-decoration-color: transparent;
-  animation: intro-name-wavy-color 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: intro-name-underline-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: calc(
     var(--intro-reveal-delay, 348ms) + var(--intro-reveal-duration, 812ms) + 100ms
   );
@@ -395,7 +402,7 @@ html[data-theme="dark"] {
 .work__title {
   margin: 0 0 var(--space-10) 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
@@ -406,7 +413,7 @@ html[data-theme="dark"] {
 .work__projects {
   display: flex;
   flex-direction: column;
-  gap: 88px;
+  gap: var(--space-10); /* 40px — Figma gap-[40px] between projects */
 }
 
 /*
@@ -513,7 +520,7 @@ html[data-theme="dark"] {
 }
 
 .work__body p + p {
-  margin-top: var(--space-4); /* 16px — Figma mb-[16px] between paragraphs */
+  margin-top: 2em; /* 2em paragraph spacing — Figma annotation */
 }
 
 .work__metrics {
@@ -618,7 +625,7 @@ html[data-theme="dark"] {
   /* Figma 554:27378 gap 24px; pad clears descenders below lh 0.9 vs the fixed title frame */
   padding-bottom: var(--space-2);
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
@@ -742,7 +749,7 @@ html[data-theme="dark"] {
 .thanks__title {
   margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
@@ -822,7 +829,7 @@ html[data-theme="dark"] {
 
 .about__label {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
@@ -865,10 +872,10 @@ html[data-theme="dark"] {
 .about__cta-label {
   margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-body-sm);
   line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-body-md);
+  letter-spacing: var(--letter-spacing-body);
   color: var(--color-neutral-fg);
 }
 
