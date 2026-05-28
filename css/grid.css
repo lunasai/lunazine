@@ -222,6 +222,13 @@
    single-column stacks, matching the Figma mobile frames.
    ═══════════════════════════════════════════════════════════════ */
 
+/* ── medium and above: ≥ 769px — wider column gap ───────────── */
+@media (min-width: 769px) {
+  :root {
+    --grid-gutter: 40px;
+  }
+}
+
 /* ── medium: ≤ 1024px ────────────────────────────────────────── */
 @media (max-width: 1024px) {
   :root {
