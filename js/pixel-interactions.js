@@ -268,7 +268,10 @@
   /* Hover / pile physics — see docs/pixel-pile-tuning.md */
   const MAX_PILE_PARTICLES       = 10000;
   const HOVER_RADIUS             = 72;
-  const HOVER_PROBABILITY        = 0.32;
+  const HOVER_PROBABILITY        = 0.32; /* unused while budget eject is on — kept for A/B */
+  const HOVER_EJECT_BUDGET       = 50;   /* grains per mousemove (deterministic pool) */
+  const HOVER_EJECT_SPEED_BONUS  = 4;    /* extra budget per px/frame swipe speed */
+  const HOVER_EJECT_SPEED_CAP    = 60;   /* max added from swipe speed */
   const PILE_GRAVITY             = 0.25;
   const PILE_DRAG_X              = 0.96;
   const HOVER_JITTER             = 5;
@@ -626,11 +629,14 @@
     const gridW = getGridW();
     const gh    = getGridH();
     const color = getTrailColor();
-    const chanceBoost = Math.min(
-      pileSwipeSpeed * HOVER_SPEED_CHANCE_K,
-      HOVER_SPEED_CHANCE_MAX
-    );
-    const baseChance = HOVER_PROBABILITY + chanceBoost;
+    const budget =
+      HOVER_EJECT_BUDGET +
+      Math.min(
+        Math.floor(pileSwipeSpeed * HOVER_EJECT_SPEED_BONUS),
+        HOVER_EJECT_SPEED_CAP
+      );
+
+    const candidates = [];
 
     for (let r = 0; r < gh; r++) {
       for (let c = 0; c < gridW; c++) {
@@ -646,28 +652,41 @@
 
         const t = 1 - dist / HOVER_RADIUS;
         const depth = columnDepthFromTop(gridW, r, c);
-        const ejectChance =
-          baseChance * t * Math.pow(DEPTH_EJECT_BIAS, depth);
-
-        if (Math.random() < ejectChance) {
-          pileGrid[r * gridW + c] = 0;
-
-          if (pileParticles.length < MAX_PILE_PARTICLES) {
-            const vel = ejectVelocityFromSwipe(pxX, pxY, pilePointerX, pilePointerY);
-            pileParticles.push({
-              trueX:    pxX,
-              trueY:    pxY,
-              vx:       vel.vx,
-              vy:       vel.vy,
-              age:      0,
-              lifetime: 55 + Math.floor(Math.random() * 75),
-              r:        color.r,
-              g:        color.g,
-              b:        color.b,
-            });
-          }
-        }
+        const weight = t * Math.pow(DEPTH_EJECT_BIAS, depth);
+        candidates.push({ r, c, pxX, pxY, weight });
       }
+    }
+
+    /* Weighted pick: higher weight = more likely to be chosen this move. */
+    for (let i = 0; i < candidates.length; i++) {
+      candidates[i].sortKey = -Math.log(Math.random() + 1e-9) / candidates[i].weight;
+    }
+    candidates.sort((a, b) => a.sortKey - b.sortKey);
+
+    const count = Math.min(budget, candidates.length);
+    for (let i = 0; i < count; i++) {
+      if (pileParticles.length >= MAX_PILE_PARTICLES) break;
+
+      const cell = candidates[i];
+      pileGrid[cell.r * gridW + cell.c] = 0;
+
+      const vel = ejectVelocityFromSwipe(
+        cell.pxX,
+        cell.pxY,
+        pilePointerX,
+        pilePointerY
+      );
+      pileParticles.push({
+        trueX:    cell.pxX,
+        trueY:    cell.pxY,
+        vx:       vel.vx,
+        vy:       vel.vy,
+        age:      0,
+        lifetime: 55 + Math.floor(Math.random() * 75),
+        r:        color.r,
+        g:        color.g,
+        b:        color.b,
+      });
     }
   }
 

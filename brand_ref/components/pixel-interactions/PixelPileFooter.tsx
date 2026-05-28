@@ -38,6 +38,9 @@ interface PixelPileFooterProps {
 const MAX_PARTICLES = 10000
 const HOVER_RADIUS = 72
 const HOVER_PROBABILITY = 0.32
+const HOVER_EJECT_BUDGET = 50
+const HOVER_EJECT_SPEED_BONUS = 4
+const HOVER_EJECT_SPEED_CAP = 60
 const PILE_GRAVITY = 0.25
 const PILE_DRAG_X = 0.96
 const HOVER_JITTER = 5
@@ -311,9 +314,18 @@ export function PixelPileFooter({
       const particles = particlesRef.current
       const color = getTrailColor()
       const gridW = gridWFor()
-      const baseChance =
-        HOVER_PROBABILITY +
-        Math.min(swipeSpeed * HOVER_SPEED_CHANCE_K, HOVER_SPEED_CHANCE_MAX)
+      const budget =
+        HOVER_EJECT_BUDGET +
+        Math.min(Math.floor(swipeSpeed * HOVER_EJECT_SPEED_BONUS), HOVER_EJECT_SPEED_CAP)
+
+      const candidates: {
+        r: number
+        c: number
+        pxX: number
+        pxY: number
+        weight: number
+        sortKey?: number
+      }[] = []
 
       for (let r = 0; r < gridH; r++) {
         for (let c = 0; c < gridW; c++) {
@@ -329,25 +341,32 @@ export function PixelPileFooter({
 
           const t = 1 - dist / HOVER_RADIUS
           const depth = columnDepthFromTop(grid, gridW, r, c)
-          const ejectChance =
-            baseChance * t * Math.pow(DEPTH_EJECT_BIAS, depth)
-
-          if (Math.random() < ejectChance) {
-            grid[r * gridW + c] = 0
-            if (particles.length < MAX_PARTICLES) {
-              const vel = ejectVelocity(pxX, pxY)
-              particles.push({
-                trueX: pxX,
-                trueY: pxY,
-                vx: vel.vx,
-                vy: vel.vy,
-                age: 0,
-                lifetime: 55 + Math.floor(Math.random() * 75),
-                ...color,
-              })
-            }
-          }
+          const weight = t * Math.pow(DEPTH_EJECT_BIAS, depth)
+          candidates.push({ r, c, pxX, pxY, weight })
         }
+      }
+
+      for (let i = 0; i < candidates.length; i++) {
+        candidates[i].sortKey =
+          -Math.log(Math.random() + 1e-9) / candidates[i].weight
+      }
+      candidates.sort((a, b) => (a.sortKey ?? 0) - (b.sortKey ?? 0))
+
+      const count = Math.min(budget, candidates.length)
+      for (let i = 0; i < count; i++) {
+        if (particles.length >= MAX_PARTICLES) break
+        const cell = candidates[i]
+        grid[cell.r * gridW + cell.c] = 0
+        const vel = ejectVelocity(cell.pxX, cell.pxY)
+        particles.push({
+          trueX: cell.pxX,
+          trueY: cell.pxY,
+          vx: vel.vx,
+          vy: vel.vy,
+          age: 0,
+          lifetime: 55 + Math.floor(Math.random() * 75),
+          ...color,
+        })
       }
     }
 

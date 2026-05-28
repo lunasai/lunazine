@@ -138,15 +138,46 @@
     return { symbolId: "moon-waning-gibbous", label: "Waning Gibbous" };
   }
 
-  var useEl = document.getElementById("moon-logo-use");
-  if (!useEl) return;
+  var FAVICON_FILES = {
+    "moon-new-moon":        "new moon.svg",
+    "moon-waxing-crescent": "waxing crescent.svg",
+    "moon-first-quarter":   "first quarter.svg",
+    "moon-waxing-gibbous":  "waxing gibbous.svg",
+    "moon-full-moon":       "full moon.svg",
+    "moon-waning-gibbous":  "waning gibbous.svg",
+    "moon-third-quarter":   "third quarter.svg",
+    "moon-waning-crescent": "waning crescent.svg",
+  };
+
+  /* Chromium browsers don't reliably refetch an SVG favicon when you only
+   * mutate the existing <link>'s href attribute, so replace the element. */
+  function setSvgFavicon(href) {
+    var existing = document.getElementById("favicon-svg");
+    var link = document.createElement("link");
+    link.id   = "favicon-svg";
+    link.rel  = "icon";
+    link.type = "image/svg+xml";
+    link.href = href;
+    if (existing && existing.parentNode) {
+      existing.parentNode.replaceChild(link, existing);
+    } else {
+      document.head.appendChild(link);
+    }
+  }
 
   var phase = getPhaseFromIllumination(getMoonIllumination(new Date()));
-  var fragment = "#" + phase.symbolId;
+  var faviconFile = FAVICON_FILES[phase.symbolId];
+  if (faviconFile) {
+    setSvgFavicon("./assets/favicon/phases/" + encodeURIComponent(faviconFile));
+  }
 
-  useEl.setAttribute("href", fragment);
-  if (typeof useEl.setAttributeNS === "function") {
-    useEl.setAttributeNS("http://www.w3.org/1999/xlink", "href", fragment);
+  var useEl = document.getElementById("moon-logo-use");
+  if (useEl) {
+    var fragment = "#" + phase.symbolId;
+    useEl.setAttribute("href", fragment);
+    if (typeof useEl.setAttributeNS === "function") {
+      useEl.setAttributeNS("http://www.w3.org/1999/xlink", "href", fragment);
+    }
   }
 
   var logoMark = document.querySelector(".navbar__logo-mark");

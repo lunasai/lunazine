@@ -1,8 +1,8 @@
 /**
  * Generates raster favicon fallbacks (PNG + multi-size ICO) from the
- * waxing-crescent SVG. The site favicon is static — modern browsers load the
- * SVG declared in index.html, older browsers and iOS home screens use these
- * raster files. Re-run after changing the source SVG.
+ * waxing-crescent phase SVG (synced from asset-sources/favicons).
+ * Modern browsers load the live phase SVG via moon-phase.js; older browsers
+ * and iOS home screens use these raster files. Re-run after sync:favicons.
  *
  * Run:  npm run favicons
  */
@@ -14,7 +14,7 @@ import pngToIco from "png-to-ico";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
-const sourceSvg = join(root, "assets", "moon-icon", "waxing crescent.svg");
+const sourceSvg = join(root, "assets", "favicon", "phases", "waxing crescent.svg");
 const outDir = join(root, "assets", "favicon");
 
 /* PNG sizes. ICO bundles the small sizes; apple-touch-icon is the iOS spec. */

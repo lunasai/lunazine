@@ -28,7 +28,7 @@ Current behavior model (as implemented):
 
 - **Swipe impulse (smoothed):** EMA on pointer delta — timing / slow-in-out, not raw snap.
 - **Any cell in disc** can eject (no surface-only cap).
-- **Depth bias:** `ejectChance *= DEPTH_EJECT_BIAS^depth` — top of column easy, deep grains rare.
+- **Deterministic budget:** Up to `HOVER_EJECT_BUDGET` (+ swipe bonus) grains per `mousemove`, weighted by `t` and depth (not per-cell dice).
 - **Linear disc falloff:** `t` from cursor to edge (not `t²`).
 - **Launch cap + arc bias:** Speed limited; cross-axis damped (`ARC_CROSS_DAMP`) but not as harsh as the ultra-soft pass.
 - **Half bat + light air kick:** Contact pop and mid-flight nudge at ~50% of the old aggressive preset.
