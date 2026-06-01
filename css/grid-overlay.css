@@ -1,0 +1,192 @@
+/*
+ * Luna Borgo — Grid Overlay  (dev-only tool)
+ * css/grid-overlay.css
+ *
+ * Renders the live 12-column grid — columns, gutters, and margins —
+ * as a fixed overlay on top of the site.
+ *
+ * All values read from the same CSS custom properties used by .page-grid,
+ * so the overlay is pixel-accurate and responds to every breakpoint.
+ *
+ * Toggle: press  G  or click the badge in the bottom-right corner.
+ * State is persisted in sessionStorage for the current tab session.
+ *
+ * Requires: css/tokens.css and css/grid.css loaded first.
+ * Injected by:  js/grid-overlay.js
+ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   1. OVERLAY CONTAINER
+   Fixed, full-viewport, non-interactive by default.
+   ═══════════════════════════════════════════════════════════════ */
+
+#grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  display: none;          /* hidden until .is-visible is added by JS */
+  overflow: hidden;
+}
+
+#grid-overlay.is-visible {
+  display: block;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   2. MARGIN ZONE INDICATOR
+   A gradient pseudo-element that tints the outer margin areas
+   (left padding and right padding of .page-grid) in a distinct
+   blue/violet hue so you can immediately see where the grid
+   content area begins.
+
+   Uses the live --grid-margin token — automatically correct
+   at every breakpoint.
+   ═══════════════════════════════════════════════════════════════ */
+
+#grid-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    hsla(248, 80%, 70%, 0.14) var(--grid-margin),
+    transparent var(--grid-margin),
+    transparent calc(100% - var(--grid-margin)),
+    hsla(248, 80%, 70%, 0.14) calc(100% - var(--grid-margin))
+  );
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   3. COLUMN GRID  (mirrors .page-grid exactly)
+   Absolutely fills the overlay; same grid definition as the real
+   layout container so column positions are pixel-perfect.
+   ═══════════════════════════════════════════════════════════════ */
+
+.grid-overlay__cols {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: var(--grid-gutter);
+  padding-inline: var(--grid-margin);
+  box-sizing: border-box;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   4. INDIVIDUAL COLUMN  (× 12)
+   Semi-transparent fill + 1 px edge lines = "redlines".
+   ═══════════════════════════════════════════════════════════════ */
+
+.grid-overlay__col {
+  position: relative;
+  background: hsla(340, 100%, 55%, 0.07);
+  /* Left and right 1px borders mark the column edges */
+  box-shadow:
+    inset  1px 0 0 hsla(340, 100%, 60%, 0.35),
+    inset -1px 0 0 hsla(340, 100%, 60%, 0.35);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   5. COLUMN NUMBER LABELS
+   Sticky so labels stay visible as you scroll.
+   ═══════════════════════════════════════════════════════════════ */
+
+.grid-overlay__col-label {
+  position: sticky;
+  top: 14px;
+  display: flex;
+  justify-content: center;
+  padding-top: 2px;
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: hsla(340, 100%, 65%, 0.65);
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   6. TOGGLE BADGE
+   Lives outside #grid-overlay so it is always interactive
+   regardless of the overlay's pointer-events state.
+   ═══════════════════════════════════════════════════════════════ */
+
+#grid-overlay-badge {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9001;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px 6px 8px;
+  background: hsla(0, 0%, 7%, 0.88);
+  border: 1px solid hsla(0, 0%, 100%, 0.10);
+  border-radius: 6px;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: hsla(0, 0%, 100%, 0.38);
+  text-transform: uppercase;
+  user-select: none;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+#grid-overlay-badge:hover {
+  color: hsla(0, 0%, 100%, 0.75);
+  border-color: hsla(0, 0%, 100%, 0.22);
+}
+
+#grid-overlay-badge.is-active {
+  color: hsla(340, 100%, 68%, 0.95);
+  border-color: hsla(340, 100%, 55%, 0.45);
+  background: hsla(0, 0%, 7%, 0.92);
+}
+
+/* Status dot */
+.grid-overlay-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsla(0, 0%, 100%, 0.18);
+  flex-shrink: 0;
+  transition: background 120ms ease;
+}
+
+#grid-overlay-badge.is-active .grid-overlay-badge__dot {
+  background: hsla(340, 100%, 60%, 1);
+  box-shadow: 0 0 5px 1px hsla(340, 100%, 60%, 0.50);
+}
+
+/* Keyboard hint */
+.grid-overlay-badge__key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 4px;
+  border: 1px solid hsla(0, 0%, 100%, 0.12);
+  border-radius: 3px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: inherit;
+  opacity: 0.7;
+}
