@@ -57,17 +57,6 @@ const ARC_CROSS_DAMP = 0.72
 const LAUNCH_LIFT_ON_SWIPE = 0.45
 const LAND_SEARCH_COLS = 2
 
-// Bayer 8×8 ordered dither matrix — gives the static pixel pile its stippled look.
-const BAYER_8X8 = [
-   0, 32,  8, 40,  2, 34, 10, 42,
-  48, 16, 56, 24, 50, 18, 58, 26,
-  12, 44,  4, 36, 14, 46,  6, 38,
-  60, 28, 52, 20, 62, 30, 54, 22,
-   3, 35, 11, 43,  1, 33,  9, 41,
-  51, 19, 59, 27, 49, 17, 57, 25,
-  15, 47,  7, 39, 13, 45,  5, 37,
-  63, 31, 55, 23, 61, 29, 53, 21,
-]
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -492,9 +481,7 @@ export function PixelPileFooter({
       for (let r = 0; r < gridH; r++) {
         for (let c = 0; c < currentGridW; c++) {
           if (grid[r * currentGridW + c] === 1) {
-            const bayerVal = BAYER_8X8[(r % 8) * 8 + (c % 8)] / 64.0
-            const alpha = 0.55 + bayerVal * 0.45
-            ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${alpha.toFixed(3)})`
+            ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`
             ctx.fillRect(c * dotSize, r * dotSize, dotSize, dotSize)
           }
         }
@@ -512,9 +499,7 @@ export function PixelPileFooter({
         for (let r = 0; r < gridH; r++) {
           for (let c = 0; c < gw; c++) {
             if (grid[r * gw + c] === 1) {
-              const bayerVal = BAYER_8X8[(r % 8) * 8 + (c % 8)] / 64.0
-              const alpha = 0.55 + bayerVal * 0.45
-              ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${alpha.toFixed(3)})`
+              ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`
               ctx.fillRect(c * dotSize, r * dotSize, dotSize, dotSize)
             }
           }
