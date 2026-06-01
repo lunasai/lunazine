@@ -44,6 +44,20 @@
   overlay.appendChild(colGrid);
   document.body.appendChild(overlay);
 
+  /* ── Viewport label helpers ─────────────────────────────────── */
+
+  const BREAKPOINTS = [
+    { name: 'x-small', max: 480 },
+    { name: 'small',   max: 768 },
+    { name: 'medium',  max: 1024 },
+    { name: 'large',   max: 1919 },
+    { name: 'x-large', max: Infinity },
+  ];
+
+  function getBreakpoint(w) {
+    return BREAKPOINTS.find(function (bp) { return w <= bp.max; }).name;
+  }
+
   /* ── Build toggle badge ─────────────────────────────────────── */
 
   const badge = document.createElement('button');
@@ -51,12 +65,36 @@
   badge.type = 'button';
   badge.setAttribute('aria-label', 'Toggle grid overlay (press G)');
   badge.setAttribute('title', 'Toggle grid overlay (G)');
+
+  const bpLabel = document.createElement('span');
+  bpLabel.className = 'grid-overlay-badge__bp';
+
+  const pxLabel = document.createElement('span');
+  pxLabel.className = 'grid-overlay-badge__px';
+
   badge.innerHTML =
     '<span class="grid-overlay-badge__dot" aria-hidden="true"></span>' +
     'Grid' +
-    '<span class="grid-overlay-badge__key" aria-hidden="true">G</span>';
+    '<span class="grid-overlay-badge__key" aria-hidden="true">G</span>' +
+    '<span class="grid-overlay-badge__sep" aria-hidden="true"></span>';
+
+  const viewport = document.createElement('span');
+  viewport.className = 'grid-overlay-badge__viewport';
+  viewport.setAttribute('aria-hidden', 'true');
+  viewport.appendChild(bpLabel);
+  viewport.appendChild(pxLabel);
+  badge.appendChild(viewport);
 
   document.body.appendChild(badge);
+
+  function updateViewportLabel() {
+    var w = window.innerWidth;
+    bpLabel.textContent = getBreakpoint(w);
+    pxLabel.textContent = w + 'px';
+  }
+
+  updateViewportLabel();
+  window.addEventListener('resize', updateViewportLabel);
 
   /* ── State management ───────────────────────────────────────── */
 
