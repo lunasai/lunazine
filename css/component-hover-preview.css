@@ -19,7 +19,7 @@
   position: relative;
   cursor: crosshair;
   touch-action: manipulation;
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-light);
   font-variation-settings: var(--font-variation-serif);
   color: var(--color-accent-fg);
 
@@ -90,6 +90,54 @@
   outline: 2px solid var(--color-accent-fg);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
+}
+
+/* ── Inline thumbnail (injected by hover-preview.js after manifest) ─ */
+
+.hover-preview-thumb {
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  max-height: var(--space-10); /* 40px — caps oversized display-text triggers */
+  width: fit-content;
+  overflow: hidden;
+  vertical-align: baseline;
+  margin-left: var(--space-1); /* 4px */
+  user-select: none;
+  flex-shrink: 0;
+  transform: translate(var(--thumb-dx, 0px), var(--thumb-dy, 0px));
+  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-preview-thumb {
+    transition: none;
+  }
+}
+
+.hover-preview-thumb img {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+
+.hover-preview-thumb::before,
+.hover-preview-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent-fg);
+}
+
+/* Layer 2: flat 30% red tint */
+.hover-preview-thumb::before {
+  opacity: 0.3;
+}
+
+/* Layer 3: solid red screen blend on top */
+.hover-preview-thumb::after {
+  mix-blend-mode: screen;
 }
 
 

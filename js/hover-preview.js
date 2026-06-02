@@ -35,12 +35,94 @@
   var manifest        = null;
   var manifestPending = [];
 
+  /* ── Inline thumbnails ────────────────────────────────────────────
+     After the manifest resolves, inject a <img> wrapped in a <span>
+     as a sibling immediately after every [data-preview-id] element.
+     Red monotone is applied via CSS filter (see component-hover-preview.css).
+     On fine-pointer devices, a micro-parallax tracks the cursor across
+     the trigger word and displaces the thumbnail by up to THUMB_PARALLAX_RANGE px.
+  ─────────────────────────────────────────────────────────────────── */
+
+  var THUMB_PARALLAX_RANGE = 5; /* max px displacement per axis */
+
+  function injectThumbs(data) {
+    document.querySelectorAll('[data-preview-id]').forEach(function (el) {
+      var id    = el.getAttribute('data-preview-id');
+      var entry = data[id];
+      if (!entry || !entry.src) return;
+
+      var img = document.createElement('img');
+      img.src = entry.src;
+      img.alt = '';
+      img.setAttribute('draggable', 'false');
+
+      var wrap = document.createElement('span');
+      wrap.className = 'hover-preview-thumb';
+      wrap.setAttribute('aria-hidden', 'true');
+      wrap.appendChild(img);
+
+      el.insertAdjacentElement('afterend', wrap);
+
+      /* ── Parallax on trigger text ───────────────────────────────── */
+
+      var thumbRafId = null;
+
+      function applyParallax(e) {
+        if (isCoarsePointer || thumbRafId) return;
+        thumbRafId = requestAnimationFrame(function () {
+          thumbRafId = null;
+          var rect = el.getBoundingClientRect();
+          var nx   = (e.clientX - rect.left  - rect.width  / 2) / (rect.width  / 2);
+          var ny   = (e.clientY - rect.top   - rect.height / 2) / (rect.height / 2);
+          nx = Math.max(-1, Math.min(1, nx));
+          ny = Math.max(-1, Math.min(1, ny));
+          wrap.style.setProperty('--thumb-dx', (nx * THUMB_PARALLAX_RANGE).toFixed(2) + 'px');
+          wrap.style.setProperty('--thumb-dy', (ny * THUMB_PARALLAX_RANGE).toFixed(2) + 'px');
+        });
+      }
+
+      function resetParallax() {
+        if (thumbRafId) { cancelAnimationFrame(thumbRafId); thumbRafId = null; }
+        wrap.style.setProperty('--thumb-dx', '0px');
+        wrap.style.setProperty('--thumb-dy', '0px');
+      }
+
+      el.addEventListener('mousemove', applyParallax);
+      el.addEventListener('mouseleave', resetParallax);
+
+      /* ── Thumbnail hover: shows card + parallax + touch toggle ─── */
+
+      if (!isCoarsePointer) {
+        wrap.addEventListener('mouseenter', function (e) {
+          positionAnchorEl = null;
+          showForLink(el, e.clientX, e.clientY, null);
+        });
+        wrap.addEventListener('mousemove', applyParallax);
+        wrap.addEventListener('mouseleave', function (e) {
+          /* don't hide if cursor moves back to the trigger text */
+          if (e.relatedTarget === el || (el.contains && el.contains(e.relatedTarget))) return;
+          hide();
+          resetParallax();
+        });
+      }
+
+      wrap.addEventListener('pointerdown', function (e) {
+        if (!isCoarsePointer) return;
+        /* treat thumbnail tap same as tapping the trigger on touch devices */
+        var fakeEvent = { currentTarget: el, clientX: e.clientX, clientY: e.clientY,
+                          pointerType: e.pointerType, preventDefault: function () { e.preventDefault(); } };
+        onTap(fakeEvent);
+      });
+    });
+  }
+
   var manifestPromise = fetch(MANIFEST_URL)
     .then(function (r) {
       return r.json();
     })
     .then(function (data) {
       manifest = data;
+      injectThumbs(data);
       var queue = manifestPending.splice(0);
       queue.forEach(function (fn) {
         fn();
@@ -299,7 +381,10 @@
     schedulePosition(e.clientX, e.clientY);
   }
 
-  function onLeave() {
+  function onLeave(e) {
+    /* Don't hide if the cursor is moving into the paired thumbnail */
+    if (e && e.relatedTarget && e.relatedTarget.classList &&
+        e.relatedTarget.classList.contains('hover-preview-thumb')) return;
     hide();
   }
 
