@@ -39,11 +39,36 @@
      After the manifest resolves, inject a <img> wrapped in a <span>
      as a sibling immediately after every [data-preview-id] element.
      Red monotone is applied via CSS filter (see component-hover-preview.css).
-     On fine-pointer devices, a micro-parallax tracks the cursor across
-     the trigger word and displaces the thumbnail by up to THUMB_PARALLAX_RANGE px.
+     A scroll-driven micro-parallax displaces each thumbnail vertically
+     based on its distance from the viewport centre (THUMB_PARALLAX_RANGE px max).
   ─────────────────────────────────────────────────────────────────── */
 
-  var THUMB_PARALLAX_RANGE = 5; /* max px displacement per axis */
+  var THUMB_PARALLAX_RANGE = 5; /* max vertical px displacement */
+
+  /** Array of {el, wrap} pairs populated by injectThumbs, used by the scroll handler. */
+  var thumbPairs = [];
+
+  var thumbScrollRafId = null;
+
+  function updateThumbParallax() {
+    var vh = window.innerHeight;
+    var center = vh / 2;
+    thumbPairs.forEach(function (pair) {
+      var rect = pair.el.getBoundingClientRect();
+      var elCenter  = rect.top + rect.height / 2;
+      /* normalised distance from viewport centre: -1 (top) → 0 (centre) → 1 (bottom) */
+      var n = Math.max(-1, Math.min(1, (elCenter - center) / center));
+      pair.wrap.style.setProperty('--thumb-dy', (n * THUMB_PARALLAX_RANGE).toFixed(2) + 'px');
+    });
+  }
+
+  function onThumbScroll() {
+    if (thumbScrollRafId) return;
+    thumbScrollRafId = requestAnimationFrame(function () {
+      thumbScrollRafId = null;
+      updateThumbParallax();
+    });
+  }
 
   function injectThumbs(data) {
     document.querySelectorAll('[data-preview-id]').forEach(function (el) {
@@ -63,46 +88,19 @@
 
       el.insertAdjacentElement('afterend', wrap);
 
-      /* ── Parallax on trigger text ───────────────────────────────── */
+      thumbPairs.push({ el: el, wrap: wrap });
 
-      var thumbRafId = null;
-
-      function applyParallax(e) {
-        if (isCoarsePointer || thumbRafId) return;
-        thumbRafId = requestAnimationFrame(function () {
-          thumbRafId = null;
-          var rect = el.getBoundingClientRect();
-          var nx   = (e.clientX - rect.left  - rect.width  / 2) / (rect.width  / 2);
-          var ny   = (e.clientY - rect.top   - rect.height / 2) / (rect.height / 2);
-          nx = Math.max(-1, Math.min(1, nx));
-          ny = Math.max(-1, Math.min(1, ny));
-          wrap.style.setProperty('--thumb-dx', (nx * THUMB_PARALLAX_RANGE).toFixed(2) + 'px');
-          wrap.style.setProperty('--thumb-dy', (ny * THUMB_PARALLAX_RANGE).toFixed(2) + 'px');
-        });
-      }
-
-      function resetParallax() {
-        if (thumbRafId) { cancelAnimationFrame(thumbRafId); thumbRafId = null; }
-        wrap.style.setProperty('--thumb-dx', '0px');
-        wrap.style.setProperty('--thumb-dy', '0px');
-      }
-
-      el.addEventListener('mousemove', applyParallax);
-      el.addEventListener('mouseleave', resetParallax);
-
-      /* ── Thumbnail hover: shows card + parallax + touch toggle ─── */
+      /* ── Thumbnail hover: shows card + touch toggle ──────────────── */
 
       if (!isCoarsePointer) {
         wrap.addEventListener('mouseenter', function (e) {
           positionAnchorEl = null;
           showForLink(el, e.clientX, e.clientY, null);
         });
-        wrap.addEventListener('mousemove', applyParallax);
         wrap.addEventListener('mouseleave', function (e) {
           /* don't hide if cursor moves back to the trigger text */
           if (e.relatedTarget === el || (el.contains && el.contains(e.relatedTarget))) return;
           hide();
-          resetParallax();
         });
       }
 
@@ -114,6 +112,11 @@
         onTap(fakeEvent);
       });
     });
+
+    /* Start scroll-driven parallax once all thumbs are in the DOM */
+    window.addEventListener('scroll', onThumbScroll, { passive: true });
+    window.addEventListener('resize', onThumbScroll, { passive: true });
+    updateThumbParallax(); /* set initial positions */
   }
 
   var manifestPromise = fetch(MANIFEST_URL)
