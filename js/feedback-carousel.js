@@ -8,7 +8,7 @@
  */
 
 (function () {
-  var DURATION = 5000; // ms per slide
+  var DURATION = 12000; // ms per slide
 
   var section = document.querySelector('.section--feedback');
   if (!section) return;
@@ -43,11 +43,17 @@
 
   function showCard(index) {
     cards.forEach(function (card, i) {
-      // Cancel any scroll-reveal animation so CSS opacity rules cleanly
-      card.style.animation = 'none';
-      card.classList.toggle('is-active', i === index);
-      card.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+      var isActive = i === index;
+      card.classList.toggle('is-active', isActive);
+      card.setAttribute('aria-hidden', isActive ? 'false' : 'true');
     });
+
+    /* Restart fade-up on the incoming card (matches work scroll-reveal pattern) */
+    var active = cards[index];
+    active.style.animation = 'none';
+    void active.offsetWidth;
+    active.style.animation = '';
+
     current = index;
   }
 
