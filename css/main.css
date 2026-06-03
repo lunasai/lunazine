@@ -507,6 +507,7 @@ body {
 /* Scaled metrics: step down with body at each breakpoint */
 @media (min-width: 1025px) {
   .section--work .impact-list__label,
+  .section--work .metric-item,
   .section--work .metric-item__text {
     font-size: 18px;
   }
@@ -514,6 +515,7 @@ body {
 
 @media (max-width: 1024px) and (min-width: 769px) {
   .section--work .impact-list__label,
+  .section--work .metric-item,
   .section--work .metric-item__text {
     font-size: 16px;
   }
@@ -521,45 +523,89 @@ body {
 
 @media (max-width: 768px) {
   .section--work .impact-list__label,
+  .section--work .metric-item,
   .section--work .metric-item__text {
     font-size: 16px;
   }
 }
 
-/* Full-width bar style — block stretches to fill row, text right-aligned */
-.section--work .metric-item {
+/* Full-width bar + label: 24px row, label centered, fill = row height */
+.section--work .work__metrics .metric-item {
   position: relative;
-  overflow: hidden;
-  gap: var(--space-4);
+  box-sizing: border-box;
+  height: 24px;
+  min-height: 24px;
+  overflow: visible;
+  gap: var(--space-2); /* 8px — bar to label */
+  align-items: stretch;
+  font-family: var(--font-mono);
+  line-height: 1.18;
+  --metric-line-height: 1.18;
+  cursor: default;
+  /* Asymmetric: quick fill in, slow smooth clear out */
+  --metric-fill-in-duration: 240ms;
+  --metric-fill-in-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --metric-fill-out-duration: 620ms;
+  --metric-fill-out-ease: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  --metric-text-in-duration: 160ms;
+  --metric-text-in-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --metric-text-in-delay: 70ms;
+  --metric-text-out-duration: 480ms;
+  --metric-text-out-ease: cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
-.section--work .metric-item__block {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  height: 20px;
-  background-color: var(--color-neutral-fg-strong);
-}
-
-/* Sweep originates from the left edge of the bar — bar + text are one unit */
+/* Active fill: full row height, grows left → right */
 .section--work .metric-item::before {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 1;
   background-color: var(--color-neutral-fg-strong);
   transform: scaleX(0);
   transform-origin: left center;
-  /* Exit: slow retreat with a brief hold so it doesn't snap away */
-  transition: transform 550ms cubic-bezier(0.25, 1, 0.5, 1) 60ms;
-  z-index: 0;
+  transition: transform var(--metric-fill-out-duration) var(--metric-fill-out-ease);
 }
 
-/* Sit text above the sweep layer; disable the old text-level fill */
+.section--work .metric-item__block {
+  position: relative;
+  z-index: 0;
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  background-color: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Idle: 2px rule at centered line-box baseline */
+.section--work .metric-item__block::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  bottom: calc((100% - 1lh) / 2 - 2px);
+  background-color: var(--color-neutral-fg-strong);
+  transition: opacity 120ms ease;
+}
+
+.section--work .metric-item.is-near .metric-item__block::after {
+  opacity: 0;
+}
+
 .section--work .metric-item__text {
   position: relative;
-  z-index: 1;
-  /* Exit: text snaps back before fill fully retreats */
-  transition: color 100ms ease;
+  z-index: 2;
+  flex-shrink: 0;
+  align-self: center;
+  line-height: var(--metric-line-height, 1.18);
+  cursor: default;
+  text-box-trim: trim-end;
+  text-box-edge: cap alphabetic;
+  transition-property: color;
+  transition-duration: var(--metric-text-out-duration);
+  transition-timing-function: var(--metric-text-out-ease);
+  transition-delay: 0ms;
 }
 
 .section--work .metric-item__text::before {
@@ -567,18 +613,24 @@ body {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  /* Enter: springy fill from the bar edge */
-  .section--work .metric-item.is-near::before,
-  .section--work .metric-item:hover::before {
-    transform: scaleX(1);
-    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* Neutralize component-metric-item :hover; only .is-near drives active state */
+  .section--work .metric-item:hover:not(.is-near) .metric-item__text,
+  .section--work .metric-item:hover:not(.is-near) .metric-item__text::before {
+    color: var(--color-neutral-fg);
+    transform: scaleX(0);
   }
 
-  /* Enter: text waits for fill to arrive before inverting */
+  .section--work .metric-item.is-near::before {
+    transform: scaleX(1);
+    transition: transform var(--metric-fill-in-duration) var(--metric-fill-in-ease);
+  }
+
   .section--work .metric-item.is-near .metric-item__text,
-  .section--work .metric-item:hover .metric-item__text {
+  .section--work .metric-item.is-near:hover .metric-item__text {
     color: var(--color-neutral-bg);
-    transition: color 140ms ease 240ms;
+    transition-duration: var(--metric-text-in-duration);
+    transition-timing-function: var(--metric-text-in-ease);
+    transition-delay: var(--metric-text-in-delay);
   }
 }
 
@@ -586,8 +638,29 @@ body {
   .section--work .metric-item::before {
     transition: none;
   }
+
   .section--work .metric-item__text {
     transition: none;
+  }
+
+  .section--work .metric-item.is-near::before {
+    transform: scaleX(1);
+  }
+
+  .section--work .metric-item.is-near .metric-item__text {
+    color: var(--color-neutral-bg);
+  }
+}
+
+@supports not (height: 1lh) {
+  .section--work .metric-item__block::after {
+    bottom: calc((100% - 1em * var(--metric-line-height, 1.18)) / 2 - 2px);
+  }
+}
+
+@supports not (text-box-trim: trim-end) {
+  .section--work .metric-item__block::after {
+    transform: translateY(1px);
   }
 }
 
@@ -667,7 +740,7 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2); /* 8px between rows */
+  gap: var(--space-1); /* 4px between rows */
 }
 
 .work__project__impact {
