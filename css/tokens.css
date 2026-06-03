@@ -190,6 +190,7 @@
   --line-height-title:  1.0;    /* title — tightened but safe for wrapping */
   --line-height-body-lg: 1.4;   /* body-lg                               */
   --line-height-normal:  1.38;  /* body-md, body-sm, mono                */
+  --line-height-thanks:  1.47;  /* thanks sign-off title (Figma 695:10014) */
 
   /* ── Letter spacing (Figma % → em: value / 100) ──────────────
      display  −1 % → −0.01em

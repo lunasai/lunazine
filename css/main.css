@@ -401,16 +401,22 @@ body {
 
 /* ─── Work sections ──────────────────────────────────────────── */
 
-/* Section label — small mono folio marker, not a display heading */
-.work__title {
-  grid-column: 1 / span 12;
-  margin: 0 0 var(--space-6) 0;
+/* Section labels — mono folio markers, uppercase */
+.work__title,
+.feedback__title,
+.about__label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-regular);
   font-size: var(--typography-mono);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-mono);
   color: var(--color-neutral-fg-muted);
+  text-transform: uppercase;
+}
+
+.work__title {
+  grid-column: 1 / span 12;
+  margin: 0 0 var(--space-6) 0;
 }
 
 /* Vertical stack of project subsections */
@@ -451,6 +457,10 @@ body {
 }
 
 @media (min-width: 1025px) {
+  .work__title {
+    grid-column: 4 / -1;
+  }
+
   .work__projects {
     grid-column: 4 / -1;
     gap: 120px;
@@ -718,10 +728,10 @@ body {
 
 /* ─── Feedback section ───────────────────────────────────────── */
 
-/* Quote/cite sit below about body scale (--typography-quote-body) */
+/* Quote/cite — large duo: match about body; stacked: step down for dark block */
 :root {
-  --typography-feedback-quote: 16px;
-  --typography-feedback-cite:  14px;
+  --typography-feedback-quote: var(--typography-quote-body);
+  --typography-feedback-cite:  var(--typography-mono);
 }
 
 @media (max-width: 1024px) {
@@ -823,12 +833,6 @@ body {
 
 .feedback__title {
   margin: 0;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-mono);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  color: var(--color-neutral-fg-muted);
 }
 
 /* Progress bar — thin rule that fills over the slide duration */
@@ -1049,17 +1053,23 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--space-6);
+  gap: var(--space-10);
 }
 
 .thanks__cat {
   margin: 0;
-  opacity: 0.4;
+}
+
+.thanks__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
 }
 
 .thanks__signoff {
   margin: 0;
-  margin-top: var(--space-4);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-regular);
   font-size: var(--typography-mono);
@@ -1084,19 +1094,18 @@ body {
 .thanks__title {
   margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-title);
-  line-height: var(--line-height-title);
+  line-height: var(--line-height-thanks);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
 }
 
 .thanks__body-p {
   margin: 0;
-  max-width: 42ch;
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
-  font-size: var(--typography-body);
+  font-size: var(--typography-quote-body);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-body);
   color: var(--color-neutral-fg);
@@ -1119,12 +1128,6 @@ body {
 }
 
 .about__label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--typography-mono);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-mono);
-  color: var(--color-neutral-fg-muted);
   margin: 0 0 var(--space-6);
 }
 
@@ -1343,6 +1346,11 @@ body.pong-active .site {
 
   .feedback__inner {
     gap: var(--space-4);
+  }
+
+  /* Match intro hero scale — opening/closing bookends on x-small */
+  .thanks__title {
+    font-size: var(--typography-intro-headline);
   }
 }
 
