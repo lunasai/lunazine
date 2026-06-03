@@ -20,48 +20,66 @@
   const BALL_SIZE_PCT   = 0.044;
   const AI_ERROR_FACTOR = [0.63, 0.35, 0.14];
 
-  // Chrome safe zone: fixed header/footer sit at 40px inset + ~30px height.
   const SAFE_TOP    = 90;
   const SAFE_BOTTOM = 80;
-
-  // ── Transition timing ────────────────────────────────────────
-  // ENTER_DELAY: how long after enter() before countdown starts.
-  // Lets the CSS overlay fade-in (1.5 s) mostly complete before the
-  // first number appears, so both animations overlap gracefully.
-  const ENTER_DELAY    = 900;   // ms
-  const BEAT_DURATION  = 1100;  // ms per countdown digit
-  const BEAT_FADE_IN   = 320;   // ms — digit rises in
-  const BEAT_FADE_OUT  = 320;   // ms — digit fades out before next
-  const EXIT_DURATION  = 1500;  // ms — matches CSS overlay fade-out
+  const SCRIM       = 0.92;
+  const EXIT_DURATION = 1500;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── Intro timeline (ms from click) ───────────────────────────
+  const T = reducedMotion
+    ? {
+        HINT_START:      0,
+        HINT_FADE:       200,
+        DIGIT_FADE_IN:   0,
+        DIGIT_HOLD:      350,
+        DIGIT_CROSSFADE: 0,
+        REVEAL_DURATION: 0,
+      }
+    : {
+        HINT_START:      200,
+        HINT_FADE:       400,
+        DIGIT_FADE_IN:   400,
+        DIGIT_HOLD:      700,
+        DIGIT_CROSSFADE: 300,
+        REVEAL_DURATION: 600,
+      };
+
+  T.BEAT1_END   = T.DIGIT_FADE_IN + T.DIGIT_HOLD;
+  T.BEAT2_END   = T.BEAT1_END + T.DIGIT_CROSSFADE + T.DIGIT_HOLD;
+  T.REVEAL_START = T.BEAT2_END + T.DIGIT_CROSSFADE + T.DIGIT_HOLD;
+  T.PLAY_START  = T.REVEAL_START + T.REVEAL_DURATION;
 
   // ── State ────────────────────────────────────────────────────
   let levelIndex = Math.min(2, Math.max(0, parseInt(localStorage.getItem('luna-pong-level') || '0', 10)));
   let W = 0, H = 0;
-  let running          = false;
-  let paused           = false;
-  let serving          = true;
-  let countdown        = 0;    // 3 → 2 → 1 → 0 (game live)
-  let countdownBeatStart = 0;  // performance.now() when current digit appeared
-  let enterTimer       = null;
-  let countdownTimer   = null;
-  let serveTimer       = null;
-  let rafId            = null;
-  let mouseY           = -1;
-  let keys             = {};
-  let scores           = { left: 0, right: 0 };
-  let aiErrorOffset    = 0;
+  let running       = false;
+  let paused        = false;
+  let serving       = true;
+  let timelineStart = 0;
+  let playStarted   = false;
+  let serveTimer    = null;
+  let rafId         = null;
+  let mouseY        = -1;
+  let keys          = {};
+  let scores        = { left: 0, right: 0 };
+  let aiErrorOffset = 0;
 
   let leftPaddle  = { x: 0, y: 0, w: 0, h: 0 };
   let rightPaddle = { x: 0, y: 0, w: 0, h: 0 };
   let ball        = { x: 0, y: 0, size: 0, vx: 0, vy: 0 };
 
   // ── Easing ───────────────────────────────────────────────────
-  function easeOutCubic(t) { return 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3); }
-  function easeInCubic(t)  { return Math.pow(Math.min(1, Math.max(0, t)), 3); }
+  function clamp(t) { return Math.min(1, Math.max(0, t)); }
+  function easeOutCubic(t)  { t = clamp(t); return 1 - Math.pow(1 - t, 3); }
+  function easeInCubic(t)   { t = clamp(t); return t * t * t; }
+  function easeInOutCubic(t) {
+    t = clamp(t);
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
 
-  // ── Colors (reads live from CSS tokens) ─────────────────────
+  // ── Colors ───────────────────────────────────────────────────
   function getColors() {
     const s = getComputedStyle(document.documentElement);
     return {
@@ -82,73 +100,99 @@
     return `rgba(${r},${g},${b},${alpha})`;
   }
 
-  // ── Countdown ────────────────────────────────────────────────
-  function startCountdown() {
-    countdown          = 3;
-    countdownBeatStart = performance.now();
-    serving            = true;
-    clearTimeout(countdownTimer);
-
-    const beatMs = reducedMotion ? 600 : BEAT_DURATION;
-
-    function tick() {
-      countdown -= 1;
-      if (countdown <= 0) {
-        countdown = 0;
-        resetBall(1, false);
-      } else {
-        countdownBeatStart = performance.now();
-        countdownTimer = setTimeout(tick, beatMs);
-      }
-    }
-    countdownTimer = setTimeout(tick, beatMs);
+  function elapsedMs() {
+    return timelineStart > 0 ? performance.now() - timelineStart : 0;
   }
 
-  // Alpha for the current countdown digit, derived every draw frame
-  // from how far through the beat we are.
-  function countdownAlpha() {
-    if (reducedMotion) return 1;
-    const elapsed = performance.now() - countdownBeatStart;
-    if (elapsed < BEAT_FADE_IN) {
-      return easeOutCubic(elapsed / BEAT_FADE_IN);
+  // ── Timeline helpers ─────────────────────────────────────────
+  function hintAlpha(elapsed) {
+    const peak = 0.38;
+    if (elapsed < T.HINT_START) return 0;
+    if (elapsed < T.HINT_START + T.HINT_FADE) {
+      return peak * easeOutCubic((elapsed - T.HINT_START) / T.HINT_FADE);
     }
-    if (elapsed > BEAT_DURATION - BEAT_FADE_OUT) {
-      return 1 - easeInCubic((elapsed - (BEAT_DURATION - BEAT_FADE_OUT)) / BEAT_FADE_OUT);
+    if (elapsed < T.REVEAL_START) return peak;
+    if (elapsed < T.PLAY_START) {
+      return peak * (1 - easeOutCubic((elapsed - T.REVEAL_START) / T.REVEAL_DURATION));
+    }
+    return 0;
+  }
+
+  function scrimAlpha(elapsed) {
+    if (elapsed < T.REVEAL_START) return SCRIM;
+    if (elapsed < T.PLAY_START) {
+      return SCRIM * (1 - easeOutCubic((elapsed - T.REVEAL_START) / T.REVEAL_DURATION));
+    }
+    return 0;
+  }
+
+  function courtAlpha(elapsed) {
+    if (elapsed < T.REVEAL_START) return 0;
+    if (elapsed < T.PLAY_START) {
+      return easeOutCubic((elapsed - T.REVEAL_START) / T.REVEAL_DURATION);
     }
     return 1;
   }
 
+  // Returns [{ text, alpha }] — may contain two entries during crossfade
+  function countdownDigits(elapsed) {
+    if (elapsed >= T.REVEAL_START) return [];
+
+    if (elapsed < T.BEAT1_END) {
+      const a = elapsed < T.DIGIT_FADE_IN
+        ? easeOutCubic(elapsed / Math.max(T.DIGIT_FADE_IN, 1))
+        : 1;
+      return [{ text: '3', alpha: a }];
+    }
+
+    if (elapsed < T.BEAT1_END + T.DIGIT_CROSSFADE) {
+      const p = (elapsed - T.BEAT1_END) / Math.max(T.DIGIT_CROSSFADE, 1);
+      const e = T.DIGIT_CROSSFADE > 0 ? easeInOutCubic(p) : 1;
+      return [{ text: '3', alpha: 1 - e }, { text: '2', alpha: e }];
+    }
+
+    if (elapsed < T.BEAT2_END) {
+      return [{ text: '2', alpha: 1 }];
+    }
+
+    if (elapsed < T.BEAT2_END + T.DIGIT_CROSSFADE) {
+      const p = (elapsed - T.BEAT2_END) / Math.max(T.DIGIT_CROSSFADE, 1);
+      const e = T.DIGIT_CROSSFADE > 0 ? easeInOutCubic(p) : 1;
+      return [{ text: '2', alpha: 1 - e }, { text: '1', alpha: e }];
+    }
+
+    return [{ text: '1', alpha: 1 }];
+  }
+
   // ── Enter / exit ─────────────────────────────────────────────
   function enter() {
-    scores  = { left: 0, right: 0 };
-    paused  = false;
-    mouseY  = -1;
-    keys    = {};
-    running = true;
+    scores        = { left: 0, right: 0 };
+    paused        = false;
+    serving       = true;
+    playStarted   = false;
+    mouseY        = -1;
+    keys          = {};
+    running       = true;
+    timelineStart = performance.now();
 
     document.body.classList.add('pong-active');
     overlay.removeAttribute('aria-hidden');
     if (window.__lenis) window.__lenis.stop();
 
-    resize();
+    layoutCourt();
     rafId = requestAnimationFrame(loop);
-
-    // Delay countdown so it emerges as the overlay finishes fading in
-    clearTimeout(enterTimer);
-    enterTimer = setTimeout(startCountdown, reducedMotion ? 0 : ENTER_DELAY);
   }
 
   function exit() {
-    running = false;
+    running       = false;
+    timelineStart = 0;
+    playStarted   = false;
+    cancelAnimationFrame(rafId);
     clearTimeout(serveTimer);
-    clearTimeout(countdownTimer);
-    clearTimeout(enterTimer);
-    countdown = 0;
 
     document.body.classList.remove('pong-active');
     overlay.setAttribute('aria-hidden', 'true');
 
-    // Keep lenis paused until overlay has finished fading out
     setTimeout(() => {
       if (window.__lenis) window.__lenis.start();
     }, reducedMotion ? 0 : EXIT_DURATION);
@@ -192,8 +236,14 @@
     }, delay);
   }
 
-  // ── Resize ───────────────────────────────────────────────────
-  function resize() {
+  function beginPlay() {
+    if (playStarted) return;
+    playStarted = true;
+    resetBall(1, false);
+  }
+
+  // ── Layout (no serve timer during intro) ─────────────────────
+  function layoutCourt() {
     W = overlay.clientWidth;
     H = overlay.clientHeight;
     canvas.width  = W;
@@ -208,14 +258,16 @@
 
     leftPaddle.w  = pw; leftPaddle.h = ph; leftPaddle.x = 0;
     rightPaddle.w = pw; rightPaddle.h = ph; rightPaddle.x = W - pw;
-    leftPaddle.y  = Math.min(leftPaddle.y,  H - ph);
-    rightPaddle.y = Math.min(rightPaddle.y, H - ph);
-    ball.size = bs;
-
-    resetBall(1, true);
+    leftPaddle.y  = H / 2 - ph / 2;
+    rightPaddle.y = H / 2 - ph / 2;
+    ball.size     = bs;
+    ball.x        = W / 2 - bs / 2;
+    ball.y        = H / 2 - bs / 2;
+    ball.vx = 0;
+    ball.vy = 0;
   }
 
-  const ro = new ResizeObserver(() => { if (running) resize(); });
+  const ro = new ResizeObserver(() => { if (running) layoutCourt(); });
   ro.observe(overlay);
 
   // ── Input ────────────────────────────────────────────────────
@@ -259,13 +311,13 @@
   window.addEventListener('keydown', (e) => {
     if (!running) return;
     keys[e.code] = true;
-    if (e.code === 'Space' || e.code === 'KeyP') {
+    if (playStarted && (e.code === 'Space' || e.code === 'KeyP')) {
       e.preventDefault();
       paused = !paused;
     }
     if (e.code === 'Escape') exit();
-    if (e.code === 'KeyZ') setLevel(levelIndex - 1);
-    if (e.code === 'KeyX') setLevel(levelIndex + 1);
+    if (playStarted && e.code === 'KeyZ') setLevel(levelIndex - 1);
+    if (playStarted && e.code === 'KeyX') setLevel(levelIndex + 1);
   });
   window.addEventListener('keyup', (e) => { delete keys[e.code]; });
 
@@ -284,6 +336,10 @@
 
   // ── Update ───────────────────────────────────────────────────
   function update() {
+    const elapsed = elapsedMs();
+
+    if (elapsed >= T.PLAY_START) beginPlay();
+
     if (mouseY >= 0) {
       leftPaddle.y = mouseY - leftPaddle.h / 2;
     } else {
@@ -292,7 +348,7 @@
     }
     leftPaddle.y = Math.max(0, Math.min(H - leftPaddle.h, leftPaddle.y));
 
-    if (paused || serving || countdown > 0) return;
+    if (!playStarted || paused || serving) return;
 
     if (ball.vx > 0) {
       const target = (ball.y + ball.size / 2) + aiErrorOffset - (rightPaddle.h / 2);
@@ -341,17 +397,13 @@
     if (ball.x > W)             { scores.left  = Math.min(999, scores.left  + 1); resetBall(-1, false); }
   }
 
-  // ── Draw ─────────────────────────────────────────────────────
-  function draw() {
-    const c = getColors();
-    ctx.clearRect(0, 0, W, H);
+  // ── Draw helpers ─────────────────────────────────────────────
+  function drawCourt(c, alpha) {
+    if (alpha <= 0.001) return;
 
-    // Background
-    ctx.fillStyle = c.bg;
-    ctx.fillRect(0, 0, W, H);
-
-    // Center dashed divider
     ctx.save();
+    ctx.globalAlpha = alpha;
+
     ctx.setLineDash([8, 10]);
     ctx.lineWidth   = 4;
     ctx.strokeStyle = hexToRgba(c.text, 0.10);
@@ -359,9 +411,8 @@
     ctx.moveTo(W / 2, 0);
     ctx.lineTo(W / 2, H);
     ctx.stroke();
-    ctx.restore();
+    ctx.setLineDash([]);
 
-    // Scores
     const scoreSize = W < 480 ? 12 : 18;
     ctx.font         = `${scoreSize}px 'Space Mono', monospace`;
     ctx.fillStyle    = c.accent;
@@ -370,61 +421,89 @@
     ctx.fillText(String(scores.left).padStart(3, '0'),  W / 4,     SAFE_TOP);
     ctx.fillText(String(scores.right).padStart(3, '0'), 3 * W / 4, SAFE_TOP);
 
-    // Paddles
     ctx.fillStyle = c.accent;
     ctx.fillRect(leftPaddle.x,  leftPaddle.y,  leftPaddle.w, leftPaddle.h);
     ctx.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.w, rightPaddle.h);
 
-    // Ball
     ctx.fillStyle = c.ball;
     ctx.fillRect(ball.x, ball.y, ball.size, ball.size);
 
-    // Serve dots
-    if (serving && !paused && countdown === 0) {
+    ctx.restore();
+  }
+
+  function drawScrim(alpha) {
+    if (alpha <= 0.001) return;
+    ctx.fillStyle = `rgba(254,250,241,${alpha.toFixed(3)})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function drawCountdownDigits(digits, c) {
+    const cdSize = W < 480 ? 48 : 72;
+    ctx.font         = `${cdSize}px 'Space Mono', monospace`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (const { text, alpha } of digits) {
+      if (alpha <= 0.001) continue;
+      ctx.fillStyle = hexToRgba(c.accent, alpha);
+      ctx.fillText(text, W / 2, H / 2);
+    }
+  }
+
+  function drawIntroHint(c, alpha) {
+    if (alpha <= 0.001) return;
+    const hintSize = W < 480 ? 10 : 12;
+    ctx.font         = `${hintSize}px 'Space Mono', monospace`;
+    ctx.fillStyle    = hexToRgba(c.text, alpha);
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('space — pause  ·  esc — exit', W / 2, H / 2 - 64);
+  }
+
+  function drawPlayHint(c, pausedNow) {
+    const hintY = H - SAFE_BOTTOM;
+    ctx.font         = `10px 'Space Mono', monospace`;
+    ctx.fillStyle    = hexToRgba(c.text, 0.25);
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(
+      pausedNow ? 'space — resume  ·  esc — exit' : 'space — pause  ·  esc — exit',
+      W / 2,
+      hintY
+    );
+  }
+
+  // ── Draw ─────────────────────────────────────────────────────
+  function draw() {
+    const c       = getColors();
+    const elapsed = elapsedMs();
+    const courtA  = courtAlpha(elapsed);
+    const scrimA  = scrimAlpha(elapsed);
+    const hintA   = hintAlpha(elapsed);
+    const digits  = countdownDigits(elapsed);
+    const scoreSize = W < 480 ? 12 : 18;
+
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.fillStyle = c.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    drawCourt(c, courtA);
+    drawScrim(scrimA);
+
+    if (digits.length) drawCountdownDigits(digits, c);
+    if (hintA > 0) drawIntroHint(c, hintA);
+
+    if (playStarted && serving && !paused) {
       ctx.font         = `${scoreSize}px 'Space Mono', monospace`;
-      ctx.fillStyle    = hexToRgba(c.accent, 0.45);
+      ctx.fillStyle    = hexToRgba(c.accent, 0.45 * courtA);
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('• • •', W / 2, H / 2 + ball.size * 2);
     }
 
-    // ── Countdown overlay ───────────────────────────────────────
-    // Alpha is computed per-frame from elapsed time within the beat,
-    // so the digit eases in and out smoothly without setInterval flicker.
-    if (countdown > 0) {
-      const a = countdownAlpha();
-
-      // Scrim: cream tint that fades with the digit
-      ctx.fillStyle = `rgba(254,250,241,${(0.88 * a).toFixed(3)})`;
-      ctx.fillRect(0, 0, W, H);
-
-      // Controls hint — appears above the digit
-      const hintSize = W < 480 ? 10 : 12;
-      ctx.font         = `${hintSize}px 'Space Mono', monospace`;
-      ctx.fillStyle    = hexToRgba(c.text, 0.38 * a);
-      ctx.textAlign    = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('space — pause  ·  esc — exit', W / 2, H / 2 - 64);
-
-      // Digit — scales very slightly on entry for presence
-      const cdSize   = W < 480 ? 48 : 72;
-      const scale    = reducedMotion ? 1 : 0.88 + 0.12 * easeOutCubic(
-        Math.min(1, (performance.now() - countdownBeatStart) / BEAT_FADE_IN)
-      );
-      ctx.save();
-      ctx.translate(W / 2, H / 2);
-      ctx.scale(scale, scale);
-      ctx.font         = `${cdSize}px 'Space Mono', monospace`;
-      ctx.fillStyle    = hexToRgba(c.accent, a);
-      ctx.textAlign    = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(String(countdown), 0, 0);
-      ctx.restore();
-    }
-
-    // ── Pause overlay ───────────────────────────────────────────
     if (paused) {
-      ctx.fillStyle = 'rgba(254,250,241,0.88)';
+      ctx.fillStyle = `rgba(254,250,241,${(0.88 * Math.max(courtA, 1)).toFixed(3)})`;
       ctx.fillRect(0, 0, W, H);
       ctx.font         = `${scoreSize}px 'Space Mono', monospace`;
       ctx.fillStyle    = c.accent;
@@ -433,19 +512,7 @@
       ctx.fillText('PAUSED', W / 2, H / 2);
     }
 
-    // Commands hint (game + pause; hidden during countdown)
-    if (countdown === 0) {
-      const hintY = H - SAFE_BOTTOM;
-      ctx.font         = `10px 'Space Mono', monospace`;
-      ctx.fillStyle    = hexToRgba(c.text, 0.25);
-      ctx.textAlign    = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(
-        paused ? 'space — resume  ·  esc — exit' : 'space — pause  ·  esc — exit',
-        W / 2,
-        hintY
-      );
-    }
+    if (playStarted && hintA <= 0) drawPlayHint(c, paused);
   }
 
   // ── Loop ─────────────────────────────────────────────────────
