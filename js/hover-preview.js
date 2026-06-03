@@ -39,16 +39,27 @@
      After the manifest resolves, inject a <img> wrapped in a <span>
      as a sibling immediately after every [data-preview-id] element.
      Red monotone is applied via CSS filter (see component-hover-preview.css).
-     A scroll-driven micro-parallax displaces each thumbnail vertically
-     based on its distance from the viewport centre (THUMB_PARALLAX_RANGE px max).
+     Scroll-driven micro-parallax displaces each thumbnail from the viewport
+     centre (vertical + per-link horizontal jitter from preview id).
   ─────────────────────────────────────────────────────────────────── */
 
-  var THUMB_PARALLAX_RANGE = 5; /* max vertical px displacement */
+  var THUMB_PARALLAX_RANGE_Y = 12; /* max vertical px (centre → edge) */
+  var THUMB_PARALLAX_RANGE_X = 4; /* horizontal cap before gain; sign per preview id */
+  var THUMB_PARALLAX_X_GAIN  = 0.28; /* horizontal follows scroll more weakly than vertical */
 
-  /** Array of {el, wrap} pairs populated by injectThumbs, used by the scroll handler. */
+  /** Array of { el, wrap, parallaxX } — populated by injectThumbs */
   var thumbPairs = [];
 
   var thumbScrollRafId = null;
+
+  /** Stable −1…1 jitter per preview id (same link always drifts the same way). */
+  function parallaxJitterFromId(id) {
+    var h = 0;
+    for (var i = 0; i < id.length; i++) {
+      h = ((h << 5) - h + id.charCodeAt(i)) | 0;
+    }
+    return (h % 201 - 100) / 100;
+  }
 
   function updateThumbParallax() {
     var vh = window.innerHeight;
@@ -58,7 +69,11 @@
       var elCenter  = rect.top + rect.height / 2;
       /* normalised distance from viewport centre: -1 (top) → 0 (centre) → 1 (bottom) */
       var n = Math.max(-1, Math.min(1, (elCenter - center) / center));
-      pair.wrap.style.setProperty('--thumb-dy', (n * THUMB_PARALLAX_RANGE).toFixed(2) + 'px');
+      pair.wrap.style.setProperty('--thumb-dy', (n * THUMB_PARALLAX_RANGE_Y).toFixed(2) + 'px');
+      pair.wrap.style.setProperty(
+        '--thumb-dx',
+        (n * THUMB_PARALLAX_X_GAIN * pair.parallaxX).toFixed(2) + 'px'
+      );
     });
   }
 
@@ -104,7 +119,11 @@
       noWrap.appendChild(wrap);
       el.appendChild(noWrap);
 
-      thumbPairs.push({ el: el, wrap: wrap });
+      thumbPairs.push({
+        el: el,
+        wrap: wrap,
+        parallaxX: parallaxJitterFromId(id) * THUMB_PARALLAX_RANGE_X,
+      });
 
       /* ── Thumbnail hover: shows card + touch toggle ──────────────── */
 
