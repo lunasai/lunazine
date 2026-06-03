@@ -183,7 +183,7 @@
     rafId = requestAnimationFrame(loop);
   }
 
-  function exit() {
+  function exit({ resumeScroll = false } = {}) {
     running       = false;
     timelineStart = 0;
     playStarted   = false;
@@ -193,10 +193,43 @@
     document.body.classList.remove('pong-active');
     overlay.setAttribute('aria-hidden', 'true');
 
+    const lenisDelay = resumeScroll || reducedMotion ? 0 : EXIT_DURATION;
     setTimeout(() => {
       if (window.__lenis) window.__lenis.start();
-    }, reducedMotion ? 0 : EXIT_DURATION);
+    }, lenisDelay);
   }
+
+  function scrollToHash(hash) {
+    if (window.__lenis) {
+      window.__lenis.scrollTo(hash);
+      return;
+    }
+    const target = document.querySelector(hash);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function onChromeClick(e) {
+    if (!running) return;
+    const el = e.target.closest('a, button');
+    if (!el) return;
+
+    const anchor = el.closest('a');
+    const href   = anchor?.getAttribute('href');
+    const hash   = href && href.startsWith('#');
+
+    exit({ resumeScroll: true });
+
+    if (hash) {
+      e.preventDefault();
+      requestAnimationFrame(() => scrollToHash(href));
+    }
+  }
+
+  document.querySelectorAll('.site-header, .site-footer').forEach((root) => {
+    root.addEventListener('click', onChromeClick, true);
+  });
 
   playLink.addEventListener('click', (e) => {
     e.preventDefault();
