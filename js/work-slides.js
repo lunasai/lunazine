@@ -33,7 +33,7 @@
     },
     {
       container: '.section--feedback',
-      items: '.feedback__title, .feedback-card'
+      items: '.feedback__title'
     },
     {
       container: '.section--about',

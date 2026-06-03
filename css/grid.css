@@ -47,8 +47,8 @@
 :root {
   /* ── Grid structure (constant at all breakpoints) ─────────── */
   --grid-columns:  12;
-  --grid-gutter:   16px;   /* column gap  */
-  --grid-row-gap:  16px;   /* row gap     */
+  --grid-gutter:   0px;    /* column gap  */
+  --grid-row-gap:  0px;    /* row gap     */
 
   /* ── Outer margin (alias — driven by --spacing-margin in tokens.css) */
   --grid-margin:   var(--spacing-margin);   /* 80px ≥1920 → 40px down to 769 → 24px ≤768 */
@@ -222,12 +222,6 @@
    single-column stacks, matching the Figma mobile frames.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── medium and above: ≥ 769px — wider column gap ───────────── */
-@media (min-width: 769px) {
-  :root {
-    --grid-gutter: 40px;
-  }
-}
 
 /* ── medium: ≤ 1024px ────────────────────────────────────────── */
 @media (max-width: 1024px) {

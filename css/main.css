@@ -210,7 +210,6 @@ body {
 #work.will-animate .work__projects .work__body p:not(.in-view),
 #work.will-animate .work__projects .work__metrics:not(.in-view),
 .section--feedback.will-animate .feedback__title:not(.in-view),
-.section--feedback.will-animate .feedback-card:not(.in-view),
 .section--about.will-animate .about__tagline:not(.in-view),
 .section--about.will-animate .about__label:not(.in-view),
 .section--about.will-animate .about__body p:not(.in-view),
@@ -224,7 +223,6 @@ body {
 #work.will-animate .work__title.in-view,
 #work.will-animate .work__projects .work__body p.in-view,
 .section--feedback.will-animate .feedback__title.in-view,
-.section--feedback.will-animate .feedback-card.in-view,
 .section--about.will-animate .about__tagline.in-view,
 .section--about.will-animate .about__label.in-view,
 .section--about.will-animate .about__body p.in-view,
@@ -233,10 +231,7 @@ body {
 }
 
 /* ── Feedback stagger ───────────────────────────────────────── */
-.section--feedback.will-animate .feedback__title.in-view                 { animation-delay:   0ms; }
-.section--feedback.will-animate .feedback-card:nth-child(1).in-view      { animation-delay: 120ms; }
-.section--feedback.will-animate .feedback-card:nth-child(2).in-view      { animation-delay: 240ms; }
-.section--feedback.will-animate .feedback-card:nth-child(3).in-view      { animation-delay: 360ms; }
+.section--feedback.will-animate .feedback__title.in-view { animation-delay: 0ms; }
 
 /* ── About top stagger ────────────────────────────────────────
    Tagline and label are both above the fold when section enters;
@@ -719,12 +714,45 @@ body {
   min-height: 100svh;
   display: flex;
   align-items: center;
-  padding-block: calc(var(--space-10) * 2);
+  padding-block: var(--section-fixed-chrome-clearance) 0;
   box-sizing: border-box;
 }
 
 .section--feedback > .page-grid {
   width: 100%;
+}
+
+/* ── Side-by-side layout: feedback (cols 1–5) + about (cols 6–12) ── */
+@media (min-width: 1025px) {
+  .section-duo {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
+    padding-inline: var(--grid-margin);
+    padding-block-start: var(--section-fixed-chrome-clearance);
+    align-items: start;
+  }
+
+  .section-duo .section--feedback {
+    grid-column: 1 / 5;
+    min-height: unset;
+    padding: 0 0 var(--space-10);
+  }
+
+  .section-duo .section--about {
+    grid-column: 6 / 13;
+    /* Reset standalone padding — duo provides top alignment */
+    padding-block-start: 0;
+    padding-inline: 0;
+  }
+
+  /* Inner page-grids: remove margins and sub-grid so content anchors
+     directly to duo column boundaries */
+  .section-duo .section--feedback .page-grid,
+  .section-duo .section--about .page-grid {
+    display: block;
+    padding-inline: 0;
+  }
 }
 
 .feedback__inner {
@@ -735,26 +763,100 @@ body {
 
 .feedback__title {
   margin: 0;
-  /* Figma 554:27378 gap 24px; pad clears descenders below lh 0.9 vs the fixed title frame */
-  padding-bottom: var(--space-2);
-  font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-title);
-  line-height: var(--line-height-title);
-  letter-spacing: var(--letter-spacing-tight);
-  color: var(--color-neutral-fg);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-neutral-fg-muted);
 }
 
+/* Progress bar — thin rule that fills over the slide duration */
+.feedback__progress {
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-neutral-bg-elevated);
+  margin-top: var(--space-5); /* 20px above progress bar */
+  margin-bottom: var(--space-8);
+  overflow: hidden;
+}
+
+.feedback__progress-fill {
+  height: 100%;
+  width: 0%;
+  background-color: var(--color-neutral-fg-strong);
+}
+
+@keyframes feedback-progress-fill {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+.feedback__progress-fill.is-running {
+  animation: feedback-progress-fill linear var(--feedback-carousel-duration, 5s) forwards;
+}
+
+/* Custom cursor label — follows mouse, swaps prev / next by section half */
+.feedback-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 500;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing-mono);
+  line-height: 1;
+  color: var(--color-neutral-bg);
+  background-color: var(--color-neutral-fg-strong);
+  padding: 5px 8px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(var(--fc-x, 0px), var(--fc-y, 0px)) scale(0.85);
+  transition:
+    opacity  160ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.feedback-cursor.is-visible {
+  opacity: 1;
+  transform: translate(var(--fc-x, 0px), var(--fc-y, 0px)) scale(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .feedback__inner:hover { cursor: none; }
+}
+
+/* Stack all cards on the same grid cell; JS cross-fades between them */
 .feedback__quotes {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-10);
+  grid-template-rows: 1fr;
+  width: 100%;
 }
 
 .feedback-card {
+  grid-column: 1;
+  grid-row: 1;
   min-width: 0;
   margin: 0;
   color: var(--color-neutral-fg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.feedback-card.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback-card { transition: none; }
+  .feedback__progress-fill.is-running { animation-duration: 0.01ms; }
 }
 
 .feedback-card__quote {
@@ -781,6 +883,7 @@ body {
 .feedback-card__quote p {
   margin: 0;
   font-family: var(--font-serif);
+  font-style: italic;
   font-weight: var(--font-weight-light);
   font-size: var(--typography-quote-body);
   line-height: var(--line-height-normal);
@@ -796,14 +899,13 @@ body {
 }
 
 .feedback-card__source cite {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-style: normal;
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-mono);
-  line-height: 1.18; /* no token: Figma mono source line height */
-  letter-spacing: var(--letter-spacing-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
+  color: var(--color-neutral-fg-muted);
 }
 
 /* ─── About section ──────────────────────────────────────────── */
@@ -941,13 +1043,13 @@ body {
 }
 
 .about__label {
-  font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-title);
-  line-height: var(--line-height-title);
-  letter-spacing: var(--letter-spacing-tight);
-  color: var(--color-neutral-fg);
-  margin: 0 0 var(--space-6); /* 24px below label before body */
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-neutral-fg-muted);
+  margin: 0 0 var(--space-6);
 }
 
 .about__body {
@@ -976,10 +1078,7 @@ body {
 }
 
 .about__cta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-3);
+  display: none;
 }
 
 .about__cta-label {
@@ -1042,7 +1141,8 @@ body {
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .section--feedback {
-    padding-block: calc(var(--space-10) * 2);
+    min-height: unset;
+    padding-block: var(--section-fixed-chrome-clearance) 0;
   }
 }
 
@@ -1057,7 +1157,7 @@ body {
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .section--feedback {
-    padding-block: calc(var(--space-8) * 2);
+    padding-block: var(--section-fixed-chrome-clearance) 0;
   }
 }
 
@@ -1072,7 +1172,7 @@ body {
 @media (max-width: 480px) {
   .section--feedback {
     min-height: auto;
-    padding-block: var(--space-10);
+    padding-block: var(--section-fixed-chrome-clearance) 0;
   }
 
   .feedback__inner {
@@ -1081,13 +1181,6 @@ body {
 
 }
 
-/* ─── desktop: ≥ 1025px ────────────────────────────────────────
-   Feedback should read as one horizontal row on large and xl screens. */
-@media (min-width: 1025px) {
-  .feedback__quotes {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
 
 /* ─── large ≥ 1440px ────────────────────────────────────────────────
    Work section two-column split: skip col 1, text cols 2–8 (7 cols),
