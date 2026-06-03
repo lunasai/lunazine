@@ -110,10 +110,10 @@ Hardcoded `px` values allowed only when no token fits — add a `/* no token */`
 .element:focus-visible {
   outline: 2px solid var(--color-accent-bg);
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-focus);
 }
 ```
-Required on every `<a>`, `<button>`, and focusable element. Elements on accent surfaces may use `var(--color-neutral-fg-on-accent)` instead.
+Required on every `<a>`, `<button>`, and focusable element. Elements on accent surfaces may use `var(--color-neutral-fg-on-accent)` instead. `--radius-focus` aliases `--radius-chip-pill` (full pill caps).
 
 **Opacity floors** — never go below these on text-bearing elements:
 
@@ -130,7 +130,7 @@ Required on every `<a>`, `<button>`, and focusable element. Elements on accent s
 }
 ```
 
-**Border radius:** `--radius-sm` (2px) for focus rings and chips; `--radius-md` (4px) where a softer edge is needed.
+**Border radius:** `--radius-focus` (pill) for focus rings; `--radius-sm` (2px) for chips/cards; `--radius-md` (4px) where a softer edge is needed.
 
 ---
 

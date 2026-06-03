@@ -1,0 +1,30 @@
+/*
+  component-tooltip.css
+  Depends on: css/tokens.css
+
+  Shared [data-tooltip] pill — dark surface, light mono label.
+  Positioning (above/below trigger) stays in navbar / bottom components.
+  Show on :hover and :focus-visible (per-component transform rules).
+*/
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-neutral-fg-on-accent);
+  background: var(--color-neutral-fg-strong);
+  border: 1px solid var(--color-base-alpha-300);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tooltip]::after {
+    transition: none;
+  }
+}

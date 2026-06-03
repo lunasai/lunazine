@@ -68,9 +68,13 @@ body {
   font-size: var(--typography-mono);
   letter-spacing: var(--letter-spacing-mono);
   text-decoration: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-focus);
   outline: 2px solid var(--color-accent-fg);
   outline-offset: 2px;
+}
+
+.skip-link:focus-visible {
+  top: var(--spacing-margin);
 }
 
 .skip-link:focus {
@@ -114,6 +118,11 @@ body {
    grid --spacing-margin may grow to 80px on x-large). Transparent —
    page scrolls behind.
    ────────────────────────────────────────────────────────────── */
+
+/* Wrapper has no layout effect — header/footer stay position:fixed */
+.site-chrome {
+  display: contents;
+}
 
 .site-header,
 .site-footer {
@@ -196,8 +205,7 @@ body {
 
    Intro is CSS-only (load animation) and not included here.
 
-   Duration is a custom property so preview-link underlines (component-hover-preview.css)
-   can wait until after this fade finishes — clearer hover affordance.
+   Duration is a custom property (used by scroll-reveal timing elsewhere on the page).
    ────────────────────────────────────────────────────────── */
 
 :root {
@@ -270,8 +278,6 @@ body {
   }
 
   .intro__name {
-    animation: none;
-    text-decoration-color: var(--color-accent-fg);
     color: var(--color-accent-fg);
   }
 }
@@ -373,30 +379,10 @@ body {
   margin: 0;
 }
 
-/* "luna" name: dotted underline matches .hover-preview-link (keeps parity when tuning thickness). */
-@keyframes intro-name-underline-reveal {
-  from {
-    text-decoration-color: transparent;
-  }
-  to {
-    text-decoration-color: var(--color-accent-fg);
-  }
-}
-
-/* Underlined name — dotted accent underline that fades in after title animation */
+/* Hero name — accent colour; thumbnail + hover card signal preview (no underline) */
 .intro__name {
   color: var(--color-accent-fg);
-  -webkit-text-decoration-line: underline;
-  text-decoration-line: underline;
-  -webkit-text-decoration-style: dotted;
-  text-decoration-style: dotted;
-  text-decoration-thickness: 4%;
-  text-underline-offset: 8.75%;
-  text-decoration-color: transparent;
-  animation: intro-name-underline-reveal 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: calc(
-    var(--intro-reveal-delay, 348ms) + var(--intro-reveal-duration, 812ms) + 100ms
-  );
+  text-decoration: none;
 }
 
 /* ─── Work sections ──────────────────────────────────────────── */
@@ -1156,6 +1142,12 @@ body {
 
 .thanks__pong-link:hover {
   opacity: 0.65;
+}
+
+.thanks__pong-link:focus-visible {
+  outline: 2px solid var(--color-accent-bg);
+  outline-offset: 3px;
+  border-radius: var(--radius-focus);
 }
 
 .thanks__title {

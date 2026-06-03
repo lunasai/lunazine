@@ -173,7 +173,7 @@
 .rotating-metric__pause:focus-visible {
   outline: 2px solid var(--color-accent-bg);
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-focus);
   opacity: 1;
   visibility: visible;
   pointer-events: auto;

@@ -1,6 +1,6 @@
 /*
   component-navbar.css
-  Depends on: css/tokens.css
+  Depends on: css/tokens.css, css/component-tooltip.css
   Primary nav (work / about): `a.button.button--chrome` plus css/component-button.css
 */
 
@@ -41,34 +41,16 @@
 }
 
 .navbar__logo-mark[data-tooltip]::after {
-  content: attr(data-tooltip);
   position: absolute;
   top: calc(100% + var(--space-2));
   left: 0;
   transform: translateY(-2px);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--color-neutral-fg);
-  background: var(--color-neutral-opacity-strong);
-  border: 1px solid var(--color-neutral-stroke-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-1) var(--space-2);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.navbar__logo-mark[data-tooltip]:hover::after {
+.navbar__logo-mark[data-tooltip]:hover::after,
+.navbar__logo-mark[data-tooltip]:focus-visible::after {
   opacity: 1;
   transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .navbar__logo-mark[data-tooltip]::after {
-    transition: none;
-  }
 }
 
 .navbar__nav {
@@ -101,7 +83,7 @@
 .navbar__brand:focus-visible {
   outline: 2px solid var(--color-accent-fg);
   outline-offset: 2px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-focus);
 }
 
 /* x-small viewport (--screen-x-small: 480px; literals required in @media) */

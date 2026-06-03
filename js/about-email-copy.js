@@ -9,15 +9,44 @@
     return Number.isFinite(n) && n > 0 ? n : DEFAULT_MS;
   }
 
+  function initFeedbackA11y(control) {
+    if (!control.hasAttribute("data-default-aria-label")) {
+      control.setAttribute(
+        "data-default-aria-label",
+        control.getAttribute("aria-label") || ""
+      );
+    }
+    control.setAttribute("aria-live", "polite");
+  }
+
+  function announceFeedback(control, message) {
+    control.setAttribute("aria-label", message);
+  }
+
+  function restoreFeedbackA11y(control) {
+    var defaultLabel = control.getAttribute("data-default-aria-label");
+    if (defaultLabel != null) {
+      control.setAttribute("aria-label", defaultLabel);
+    }
+  }
+
+  function feedbackMessage(labelEl, fallback) {
+    if (!labelEl) return fallback;
+    var text = labelEl.textContent.trim();
+    return text || fallback;
+  }
+
   /* Clipboard · Figma status=feedback (thumb + copied) */
   document.querySelectorAll(".js-copy-email").forEach(function (btn) {
     var email = (btn.getAttribute("data-email") || "").trim();
     var feedbackFace = btn.querySelector(".button__face--feedback");
     if (!feedbackFace) return;
 
+    initFeedbackA11y(btn);
+
     var labelEl = feedbackFace.querySelector(".button__feedback-label");
-    var okLabel = labelEl ? labelEl.textContent.trim() : "copied";
-    var errorLabel = btn.getAttribute("data-feedback-error") || "couldn't copy";
+    var okLabel = labelEl ? labelEl.textContent.trim() : "Copied";
+    var errorLabel = btn.getAttribute("data-feedback-error") || "Couldn't copy";
     var restoreTimer;
 
     btn.addEventListener("click", async function () {
@@ -32,9 +61,12 @@
       }
 
       btn.classList.add("is-feedback");
+      announceFeedback(btn, feedbackMessage(labelEl, okLabel));
+
       restoreTimer = window.setTimeout(function () {
         btn.classList.remove("is-feedback");
         if (labelEl) labelEl.textContent = okLabel;
+        restoreFeedbackA11y(btn);
       }, feedbackDuration(btn));
     });
   });
@@ -44,9 +76,11 @@
     var feedbackFace = link.querySelector(".button__face--feedback");
     if (!feedbackFace || link.tagName !== "A") return;
 
+    initFeedbackA11y(link);
+
     var labelEl = feedbackFace.querySelector(".button__feedback-label");
-    var okLabel = labelEl ? labelEl.textContent.trim() : "downloaded";
-    var errorLabel = link.getAttribute("data-feedback-error") || "couldn't download";
+    var okLabel = labelEl ? labelEl.textContent.trim() : "Downloaded";
+    var errorLabel = link.getAttribute("data-feedback-error") || "Couldn't download";
     var restoreTimer;
 
     function showFeedback(success) {
@@ -54,9 +88,15 @@
       if (labelEl) labelEl.textContent = success ? okLabel : errorLabel;
 
       link.classList.add("is-feedback");
+      announceFeedback(
+        link,
+        feedbackMessage(labelEl, success ? okLabel : errorLabel)
+      );
+
       restoreTimer = window.setTimeout(function () {
         link.classList.remove("is-feedback");
         if (labelEl) labelEl.textContent = okLabel;
+        restoreFeedbackA11y(link);
       }, feedbackDuration(link));
     }
 

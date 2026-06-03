@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="./css/tokens.css" />
     <link rel="stylesheet" href="./css/grid.css" />
 
+    <link rel="stylesheet" href="./css/component-tooltip.css" />
     <link rel="stylesheet" href="./css/component-navbar.css" />
     <link rel="stylesheet" href="./css/component-button.css" />
     <link rel="stylesheet" href="./css/component-bottom.css" />
@@ -88,6 +89,8 @@
 
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
+    <!-- Fixed chrome (header + footer): DOM order matches keyboard tab order before <main> content -->
+    <div class="site-chrome">
     <!-- ── Fixed header: inset var(--spacing-margin) from top/left/right ── -->
     <div class="site-header">
       <header class="navbar" role="banner" aria-label="Site header">
@@ -110,7 +113,7 @@
       </header>
     </div>
 
-    <!-- ── Fixed footer: inset var(--spacing-margin) from bottom/left/right ── -->
+    <!-- ── Fixed footer: before <main> in DOM so tab order is header nav → footer actions → page content ── -->
     <div class="site-footer">
       <footer class="bottom" aria-label="Footer status bar">
         <button
@@ -121,7 +124,7 @@
           data-tooltip="Tap to copy"
         >
           <span class="button__face button__face--default">Email me</span>
-          <span class="button__face button__face--feedback" aria-live="polite">
+          <span class="button__face button__face--feedback">
             <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
               <use href="#figma-pixel-hand-awesome"></use>
             </svg>
@@ -138,7 +141,7 @@
           aria-label="Download CV as PDF"
         >
           <span class="button__face button__face--default">Download CV</span>
-          <span class="button__face button__face--feedback" aria-live="polite">
+          <span class="button__face button__face--feedback">
             <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
               <use href="#figma-pixel-hand-awesome"></use>
             </svg>
@@ -147,6 +150,7 @@
         </a>
       </footer>
     </div>
+    </div><!-- /.site-chrome -->
 
     <!-- ── Scrollable content ── -->
     <main class="site" aria-label="Portfolio" id="main-content">
@@ -318,7 +322,7 @@
                     </svg>
                     Download CV
                   </span>
-                  <span class="button__face button__face--feedback" aria-live="polite">
+                  <span class="button__face button__face--feedback">
                     <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
                       <use href="#figma-pixel-hand-awesome"></use>
                     </svg>
@@ -337,7 +341,7 @@
                     </svg>
                     Get in touch
                   </span>
-                  <span class="button__face button__face--feedback" aria-live="polite">
+                  <span class="button__face button__face--feedback">
                     <svg class="button__feedback-thumb" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
                       <use href="#figma-pixel-hand-awesome"></use>
                     </svg>
@@ -408,6 +412,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js" defer></script>
+    <script src="./js/site-keyboard.js" defer></script>
     <script src="./js/nav-about-anchor.js" defer></script>
     <script src="./js/lenis-smooth-scroll.js" defer></script>
     <script src="./js/work-pin-scrolltrigger.js" defer></script>

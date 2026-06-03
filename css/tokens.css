@@ -317,7 +317,11 @@
   /* ── Border radius ───────────────────────────────────────────*/
   --radius-sm: 2px;
   --radius-md: 4px;
-  --radius-chip-pill: 32px; /* Figma button hover capsule (625:15847) */
+  --radius-chip-pill: 32px; /* legacy pill cap — prefer ellipse hover in component-button */
+  --radius-focus: var(--radius-chip-pill); /* focus rings — full pill caps on controls + links */
+  --radius-control-hover-ellipse: 50%; /* stretched oval on chrome / CTA hover (border-radius shorthand) */
+  --control-ellipse-outset-x: 8px;     /* ::before bleeds past label L/R */
+  --control-ellipse-inset-y: 3px;      /* shaves top/bottom — flatter oval */
 
   /* ── Overlay scrim ───────────────────────────────────────────*/
   --overlay: rgba(0, 0, 0, 0.40);

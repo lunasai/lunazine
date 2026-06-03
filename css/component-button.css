@@ -5,9 +5,9 @@
   Variants:
   - `.button` — base mono control; `:hover` uses accent fill (legacy / previews).
   - `.button.button--chrome` — header/footer / primary nav — Figma dark: idle #d9d9d9
-      (--color-chrome-muted-fg) · hover capsule (--color-control-pill-hover-*).
+      (--color-chrome-muted-fg) · hover stretched ellipse (--color-control-pill-hover-*).
   - `.button.button--cta` — about-row + timeline icon links · dark idle (--color-chrome-muted-fg);
-      hover pill same capsule tokens · optional feedback face.
+      hover ellipse same tokens · optional feedback face.
   - `.button--accent` — accent text / preview filler (see previews/button.html).
 
   Shared faces — copy / download feedback (Figma streamline-pixel:hand-awesome · 625:18917):
@@ -102,7 +102,34 @@ a.button.button--accent:visited {
 .button:focus-visible {
   outline: 2px solid var(--color-accent-bg);
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-focus);
+}
+
+/* Chrome / CTA: pill focus ring + hover ellipse (keyboard matches pointer).
+   border-radius must be set here — .button.button--chrome { border-radius: 0 } beats .button:focus-visible. */
+.button.button--chrome:focus-visible,
+.button.button--cta:focus-visible {
+  border-radius: var(--radius-focus);
+  outline: 2px solid var(--color-accent-bg);
+  outline-offset: 2px;
+  color: var(--color-control-pill-hover-fg);
+}
+
+.button.button--chrome:focus-visible::before,
+.button.button--cta:focus-visible::before {
+  opacity: 1;
+}
+
+a.button.button--chrome:focus-visible:visited,
+a.button.button--cta:focus-visible:visited {
+  color: var(--color-control-pill-hover-fg);
+}
+
+.button.button--chrome.is-feedback:focus-visible,
+.button.button--cta.is-feedback:focus-visible,
+a.button.button--chrome.is-feedback:focus-visible:visited,
+a.button.button--cta.is-feedback:focus-visible:visited {
+  color: var(--color-neutral-fg);
 }
 
 /* ── Faces (default ↔ feedback swap) ─────────────────────────────────── */
@@ -139,14 +166,40 @@ a.button.button--accent:visited {
   opacity: 0.8; /* matches Figma fill-opacity on glyph */
 }
 
+/* ── Hover ellipse (::before) — shared chrome + CTA ───────────────────── */
+
+.button.button--chrome::before,
+.button.button--cta::before {
+  content: '';
+  position: absolute;
+  top: var(--control-ellipse-inset-y);
+  right: calc(-1 * var(--control-ellipse-outset-x));
+  bottom: var(--control-ellipse-inset-y);
+  left: calc(-1 * var(--control-ellipse-outset-x));
+  border-radius: var(--radius-control-hover-ellipse);
+  background: var(--color-control-pill-hover-bg);
+  opacity: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.button.button--chrome.is-feedback::before,
+.button.button--cta.is-feedback::before {
+  content: none;
+}
+
 /* ── Chrome: navbar + footer controls ─────────────────────────────────── */
 
 .button.button--chrome {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
   box-sizing: border-box;
   height: auto;
   min-height: var(--space-6);
-  /* Figma — padding 0; frame 44×24 is text + intrinsic line-box */
-  padding: 0;
+  /* Padding reserved for stable hover/feedback; negative margin restores Figma alignment (was padding: 0) */
+  padding: var(--space-1) var(--space-2);
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2));
 
   font-family: var(--font-brand);
   font-weight: var(--font-weight-regular);
@@ -154,13 +207,14 @@ a.button.button--accent:visited {
   line-height: 1.18; /* Figma button label */
   letter-spacing: var(--letter-spacing-chrome);
 
+  background: transparent;
   border-radius: 0;
 
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    border-radius 0.15s ease,
-    padding 0.15s ease;
+  transition: color 0.15s ease;
+}
+
+.button.button--chrome::before {
+  transition: opacity 0.15s ease;
 }
 
 a.button.button--chrome:visited {
@@ -168,9 +222,6 @@ a.button.button--chrome:visited {
 }
 
 .button.button--chrome.is-feedback {
-  background: transparent;
-  border-radius: 0;
-  padding: 0;
   color: var(--color-neutral-fg);
 }
 
@@ -179,14 +230,29 @@ a.button.button--chrome.is-feedback:visited {
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .button.button--chrome:not(.is-feedback):hover::before {
+    opacity: 1;
+  }
+
   .button.button--chrome:not(.is-feedback):hover {
-    padding: 0;
-    border-radius: var(--radius-chip-pill);
-    background: var(--color-control-pill-hover-bg);
     color: var(--color-control-pill-hover-fg);
   }
 
   a.button.button--chrome:not(.is-feedback):visited:hover {
+    color: var(--color-control-pill-hover-fg);
+  }
+}
+
+@media (hover: none) {
+  .button.button--chrome:not(.is-feedback):active::before {
+    opacity: 1;
+  }
+
+  .button.button--chrome:not(.is-feedback):active {
+    color: var(--color-control-pill-hover-fg);
+  }
+
+  a.button.button--chrome:not(.is-feedback):visited:active {
     color: var(--color-control-pill-hover-fg);
   }
 }
@@ -200,12 +266,15 @@ a.button.button--chrome.is-feedback:visited {
 /* ── CTA row: icon links (About + panel download · Figma instances 625:18920 / 625:19916) ─ */
 
 .button.button--cta {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
   box-sizing: border-box;
   height: auto;
   min-height: 0;
-  padding-inline: 0;
-  /* Reserve hover pill vertical padding — width still grows on :hover only */
-  padding-block: var(--space-1);
+  /* Inline padding for ellipse; block padding unchanged from original — margin cancels horizontal only */
+  padding: var(--space-1) var(--space-2);
+  margin-inline: calc(-1 * var(--space-2));
 
   justify-content: flex-start;
 
@@ -215,13 +284,15 @@ a.button.button--chrome.is-feedback:visited {
   line-height: 1.18;
   letter-spacing: var(--letter-spacing-chrome);
 
-  /* Idle: icon + label · Hover/Figma: icon hides, pill wraps label only (centered) */
-  transition:
-    background-color 0.38s cubic-bezier(0.25, 0.72, 0.25, 1),
-    color 0.3s cubic-bezier(0.25, 0.72, 0.25, 1),
-    border-radius 0.42s cubic-bezier(0.25, 0.72, 0.25, 1),
-    padding 0.42s cubic-bezier(0.25, 0.72, 0.25, 1),
-    gap 0.42s cubic-bezier(0.25, 0.72, 0.25, 1);
+  background: transparent;
+  border-radius: 0;
+
+  /* Idle: icon + label · Hover: icon fades, ellipse ::before, label stays put */
+  transition: color 0.3s cubic-bezier(0.25, 0.72, 0.25, 1);
+}
+
+.button.button--cta::before {
+  transition: opacity 0.38s cubic-bezier(0.25, 0.72, 0.25, 1);
 }
 
 a.button.button--cta:visited {
@@ -229,9 +300,6 @@ a.button.button--cta:visited {
 }
 
 .button.button--cta.is-feedback {
-  background: transparent;
-  border-radius: 0;
-  padding: 0;
   color: var(--color-neutral-fg);
 }
 
@@ -251,38 +319,22 @@ a.button.button--cta.is-feedback:visited {
   opacity: 1;
   overflow: hidden;
   display: block;
-  transform: translateX(0);
-  transition:
-    max-width 0.42s cubic-bezier(0.25, 0.72, 0.25, 1),
-    opacity 0.34s cubic-bezier(0.25, 0.72, 0.25, 1),
-    transform 0.42s cubic-bezier(0.25, 0.72, 0.25, 1);
+  transition: opacity 0.34s cubic-bezier(0.25, 0.72, 0.25, 1);
 }
 
-.button.button--cta .button__face--default {
-  transition: gap 0.42s cubic-bezier(0.25, 0.72, 0.25, 1);
-}
-
-/* Figma hover: no leading icon, pill shrink-wraps label (text centered in capsule) */
+/* Hover: ellipse behind; icon fades but keeps layout width so label does not shift */
 @media (hover: hover) and (pointer: fine) {
-  .button.button--cta:not(.is-feedback):hover {
-    padding-inline: var(--space-2);
-    border-radius: var(--radius-chip-pill);
-    background: var(--color-control-pill-hover-bg);
-    color: var(--color-control-pill-hover-fg);
-    justify-content: center;
-    gap: 0;
+  .button.button--cta:not(.is-feedback):hover::before {
+    opacity: 1;
   }
 
-  .button.button--cta:not(.is-feedback):hover .button__face--default {
-    justify-content: center;
-    gap: 0;
+  .button.button--cta:not(.is-feedback):hover {
+    color: var(--color-control-pill-hover-fg);
   }
 
   .button.button--cta:not(.is-feedback):hover > svg,
   .button.button--cta:not(.is-feedback):hover .button__face--default > svg {
-    max-width: 0;
     opacity: 0;
-    transform: translateX(-3px);
     pointer-events: none;
   }
 
@@ -291,27 +343,19 @@ a.button.button--cta.is-feedback:visited {
   }
 }
 
-/* Touch-primary: no :hover — mirror pill while pressed */
+/* Touch-primary: no :hover — mirror ellipse while pressed */
 @media (hover: none) {
-  .button.button--cta:not(.is-feedback):active {
-    padding-inline: var(--space-2);
-    border-radius: var(--radius-chip-pill);
-    background: var(--color-control-pill-hover-bg);
-    color: var(--color-control-pill-hover-fg);
-    justify-content: center;
-    gap: 0;
+  .button.button--cta:not(.is-feedback):active::before {
+    opacity: 1;
   }
 
-  .button.button--cta:not(.is-feedback):active .button__face--default {
-    justify-content: center;
-    gap: 0;
+  .button.button--cta:not(.is-feedback):active {
+    color: var(--color-control-pill-hover-fg);
   }
 
   .button.button--cta:not(.is-feedback):active > svg,
   .button.button--cta:not(.is-feedback):active .button__face--default > svg {
-    max-width: 0;
     opacity: 0;
-    transform: translateX(-3px);
     pointer-events: none;
   }
 
@@ -321,32 +365,18 @@ a.button.button--cta.is-feedback:visited {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .button.button--chrome::before,
+  .button.button--cta::before {
+    transition: none;
+  }
+
   .button.button--cta {
     transition: none;
   }
 
   .button.button--cta > svg,
   .button.button--cta .button__face--default svg {
-    transition: none;
-    transform: none;
-  }
-
-  .button.button--cta .button__face--default {
-    transition: none;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
-  .button.button--cta:not(.is-feedback):hover > svg,
-  .button.button--cta:not(.is-feedback):hover .button__face--default > svg {
-    transform: none;
-  }
-}
-
-@media (hover: none) and (prefers-reduced-motion: reduce) {
-  .button.button--cta:not(.is-feedback):active > svg,
-  .button.button--cta:not(.is-feedback):active .button__face--default > svg {
-    transform: none;
+    transition: opacity 0.01ms;
   }
 }
 

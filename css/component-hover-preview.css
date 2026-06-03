@@ -1,16 +1,13 @@
 /*
   css/component-hover-preview.css
-  Hover-preview links: native wavy underline (matches Figma text styles) + floating preview card.
+  Hover-preview links: accent colour + inline thumbnail + floating preview card.
 
   Visual language:
-    · Underline: WAVY `semantic/accent/bg` (`--color-accent-bg`, #5543e4 on dark) — matches Figma work
-      inline links; thickness 4% / offset 8.75%. Intro “luna” underline uses `--color-accent-fg` in main.css.
+    · Work links: accent text only (no underline); thumbnail signals interactivity
+    · Intro “luna” uses accent colour only (main.css)
     · Card: borderless, sharp corners (--radius-sm), dark surface
-    · Motion: preview card scales in; underline colour fades in after scroll-reveal (timing tied to
-      main.css `--scroll-reveal-fade-duration`)
-    · Keyboard: :focus-visible shows underline + ring immediately; JS opens the preview card
+    · Keyboard: :focus-visible ring; JS opens the preview card
     · Touch (coarse pointer): one-time hint when #work enters view (sessionStorage)
-    · Reduced motion: underline colour applies immediately when revealed
 */
 
 /* ── Hover-preview link ─────────────────────────────────────────── */
@@ -22,64 +19,16 @@
   font-weight: var(--font-weight-light);
   font-variation-settings: var(--font-variation-serif);
   color: var(--color-accent-fg);
-
-  -webkit-text-decoration-line: underline;
-  text-decoration-line: underline;
-  -webkit-text-decoration-style: dotted;
-  text-decoration-style: dotted;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 6%;
-  text-underline-offset: 8.75%;
-
-  transition: text-decoration-color 0.48s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: 0s;
+  text-decoration: none;
 }
-
-/* ── Focus (keyboard): ring + underline visible immediately ─────── */
 
 .hover-preview-link:focus-visible {
   outline: 2px solid var(--color-accent-bg);
   outline-offset: 3px;
-  border-radius: var(--radius-sm);
-  text-decoration-color: var(--color-accent-bg);
-  transition-delay: 0s;
+  border-radius: var(--radius-focus);
 }
 
-/* ── Hover: underline visible before parent paragraph is revealed ─ */
-
-@media (hover: hover) and (pointer: fine) {
-  .hover-preview-link:hover {
-    text-decoration-color: var(--color-accent-bg);
-    transition-delay: 0s;
-  }
-}
-
-/* ── After scroll-reveal: accent underline fades in (delayed colour) ─ */
-
-.in-view .hover-preview-link {
-  text-decoration-color: var(--color-accent-bg);
-  transition-delay: calc(var(--scroll-reveal-fade-duration, 500ms) + 100ms);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .in-view .hover-preview-link:hover {
-    transition-delay: 0s;
-  }
-}
-
-/* ── Reduced motion ─────────────────────────────────────────────── */
-
-@media (prefers-reduced-motion: reduce) {
-  .hover-preview-link {
-    transition-duration: 1ms;
-  }
-
-  .in-view .hover-preview-link {
-    transition-delay: 0s;
-  }
-}
-
-/* ── Other preview triggers (hero name; underline stays in main.css) ───────── */
+/* ── Hero preview trigger (intro name) ──────────────────────────── */
 
 .intro__name[data-preview-id] {
   cursor: crosshair;
@@ -89,7 +38,7 @@
 .intro__name[data-preview-id]:focus-visible {
   outline: 2px solid var(--color-accent-fg);
   outline-offset: 3px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-focus);
 }
 
 /* ── Inline thumbnail (injected by hover-preview.js after manifest) ─ */
@@ -102,17 +51,16 @@
   width: fit-content;
   overflow: hidden;
   vertical-align: baseline;
-  margin-left: var(--space-1); /* 4px */
+  margin-left: var(--space-2); /* 8px — gap between trigger word and thumb */
   user-select: none;
   flex-shrink: 0;
-  transform: translateY(var(--thumb-dy, 0px));
-  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(var(--thumb-dx, 0px), var(--thumb-dy, 0px));
   will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hover-preview-thumb {
-    transition: none;
+    transform: none;
   }
 }
 

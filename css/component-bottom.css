@@ -1,6 +1,6 @@
 /*
   component-bottom.css
-  Depends on: css/tokens.css
+  Depends on: css/tokens.css, css/component-tooltip.css
 */
 
 .bottom {
@@ -19,7 +19,21 @@
   color: var(--color-neutral-fg);
 }
 
+/* Chrome buttons keep internal padding; pull the row so labels align with navbar brand edges */
+.site-footer .bottom {
+  margin-inline: calc(-1 * var(--space-2));
+  width: calc(100% + 2 * var(--space-2));
+}
 
+.site-footer .bottom .button.button--chrome {
+  margin-block: calc(-1 * var(--space-1));
+  margin-inline: 0;
+}
+
+.site-footer .bottom .bottom__download.button.button--chrome {
+  margin-left: auto;
+  margin-right: 0;
+}
 
 .bottom__contact {
   flex: 0 0 auto;
@@ -28,34 +42,16 @@
 }
 
 .bottom__contact[data-tooltip]::after {
-  content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + var(--space-2));
   left: 50%;
   transform: translateX(-50%) translateY(2px);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--color-neutral-fg);
-  background: var(--color-neutral-opacity-strong);
-  border: 1px solid var(--color-neutral-stroke-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-1) var(--space-2);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.bottom__contact[data-tooltip]:hover::after {
+.bottom__contact[data-tooltip]:hover::after,
+.bottom__contact[data-tooltip]:focus-visible::after {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bottom__contact[data-tooltip]::after {
-    transition: none;
-  }
 }
 
 .bottom__time {
@@ -66,34 +62,16 @@
 }
 
 .bottom__time[data-tooltip]::after {
-  content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + var(--space-2));
   left: 50%;
   transform: translateX(-50%) translateY(2px);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--color-neutral-fg);
-  background: var(--color-neutral-opacity-strong);
-  border: 1px solid var(--color-neutral-stroke-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-1) var(--space-2);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.bottom__time[data-tooltip]:hover::after {
+.bottom__time[data-tooltip]:hover::after,
+.bottom__time[data-tooltip]:focus-visible::after {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bottom__time[data-tooltip]::after {
-    transition: none;
-  }
 }
 
 /* Retro step-blink on the colon separators — classic digital-clock feel */
@@ -114,7 +92,6 @@
 }
 
 .bottom__download {
-  margin-left: auto;
   flex: 0 0 auto;
 }
 
