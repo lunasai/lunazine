@@ -16,9 +16,10 @@
   var cards  = Array.from(section.querySelectorAll('.feedback-card'));
   var inner  = section.querySelector('.feedback__inner');
   var quotes = section.querySelector('.feedback__quotes');
-  if (cards.length < 2 || !inner || !quotes) return;
+  var block  = section.querySelector('.feedback__block');
+  if (cards.length < 2 || !inner || !quotes || !block) return;
 
-  /* ── Progress bar (injected) ────────────────────────────────────── */
+  /* ── Progress bar (injected inside dark block) ───────────────────── */
 
   var progress = document.createElement('div');
   progress.className = 'feedback__progress';
@@ -27,7 +28,7 @@
   var fill = document.createElement('div');
   fill.className = 'feedback__progress-fill';
   progress.appendChild(fill);
-  quotes.insertAdjacentElement('afterend', progress);
+  block.appendChild(progress);
 
   section.style.setProperty('--feedback-carousel-duration', (DURATION / 1000) + 's');
 
@@ -121,8 +122,8 @@
 
   /* ── Click to advance / go back ─────────────────────────────────── */
 
-  inner.addEventListener('click', function (e) {
-    var rect   = inner.getBoundingClientRect();
+  block.addEventListener('click', function (e) {
+    var rect   = block.getBoundingClientRect();
     var isLeft = e.clientX < rect.left + rect.width / 2;
     var next   = isLeft
       ? (current - 1 + cards.length) % cards.length

@@ -82,6 +82,13 @@ body {
   scroll-margin-top: var(--section-fixed-chrome-clearance);
 }
 
+/* Anchor jumps keep full chrome clearance; section padding can be tighter */
+#work,
+#feedback,
+#about {
+  scroll-margin-top: var(--section-fixed-chrome-clearance);
+}
+
 /* ─── Tag component ─────────────────────────────────────────── */
 .tag {
   display: inline-flex;
@@ -475,21 +482,21 @@ body {
 }
 
 /* Scaled metrics: step down with body at each breakpoint */
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
   .section--work .impact-list__label,
   .section--work .metric-item__text {
     font-size: 18px;
   }
 }
 
-@media (min-width: 481px) and (max-width: 768px) {
+@media (max-width: 1024px) and (min-width: 769px) {
   .section--work .impact-list__label,
   .section--work .metric-item__text {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 
-@media (max-width: 1024px) and (min-width: 769px) {
+@media (max-width: 768px) {
   .section--work .impact-list__label,
   .section--work .metric-item__text {
     font-size: 16px;
@@ -710,6 +717,19 @@ body {
 
 /* ─── Feedback section ───────────────────────────────────────── */
 
+/* Quote/cite sit below about body scale (--typography-quote-body) */
+:root {
+  --typography-feedback-quote: 16px;
+  --typography-feedback-cite:  14px;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --typography-feedback-quote: 14px;
+    --typography-feedback-cite:  12px;
+  }
+}
+
 .section--feedback {
   min-height: 100svh;
   display: flex;
@@ -730,28 +750,66 @@ body {
     column-gap: var(--grid-gutter);
     padding-inline: var(--grid-margin);
     padding-block-start: var(--section-fixed-chrome-clearance);
-    align-items: start;
+    align-items: stretch;
+    background-color: var(--color-neutral-bg);
   }
 
   .section-duo .section--feedback {
     grid-column: 1 / 5;
     min-height: unset;
-    padding: 0 0 var(--space-10);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: transparent;
   }
+
 
   .section-duo .section--about {
     grid-column: 6 / 13;
     /* Reset standalone padding — duo provides top alignment */
     padding-block-start: 0;
     padding-inline: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+  }
+
+  .section-duo .section--about .about__scroll {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section-duo .section--about .page-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Inner page-grids: remove margins and sub-grid so content anchors
      directly to duo column boundaries */
   .section-duo .section--feedback .page-grid,
   .section-duo .section--about .page-grid {
-    display: block;
     padding-inline: 0;
+  }
+
+  /* Stretch the height chain so feedback__block fills to match about body */
+  .section-duo .section--feedback .page-grid {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .section-duo .feedback__inner {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .section-duo .feedback__block {
+    flex: 1;
+    min-height: 0;
   }
 }
 
@@ -759,6 +817,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  flex: 1;
 }
 
 .feedback__title {
@@ -775,16 +834,15 @@ body {
 .feedback__progress {
   width: 100%;
   height: 2px;
-  background-color: var(--color-neutral-bg-elevated);
-  margin-top: var(--space-5); /* 20px above progress bar */
-  margin-bottom: var(--space-8);
+  background-color: rgba(254, 250, 241, 0.2); /* --color-neutral-bg at low opacity */
   overflow: hidden;
+  margin-top: auto;
 }
 
 .feedback__progress-fill {
   height: 100%;
   width: 0%;
-  background-color: var(--color-neutral-fg-strong);
+  background-color: var(--color-neutral-bg);
 }
 
 @keyframes feedback-progress-fill {
@@ -831,11 +889,23 @@ body {
 }
 
 /* Stack all cards on the same grid cell; JS cross-fades between them */
+.feedback__block {
+  flex: 1;
+  background-color: var(--color-neutral-fg-strong);
+  padding: var(--space-10);
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .feedback__quotes {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: auto;
   width: 100%;
+  flex: 1 1 auto;
+  margin-bottom: var(--space-10);
 }
 
 .feedback-card {
@@ -843,6 +913,9 @@ body {
   grid-row: 1;
   min-width: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   color: var(--color-neutral-fg);
   opacity: 0;
   pointer-events: none;
@@ -860,18 +933,15 @@ body {
 }
 
 .feedback-card__quote {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
   margin: 0;
 }
 
 .feedback-card__quote-icon,
 .feedback-card__source-icon {
   flex: 0 0 auto;
-  width: var(--space-4);  /* 16px */
-  height: var(--space-4);
-  color: var(--color-neutral-fg);
+  width: 24px;
+  height: 24px;
+  color: var(--color-neutral-bg);
 }
 
 /* Figma orients pixel:quote-right-solid via −scale-y + rotate; reproduce as 2D transform */
@@ -885,27 +955,26 @@ body {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: var(--font-weight-light);
-  font-size: var(--typography-quote-body);
+  font-size: var(--typography-feedback-quote);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-body);
-  color: var(--color-neutral-fg);
+  color: var(--color-neutral-bg);
 }
 
 .feedback-card__source {
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
-  margin-top: var(--space-2);
 }
 
 .feedback-card__source cite {
   font-family: var(--font-serif);
   font-style: normal;
   font-weight: var(--font-weight-light);
-  font-size: var(--typography-mono);
+  font-size: var(--typography-feedback-cite);
   line-height: var(--line-height-normal);
   letter-spacing: var(--letter-spacing-body);
-  color: var(--color-neutral-fg-muted);
+  color: var(--color-neutral-bg);
 }
 
 /* ─── About section ──────────────────────────────────────────── */
@@ -948,82 +1017,82 @@ body {
 .section--thanks {
   position: relative;
   z-index: 2;
-  /* Transparent so the pixel-pile band (z-index 1) can show through when scrolled to the footer */
+  /* One viewport tall: centered sign-off + pixel pile band at the bottom edge */
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
   background-color: transparent;
-  padding-top: var(--spacing-thanks-padding-top);
-  padding-bottom: calc(var(--space-10) * 2);
+  padding: 0;
   box-sizing: border-box;
+}
+
+.section--thanks > .page-grid {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  align-content: center;
+}
+
+.section--thanks > .pixel-pile-footer {
+  flex-shrink: 0;
 }
 
 .thanks__inner {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: var(--space-6);
+}
+
+.thanks__cat {
+  margin: 0;
+  opacity: 0.4;
+}
+
+.thanks__signoff {
+  margin: 0;
+  margin-top: var(--space-4);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-neutral-fg-muted);
+}
+
+.thanks__pong-link {
+  color: var(--color-accent-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-fg);
+  text-decoration-thickness: 4%;
+  text-underline-offset: 0.2em;
+  transition: opacity 0.15s ease;
+}
+
+.thanks__pong-link:hover {
+  opacity: 0.65;
 }
 
 .thanks__title {
   margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
 }
 
-.thanks__body {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-6);
-}
-
-/* Body paragraph: grows to fill remaining row width */
 .thanks__body-p {
-  flex: 1 1 auto;
-  min-width: 0;
   margin: 0;
+  max-width: 42ch;
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
-  font-size: var(--typography-body-lg);
-  line-height: var(--line-height-body-lg);
-  letter-spacing: var(--letter-spacing-body-lg);
+  font-size: var(--typography-body);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
   color: var(--color-neutral-fg);
-}
-
-/* Desktop row order: body(0) | cat(2) | love-luna(3) */
-.thanks__cat {
-  flex: 0 0 auto;
-  order: 2;
-}
-
-.thanks__signoff {
-  order: 3;
-  flex: 0 0 auto;
-  white-space: nowrap;
-  margin: 0;
-  font-family: var(--font-serif);
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-body-lg);
-  line-height: var(--line-height-body-lg);
-  letter-spacing: var(--letter-spacing-body-lg);
-  color: var(--color-neutral-fg);
-}
-
-/* Mobile: natural HTML order (body / love-luna / cat), cat right-aligned */
-@media (max-width: 768px) {
-  .thanks__body {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .thanks__cat {
-    order: 0;
-    align-self: flex-end;
-  }
-
-  .thanks__signoff {
-    order: 0;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1110,10 +1179,10 @@ body {
 
 
 /* ─── Pixel pile footer ──────────────────────────────────────────
-   End of <main> (document flow), full width. JS inserts a <canvas>
+   Inside .section--thanks (document end). JS inserts a <canvas>
    (position: absolute; bottom: 0) whose height tracks innerHeight;
-   the band grows upward from the footer — only visible when scrolled
-   to the page bottom, not pinned to the viewport.
+   the band grows upward from the section bottom — visible when
+   scrolled to the thanks viewport.
    ──────────────────────────────────────────────────────────────── */
 
 .pixel-pile-footer {
@@ -1124,6 +1193,77 @@ body {
   z-index: 1;
   pointer-events: none;
 }
+
+/* ─── Pong overlay ───────────────────────────────────────────────
+   Fixed full-viewport canvas, sits below fixed chrome (z-index 100)
+   so header and footer remain visible and interactive during play.
+   Activated by js/pong.js adding .pong-active to <body>.
+
+   Transition: overlay fades in (opacity 0→1) while page content
+   (.site) fades out simultaneously. Exit reverses both.
+   visibility delays to hidden only after opacity reaches 0,
+   so pointer-events are off while invisible.
+   ──────────────────────────────────────────────────────────────── */
+
+#pong-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  cursor: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Hidden state */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity      1.5s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility   0s   1.5s;           /* hide only after fade completes */
+}
+
+body.pong-active #pong-overlay {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity      1.5s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility   0s   0s;             /* show immediately */
+}
+
+body.pong-active {
+  overflow: hidden;
+}
+
+/* Page content dissolves as the overlay fades in */
+.site {
+  transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.pong-active .site {
+  opacity: 0;
+}
+
+#pong-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  #pong-overlay {
+    cursor: default;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pong-overlay,
+  body.pong-active #pong-overlay,
+  .site {
+    transition: none;
+  }
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE OVERRIDES
@@ -1142,7 +1282,21 @@ body {
 @media (max-width: 1024px) {
   .section--feedback {
     min-height: unset;
-    padding-block: var(--section-fixed-chrome-clearance) 0;
+    padding-block: var(--space-10) 0;
+  }
+
+  .section--work {
+    padding-top: var(--space-10);
+    padding-bottom: var(--space-10);
+  }
+
+  .section--about {
+    padding-block-start: var(--space-10);
+  }
+
+  /* Gap between stacked feedback and about */
+  .section-duo .section--about {
+    padding-block-start: calc(var(--space-10) * 2);
   }
 }
 
@@ -1157,7 +1311,11 @@ body {
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .section--feedback {
-    padding-block: var(--section-fixed-chrome-clearance) 0;
+    padding-block: var(--space-10) 0;
+  }
+
+  .feedback__block {
+    padding: var(--space-6); /* 24px — less imposing at tablet */
   }
 }
 
@@ -1172,13 +1330,16 @@ body {
 @media (max-width: 480px) {
   .section--feedback {
     min-height: auto;
-    padding-block: var(--section-fixed-chrome-clearance) 0;
+    padding-block: var(--space-10) 0;
+  }
+
+  .feedback__block {
+    padding: var(--space-4); /* 16px — tight for narrow screens */
   }
 
   .feedback__inner {
     gap: var(--space-4);
   }
-
 }
 
 

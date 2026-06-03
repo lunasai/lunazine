@@ -256,8 +256,10 @@
           <div class="col-full feedback__inner">
             <h2 class="feedback__title" id="feedback-heading">What they say</h2>
 
+            <div class="feedback__block">
             <div class="feedback__quotes" role="list" aria-label="Feedback quotes">
               <figure class="feedback-card" role="listitem">
+                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
                 <blockquote class="feedback-card__quote">
                   <p>Luna is a standout designer and leader with a rare combination of strategic thinking, craftsmanship, and execution. Her impact on our design systems and overall design work was significant &mdash; she elevated standards, strengthened foundations, and consistently raised the bar for quality across the team.</p>
                 </blockquote>
@@ -267,6 +269,7 @@
               </figure>
 
               <figure class="feedback-card" role="listitem">
+                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
                 <blockquote class="feedback-card__quote">
                   <p>Luna consistently delivers high-quality work with attention to detail, even when faced with complex challenges. Her ability to manage projects effectively, while maintaining strong relationships with stakeholders, ensures she consistently meets her goals.</p>
                 </blockquote>
@@ -276,6 +279,7 @@
               </figure>
 
               <figure class="feedback-card" role="listitem">
+                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
                 <blockquote class="feedback-card__quote">
                   <p>Luna is truly one of the most dependable and trustworthy people I have the pleasure of working with. Her ability to provide spot-on design advice and navigate complex situations is something I rely on wholeheartedly.</p>
                 </blockquote>
@@ -284,6 +288,7 @@
                 </figcaption>
               </figure>
             </div>
+            </div><!-- /.feedback__block -->
           </div>
         </div>
       </section>
@@ -360,15 +365,13 @@
         </div><!-- /.about__scroll -->
       </section>
 
+      </div><!-- /.section-duo -->
+
       <!-- Thanks / sign-off -->
       <section class="section section--thanks" id="thanks" aria-label="Sign-off">
         <div class="page-grid">
           <div class="col-full thanks__inner">
-            <h2 class="thanks__title">Thanks for the visit.</h2>
-            <div class="thanks__body">
-              <p class="thanks__body-p">If you&rsquo;d like to see more of my work, wanna partner for a project or just chat about design, send me a mail! I&rsquo;d love to hear from you ^^</p>
-              <p class="thanks__signoff">Love, Luna</p>
-              <pre class="about__ascii thanks__cat" aria-hidden="true">
+            <pre class="about__ascii thanks__cat" aria-hidden="true">
        _
        \*-.
         )  _`-.
@@ -384,22 +387,27 @@
          ; '   : :`-:     _.`* ;
 [bug] .*' /  .*' ; .*`- +'  `*'
       `*-*   `*-*  `*-*'
-              </pre>
-            </div>
+            </pre>
+            <h2 class="thanks__title">Thanks for the visit.</h2>
+            <p class="thanks__body-p">If you&rsquo;d like to see more of my work, wanna partner for a project or just chat about design, send me a mail! I&rsquo;d love to hear from you ^^</p>
+            <p class="thanks__signoff">Enough work? <a href="./pong.html" class="thanks__pong-link">Play pong</a></p>
           </div>
         </div>
+        <!-- Pixel pile — sand band anchored to the bottom of this viewport-tall section -->
+        <div class="pixel-pile-footer" aria-hidden="true"></div>
       </section>
 
-      </div><!-- /.section-duo -->
-
-      <!-- Pixel pile — falls from cursor clicks, accumulates as a sand mountain at page bottom -->
-      <div class="pixel-pile-footer" aria-hidden="true"></div>
-
     </main>
+
+    <!-- Pong overlay — fixed, z-index 50, below site chrome (z-index 100) -->
+    <div id="pong-overlay" aria-hidden="true">
+      <canvas id="pong-canvas"></canvas>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js" defer></script>
+    <script src="./js/nav-about-anchor.js" defer></script>
     <script src="./js/lenis-smooth-scroll.js" defer></script>
     <script src="./js/work-pin-scrolltrigger.js" defer></script>
     <script src="./js/hover-preview.js" defer></script>
@@ -412,6 +420,7 @@
     <script src="./js/grid-overlay.js" defer></script>
     <script src="./js/metric-proximity.js" defer></script>
     <script src="./js/feedback-carousel.js" defer></script>
+    <script src="./js/pong.js" defer></script>
 
   </body>
 </html>
