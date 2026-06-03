@@ -325,18 +325,18 @@ body {
   text-wrap: pretty;
 }
 
-/* Two-paragraph title structure: greeting + headline */
+/* Single flowing statement: greeting (light) — headline (semibold) soul. (italic) */
 .intro__title p {
   margin: 0;
 }
 
-.intro__title p.intro__title-greeting {
-  margin-bottom: var(--space-6); /* 24px gap between greeting and headline */
+.intro__title-em {
+  font-style: italic;
 }
 
 .intro__title {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-intro-headline);
   /* Figma: intro headline size is decoupled from section typography/title;
      line-height follows flowing hero copy (leading-none in file). */
@@ -398,15 +398,16 @@ body {
 
 /* ─── Work sections ──────────────────────────────────────────── */
 
-/* Section heading — full-width, sits directly in the 12-col grid */
+/* Section label — small mono folio marker, not a display heading */
 .work__title {
-  margin: 0 0 var(--space-10) 0;
-  font-family: var(--font-serif);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--typography-title);
-  line-height: var(--line-height-title);
-  letter-spacing: var(--letter-spacing-tight);
-  color: var(--color-neutral-fg);
+  grid-column: 1 / span 12;
+  margin: 0 0 var(--space-6) 0;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-neutral-fg-muted);
 }
 
 /* Vertical stack of project subsections */
@@ -436,20 +437,132 @@ body {
 }
 
 .work__project__grid-row--body .work__body {
-  grid-column: 3 / span 8;
+  grid-column: 1 / -1;
   min-width: 0;
 }
 
 .work__project__grid-row--impact .work__project__impact {
-  grid-column: 9 / span 4;
+  grid-column: 1 / -1;
   width: 100%;
   min-width: 0;
 }
 
+@media (min-width: 1025px) {
+  .work__projects {
+    grid-column: 4 / -1;
+    gap: 120px;
+  }
+}
+
 @media (max-width: 1024px) {
+  .work__title,
+  .work__projects,
   .work__project__grid-row--body .work__body,
   .work__project__grid-row--impact .work__project__impact {
     grid-column: 1 / -1;
+  }
+
+  .work__body {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .work__body {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .work__body {
+    font-size: 22px;
+  }
+}
+
+/* Scaled metrics: step down with body at each breakpoint */
+@media (min-width: 769px) {
+  .section--work .impact-list__label,
+  .section--work .metric-item__text {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .section--work .impact-list__label,
+  .section--work .metric-item__text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .section--work .impact-list__label,
+  .section--work .metric-item__text {
+    font-size: 16px;
+  }
+}
+
+/* Full-width bar style — block stretches to fill row, text right-aligned */
+.section--work .metric-item {
+  position: relative;
+  overflow: hidden;
+  gap: var(--space-4);
+}
+
+.section--work .metric-item__block {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  height: 20px;
+  background-color: var(--color-neutral-fg-strong);
+}
+
+/* Sweep originates from the left edge of the bar — bar + text are one unit */
+.section--work .metric-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-neutral-fg-strong);
+  transform: scaleX(0);
+  transform-origin: left center;
+  /* Exit: slow retreat with a brief hold so it doesn't snap away */
+  transition: transform 550ms cubic-bezier(0.25, 1, 0.5, 1) 60ms;
+  z-index: 0;
+}
+
+/* Sit text above the sweep layer; disable the old text-level fill */
+.section--work .metric-item__text {
+  position: relative;
+  z-index: 1;
+  /* Exit: text snaps back before fill fully retreats */
+  transition: color 100ms ease;
+}
+
+.section--work .metric-item__text::before {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* Enter: springy fill from the bar edge */
+  .section--work .metric-item.is-near::before,
+  .section--work .metric-item:hover::before {
+    transform: scaleX(1);
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Enter: text waits for fill to arrive before inverting */
+  .section--work .metric-item.is-near .metric-item__text,
+  .section--work .metric-item:hover .metric-item__text {
+    color: var(--color-neutral-bg);
+    transition: color 140ms ease 240ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section--work .metric-item::before {
+    transition: none;
+  }
+  .section--work .metric-item__text {
+    transition: none;
   }
 }
 
@@ -505,12 +618,12 @@ body {
   flex: 1 1 auto;
 }
 
-/* Project copy: body type scale (not section headings) */
+/* Project copy — editorial display scale on large, steps down responsively */
 .work__body {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
-  font-size: var(--typography-body-md);
-  line-height: var(--line-height-normal);
+  font-size: 40px;
+  line-height: var(--line-height-body-lg); /* 1.4 — more open at display size */
   letter-spacing: var(--letter-spacing-body-md);
   color: var(--color-neutral-fg);
 }
@@ -625,7 +738,7 @@ body {
   /* Figma 554:27378 gap 24px; pad clears descenders below lh 0.9 vs the fixed title frame */
   padding-bottom: var(--space-2);
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
@@ -749,7 +862,7 @@ body {
 .thanks__title {
   margin: 0;
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
@@ -829,7 +942,7 @@ body {
 
 .about__label {
   font-family: var(--font-serif);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-light);
   font-size: var(--typography-title);
   line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);

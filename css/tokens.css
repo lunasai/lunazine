@@ -159,8 +159,8 @@
   ────────────────────────────────────────────────────────────── */
   /* Body / heading serif — Fraunces variable (WONK axis enabled via font-variation-settings) */
   --font-serif: 'Fraunces', Georgia, serif;
-  /* Fixed chrome (navbar + footer) — Montagu Slab brand identity font */
-  --font-brand: 'Montagu Slab', Georgia, serif;
+  /* Fixed chrome (navbar + footer) — Fraunces, unified with body/display */
+  --font-brand: var(--font-serif);
   --font-glyph-jp: 'Noto Sans JP', sans-serif;
   --font-glyph-arrow: 'Noto Sans Math', sans-serif;
   --font-mono:  'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -187,7 +187,7 @@
      Figma unitless multipliers.
   ────────────────────────────────────────────────────────────── */
   --line-height-tight:  1.2;    /* display                                */
-  --line-height-title:  0.9;    /* title — 90% (Figma title style)        */
+  --line-height-title:  1.0;    /* title — tightened but safe for wrapping */
   --line-height-body-lg: 1.4;   /* body-lg                               */
   --line-height-normal:  1.38;  /* body-md, body-sm, mono                */
 
@@ -199,11 +199,11 @@
      body-sm   0 % →  0em
      mono     −4 % → −0.04em
   ────────────────────────────────────────────────────────────── */
-  --letter-spacing-tight:   -0.03em; /* section headings / title style (−3%)  */
-  --letter-spacing-body-lg: -0.03em; /* body-lg                     */
-  --letter-spacing-body-md: -0.03em; /* body-md                     */
-  --letter-spacing-body:    -0.03em; /* body-sm, link                */
-  --letter-spacing-mono:    -0.04em; /* Space Mono (Figma −4 %)     */
+  --letter-spacing-tight:   -0.03em; /* display / title — compensates loose large-type spacing */
+  --letter-spacing-body-lg: -0.01em; /* body-lg — slight tightening, readable at 32px         */
+  --letter-spacing-body-md: -0.01em; /* body-md — slight tightening, readable at 24px         */
+  --letter-spacing-body:    -0.01em; /* body-sm, link, quote, about                           */
+  --letter-spacing-mono:    -0.04em; /* Space Mono (Figma −4 %)                               */
   --letter-spacing-chrome:  -0.04em; /* Header / footer (Figma −4 %) */
 
   /* Fixed chrome (navbar + bottom bar): Montagu Slab 14px — size tracks --typography-mono */
@@ -253,14 +253,14 @@
 
 :root {
   --typography-display:      80px;
-  /* Section headings — Figma typography/title on desktop frames */
-  --typography-title:        140px;
+  /* Section headings — reduced from original 96px to tighten scale ratio vs body */
+  --typography-title:        72px;
   /*
    * Intro hero (“hi, I'm luna …”) — hard-coded separately in Figma from
    * typography/title (64px ≥769px / 32px ≤768px).
    */
-  --typography-intro-headline: 64px;
-  --typography-body-lg:      32px;
+  --typography-intro-headline: 80px;
+  --typography-body-lg:      24px;
   --typography-body:         var(--typography-body-lg); /* backward-compat alias */
   --typography-body-md:      24px;
   --typography-body-sm:      20px;
@@ -336,7 +336,8 @@
 @media (max-width: 1024px) {
   :root {
     --typography-display:  72px;
-    --typography-title:    96px;
+    --typography-title:    60px;
+    --typography-intro-headline: 80px; /* hero stays bold on tablet */
     --typography-body-lg:  20px;
     --typography-body-md:  20px;
     --typography-body-sm:  16px;
@@ -351,7 +352,7 @@
 @media (max-width: 768px) {
   :root {
     --typography-display:   64px;
-    --typography-intro-headline: 32px;
+    --typography-intro-headline: 64px;
     /* --typography-title    stays 96px */
     /* --typography-body-*   inherited from ≤1024 */
     /* --typography-mono     stays 14px */
@@ -365,8 +366,8 @@
 @media (max-width: 480px) {
   :root {
     --typography-display:   48px;
-    --typography-title:     80px;
-    /* --typography-intro-headline stays 32px */
+    --typography-title:     48px;
+    --typography-intro-headline: 52px;
     /* --typography-body-*   inherited from ≤1024 */
     /* --typography-mono     stays 14px */
     /* --typography-footnote stays 10px */
@@ -378,7 +379,7 @@
 @media (min-width: 1920px) {
   :root {
     --typography-display:  88px;
-    --typography-title:    140px;
+    --typography-title:    88px;
     --typography-footnote: 14px;
     --spacing-margin:      80px;
     --spacing-chrome-inset: var(--space-10); /* 40px — grid margin grows; chrome stays large-desktop */

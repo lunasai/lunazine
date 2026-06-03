@@ -86,7 +86,23 @@
       wrap.setAttribute('aria-hidden', 'true');
       wrap.appendChild(img);
 
-      el.insertAdjacentElement('afterend', wrap);
+      /* Split the last word so only it + the thumbnail are no-wrap.
+         Preceding words remain free to wrap normally in the paragraph. */
+      var raw       = el.textContent.trim();
+      var lastSpace = raw.lastIndexOf(' ');
+      var lastWord  = lastSpace >= 0 ? raw.slice(lastSpace + 1) : raw;
+      var preceding = lastSpace >= 0 ? raw.slice(0, lastSpace)  : '';
+
+      el.textContent = '';
+      if (preceding) {
+        el.appendChild(document.createTextNode(preceding + ' '));
+      }
+
+      var noWrap = document.createElement('span');
+      noWrap.style.whiteSpace = 'nowrap';
+      noWrap.appendChild(document.createTextNode(lastWord));
+      noWrap.appendChild(wrap);
+      el.appendChild(noWrap);
 
       thumbPairs.push({ el: el, wrap: wrap });
 
