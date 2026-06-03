@@ -1258,23 +1258,20 @@ body {
   color: var(--color-neutral-fg-muted);
 }
 
-.thanks__pong-link {
-  color: var(--color-accent-fg);
-  text-decoration: underline;
-  text-decoration-color: var(--color-accent-fg);
-  text-decoration-thickness: 4%;
-  text-underline-offset: 0.2em;
-  transition: opacity 0.15s ease;
-}
-
-.thanks__pong-link:hover {
-  opacity: 0.65;
-}
-
-.thanks__pong-link:focus-visible {
-  outline: 2px solid var(--color-accent-bg);
-  outline-offset: 3px;
-  border-radius: var(--radius-focus);
+/* Sign-off mono type; inline baseline + padding for chrome-sized ellipse */
+.thanks__signoff .thanks__pong-link {
+  display: inline;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: inherit;
+  letter-spacing: var(--letter-spacing-mono);
+  height: auto;
+  min-height: 0;
+  padding: var(--space-1) var(--space-2);
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2));
+  text-decoration: none;
+  vertical-align: baseline;
 }
 
 .thanks__title {

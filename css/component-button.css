@@ -263,6 +263,37 @@ a.button.button--chrome.is-feedback:visited {
   }
 }
 
+/* Chrome outline — accent stroke ellipse (e.g. thanks Play pong) */
+.button.button--chrome.button--chrome-outline::before {
+  background: transparent;
+  border: 1px solid var(--color-accent-bg);
+  box-sizing: border-box;
+}
+
+a.button.button--chrome.button--chrome-outline,
+a.button.button--chrome.button--chrome-outline:visited {
+  color: var(--color-accent-fg);
+}
+
+.button.button--chrome.button--chrome-outline:focus-visible,
+a.button.button--chrome.button--chrome-outline:focus-visible:visited {
+  color: var(--color-accent-fg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button.button--chrome.button--chrome-outline:not(.is-feedback):hover,
+  a.button.button--chrome.button--chrome-outline:not(.is-feedback):visited:hover {
+    color: var(--color-accent-fg);
+  }
+}
+
+@media (hover: none) {
+  .button.button--chrome.button--chrome-outline:not(.is-feedback):active,
+  a.button.button--chrome.button--chrome-outline:not(.is-feedback):visited:active {
+    color: var(--color-accent-fg);
+  }
+}
+
 /* ── CTA row: icon links (About + panel download · Figma instances 625:18920 / 625:19916) ─ */
 
 .button.button--cta {

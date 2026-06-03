@@ -1,5 +1,6 @@
 /**
- * Thanks ASCII cat — motion in view only; eye blinks every 30s.
+ * Thanks ASCII cat — motion in view only; eye blinks every 15s.
+ * Blinks 2s after the section enters view, then every 15s.
  */
 
 (function () {
@@ -12,7 +13,8 @@
   var section = document.getElementById("thanks");
   if (!cat || !eye || !section) return;
 
-  var BLINK_INTERVAL_MS = 30000;
+  var BLINK_INITIAL_DELAY_MS = 2000;
+  var BLINK_INTERVAL_MS = 15000;
   var blinkTimer = null;
 
   function clearBlinkTimer() {
@@ -22,24 +24,28 @@
     }
   }
 
-  function scheduleBlink() {
+  function triggerBlink() {
+    if (!cat.classList.contains("is-in-view")) return;
+
+    eye.classList.remove("is-blinking");
+    void eye.offsetWidth;
+    eye.classList.add("is-blinking");
+  }
+
+  function scheduleBlink(delayMs) {
     clearBlinkTimer();
     if (!cat.classList.contains("is-in-view")) return;
 
     blinkTimer = window.setTimeout(function () {
       blinkTimer = null;
-      if (!cat.classList.contains("is-in-view")) return;
-
-      eye.classList.remove("is-blinking");
-      void eye.offsetWidth;
-      eye.classList.add("is-blinking");
-    }, BLINK_INTERVAL_MS);
+      triggerBlink();
+    }, delayMs);
   }
 
   eye.addEventListener("animationend", function (event) {
     if (event.animationName !== "thanks-cat-eye-blink") return;
     eye.classList.remove("is-blinking");
-    scheduleBlink();
+    scheduleBlink(BLINK_INTERVAL_MS);
   });
 
   var observer = new IntersectionObserver(
@@ -47,7 +53,7 @@
       entries.forEach(function (entry) {
         cat.classList.toggle("is-in-view", entry.isIntersecting);
         if (entry.isIntersecting) {
-          scheduleBlink();
+          scheduleBlink(BLINK_INITIAL_DELAY_MS);
         } else {
           clearBlinkTimer();
           eye.classList.remove("is-blinking");
