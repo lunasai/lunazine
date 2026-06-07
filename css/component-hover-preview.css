@@ -50,17 +50,17 @@
   max-height: var(--space-10); /* 40px — caps oversized display-text triggers */
   width: fit-content;
   overflow: hidden;
-  vertical-align: baseline;
+  vertical-align: middle;
   margin-left: var(--space-2); /* 8px — gap between trigger word and thumb */
   user-select: none;
   flex-shrink: 0;
-  transform: translate(var(--thumb-dx, 0px), var(--thumb-dy, 0px));
+  /* transform written directly by JS (mouse parallax); no CSS default needed */
   will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hover-preview-thumb {
-    transform: none;
+    transform: none !important;
   }
 }
 

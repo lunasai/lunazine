@@ -35,25 +35,39 @@
   var manifest        = null;
   var manifestPending = [];
 
-  /* ── Inline thumbnails ────────────────────────────────────────────
+  /* ── Inline thumbnail parallax (mouse + scroll) ──────────────────
      After the manifest resolves, inject a <img> wrapped in a <span>
      as a sibling immediately after every [data-preview-id] element.
-     Red monotone is applied via CSS filter (see component-hover-preview.css).
-     Scroll-driven micro-parallax displaces each thumbnail from the viewport
-     centre (vertical + per-link horizontal jitter from preview id).
+     Red monotone is applied via CSS (component-hover-preview.css).
+
+     Two additive contributions per frame:
+       Mouse  — lateral X+Y drift relative to #work section centre.
+       Scroll — vertical Y drift as the link moves through the viewport
+                (link at centre → 0; at top/bottom edge → ±SCROLL_MAX).
+
+     Each thumbnail has its own depth (0.6–1.4) so all five move at
+     slightly different rates — the stereo offset reads as physical depth.
+     Motion is lerped (factor 0.04) for a smooth, organic feel.
+     No idle bob — inline elements bobbing reads as a bug.
+     Entirely disabled under prefers-reduced-motion.
   ─────────────────────────────────────────────────────────────────── */
 
-  var THUMB_PARALLAX_RANGE_Y = 12; /* max vertical px (centre → edge) */
-  var THUMB_PARALLAX_RANGE_X = 4; /* horizontal cap before gain; sign per preview id */
-  var THUMB_PARALLAX_X_GAIN  = 0.28; /* horizontal follows scroll more weakly than vertical */
+  var THUMB_PARALLAX_MOUSE  = 4; /* max mouse drift px at depth 1 (X + Y) */
+  var THUMB_PARALLAX_SCROLL = 6; /* max scroll drift px at depth 1 (Y only) */
+  var THUMB_LERP            = 0.04; /* lerp factor — responsive but soft */
 
-  /** Array of { el, wrap, parallaxX } — populated by injectThumbs */
-  var thumbPairs = [];
+  /** @type {Array<{ el, wrap, depth, currentX, currentY }>} */
+  var thumbPairs       = [];
+  var thumbMotionRafId = null;
+  var thumbWorkVisible = false;
+  var thumbWorkSection = null;
+  var thumbNormMouseX  = 0;
+  var thumbNormMouseY  = 0;
 
-  var thumbScrollRafId = null;
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /** Stable −1…1 jitter per preview id (same link always drifts the same way). */
-  function parallaxJitterFromId(id) {
+  /** Stable −1…1 value derived from id + seed suffix. */
+  function stableFromId(id) {
     var h = 0;
     for (var i = 0; i < id.length; i++) {
       h = ((h << 5) - h + id.charCodeAt(i)) | 0;
@@ -61,28 +75,60 @@
     return (h % 201 - 100) / 100;
   }
 
-  function updateThumbParallax() {
-    var vh = window.innerHeight;
-    var center = vh / 2;
-    thumbPairs.forEach(function (pair) {
-      var rect = pair.el.getBoundingClientRect();
-      var elCenter  = rect.top + rect.height / 2;
-      /* normalised distance from viewport centre: -1 (top) → 0 (centre) → 1 (bottom) */
-      var n = Math.max(-1, Math.min(1, (elCenter - center) / center));
-      pair.wrap.style.setProperty('--thumb-dy', (n * THUMB_PARALLAX_RANGE_Y).toFixed(2) + 'px');
-      pair.wrap.style.setProperty(
-        '--thumb-dx',
-        (n * THUMB_PARALLAX_X_GAIN * pair.parallaxX).toFixed(2) + 'px'
-      );
+  /** Depth 0.6–1.4 — each thumb drifts at a different rate for stereo parallax. */
+  function depthFromId(id) {
+    return 0.6 + (stableFromId(id + ':d') + 1) / 2 * 0.8;
+  }
+
+  /* Pointer tracker — normalised to #work section centre (roughly −1…1). */
+  function onThumbPointerMove(e) {
+    if (!thumbWorkSection) return;
+    var rect    = thumbWorkSection.getBoundingClientRect();
+    var hw      = rect.width  / 2;
+    var hh      = rect.height / 2;
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    thumbNormMouseX = hw > 0 ? (clientX - (rect.left + hw)) / hw : 0;
+    thumbNormMouseY = hh > 0 ? (clientY - (rect.top  + hh)) / hh : 0;
+  }
+
+  /* Continuous lerp loop — only alive when #work is in the viewport. */
+  function runThumbLoop() {
+    if (!thumbWorkVisible || prefersReducedMotion) { thumbMotionRafId = null; return; }
+
+    thumbMotionRafId = requestAnimationFrame(function () {
+      if (!thumbWorkVisible || prefersReducedMotion) { thumbMotionRafId = null; return; }
+
+      var vh = window.innerHeight;
+
+      thumbPairs.forEach(function (pair) {
+        /* Scroll: normalised distance of link centre from viewport centre (-1…1) */
+        var elRect     = pair.el.getBoundingClientRect();
+        var scrollNorm = Math.max(-1, Math.min(1,
+          (elRect.top + elRect.height / 2 - vh / 2) / (vh / 2)
+        ));
+
+        var tx = thumbNormMouseX * pair.depth * THUMB_PARALLAX_MOUSE;
+        var ty = (thumbNormMouseY * pair.depth * THUMB_PARALLAX_MOUSE)
+               + (scrollNorm      * pair.depth * THUMB_PARALLAX_SCROLL);
+
+        pair.currentX += (tx - pair.currentX) * THUMB_LERP;
+        pair.currentY += (ty - pair.currentY) * THUMB_LERP;
+        pair.wrap.style.transform =
+          'translate3d(' + pair.currentX.toFixed(2) + 'px,' + pair.currentY.toFixed(2) + 'px,0)';
+      });
+
+      runThumbLoop();
     });
   }
 
-  function onThumbScroll() {
-    if (thumbScrollRafId) return;
-    thumbScrollRafId = requestAnimationFrame(function () {
-      thumbScrollRafId = null;
-      updateThumbParallax();
-    });
+  function startThumbLoop() {
+    if (thumbMotionRafId || prefersReducedMotion) return;
+    runThumbLoop();
+  }
+
+  function stopThumbLoop() {
+    if (thumbMotionRafId) { cancelAnimationFrame(thumbMotionRafId); thumbMotionRafId = null; }
   }
 
   function injectThumbs(data) {
@@ -120,9 +166,11 @@
       el.appendChild(noWrap);
 
       thumbPairs.push({
-        el: el,
-        wrap: wrap,
-        parallaxX: parallaxJitterFromId(id) * THUMB_PARALLAX_RANGE_X,
+        el:       el,
+        wrap:     wrap,
+        depth:    depthFromId(id),
+        currentX: 0,
+        currentY: 0,
       });
 
       /* ── Thumbnail hover: shows card + touch toggle ──────────────── */
@@ -148,10 +196,25 @@
       });
     });
 
-    /* Start scroll-driven parallax once all thumbs are in the DOM */
-    window.addEventListener('scroll', onThumbScroll, { passive: true });
-    window.addEventListener('resize', onThumbScroll, { passive: true });
-    updateThumbParallax(); /* set initial positions */
+    if (!thumbPairs.length || prefersReducedMotion) return;
+
+    /* Gate motion loop on #work visibility — no rAF cost when off-screen. */
+    thumbWorkSection = document.getElementById('work');
+    if (thumbWorkSection) {
+      new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            thumbWorkVisible = entry.isIntersecting;
+            if (thumbWorkVisible) { startThumbLoop(); }
+            else                  { stopThumbLoop();  }
+          });
+        },
+        { threshold: 0 }
+      ).observe(thumbWorkSection);
+
+      window.addEventListener('mousemove', onThumbPointerMove, { passive: true });
+      window.addEventListener('touchmove', onThumbPointerMove, { passive: true });
+    }
   }
 
   var manifestPromise = fetch(MANIFEST_URL)
