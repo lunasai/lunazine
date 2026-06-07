@@ -721,8 +721,9 @@ body {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
   font-size: 40px;
-  line-height: var(--line-height-body-lg); /* 1.4 — more open at display size */
+  line-height: var(--line-height-editorial);
   letter-spacing: var(--letter-spacing-body-md);
+  text-wrap: pretty;
   color: var(--color-neutral-fg);
 }
 
@@ -1279,7 +1280,7 @@ body {
   font-family: var(--font-serif);
   font-weight: var(--font-weight-light);
   font-size: var(--typography-title);
-  line-height: var(--line-height-thanks);
+  line-height: var(--line-height-title);
   letter-spacing: var(--letter-spacing-tight);
   color: var(--color-neutral-fg);
 }
