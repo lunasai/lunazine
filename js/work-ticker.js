@@ -1,0 +1,239 @@
+/*
+  js/work-ticker.js
+  Infinite horizontal image ticker with custom cursor and cream modal.
+
+  Behaviour:
+    · GSAP infinite x-translate loop (cloned items for seamless wrap)
+    · Slows to 25% speed on mouseenter; restores on mouseleave
+    · Drag-to-scrub: pauses tween, offsets track position, resumes on release
+    · "View" pill cursor follows mouse with a spring lag
+    · Click opens a cream modal with the full image + Space Mono caption
+    · Escape or close button dismisses the modal
+    · prefers-reduced-motion: GSAP tween skipped; static grid via CSS
+*/
+
+(function () {
+  'use strict';
+
+  if (!window.gsap) return;
+
+  var gsap = window.gsap;
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── DOM refs ──────────────────────────────────────────────────── */
+
+  var viewport = document.querySelector('.ticker__viewport');
+  var track    = document.querySelector('.ticker__track');
+  var cursor     = document.querySelector('.ticker-cursor');
+  var cursorText = document.querySelector('.ticker-cursor__text');
+  if (!viewport || !track || !cursor) return;
+
+  /* ── Clone items for seamless infinite loop ─────────────────────
+     We duplicate the entire set of items so the track is 2× content width.
+     GSAP animates x from 0 → -contentWidth, then repeat: -1 wraps silently.
+  ────────────────────────────────────────────────────────────────── */
+
+  var originalItems = Array.from(track.querySelectorAll('.ticker__item'));
+
+  if (!reducedMotion) {
+    originalItems.forEach(function (item) {
+      var clone = item.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      clone.removeAttribute('tabindex');
+      track.appendChild(clone);
+    });
+  }
+
+  /* ── Measure content width (single set, not cloned) ─────────────── */
+
+  function getContentWidth() {
+    var gap  = 16; /* matches --space-4 in CSS */
+    var total = 0;
+    originalItems.forEach(function (item) {
+      total += item.offsetWidth + gap;
+    });
+    return total;
+  }
+
+  /* ── GSAP tween ─────────────────────────────────────────────────── */
+
+  var tween = null;
+  var TICKER_DURATION = 40; /* seconds for one full loop */
+  var cachedContentWidth = 0;
+
+  function initTween() {
+    if (reducedMotion) return;
+
+    cachedContentWidth = getContentWidth();
+    if (cachedContentWidth <= 0) return;
+
+    /* Wrap x using modifiers so the jump back is invisible.
+       Works from any starting x (including post-drag offsets). */
+    tween = gsap.to(track, {
+      x: '-=' + cachedContentWidth,
+      duration: TICKER_DURATION,
+      ease: 'none',
+      repeat: -1,
+      modifiers: {
+        x: gsap.utils.unitize(function (x) {
+          return parseFloat(x) % cachedContentWidth;
+        })
+      }
+    });
+  }
+
+  /* Re-init on resize (content width changes with font/zoom) */
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      if (tween) {
+        tween.kill();
+        gsap.set(track, { x: 0 });
+      }
+      tween = null;
+      initTween();
+    }, 200);
+  });
+
+  /* ── Speed control on hover ──────────────────────────────────────── */
+
+  viewport.addEventListener('mouseenter', function () {
+    if (tween) tween.timeScale(0.25);
+  });
+
+  viewport.addEventListener('mouseleave', function () {
+    if (tween) tween.timeScale(1);
+  });
+
+  /* ── Drag-to-scrub ──────────────────────────────────────────────── */
+
+  var isDragging    = false;
+  var dragStartX    = 0;
+  var trackStartX   = 0;
+  var hasDragged    = false;
+  /* 10px threshold: large enough that normal trackpad click movement
+     never triggers a drag, small enough that intentional scrubbing
+     starts immediately. */
+  var DRAG_THRESHOLD = 10;
+
+  viewport.addEventListener('pointerdown', function (e) {
+    isDragging  = true;
+    hasDragged  = false;
+    dragStartX  = e.clientX;
+    trackStartX = gsap.getProperty(track, 'x');
+    if (tween) tween.pause();
+    if (window.__lenis) window.__lenis.stop();
+  });
+
+  window.addEventListener('pointermove', function (e) {
+    if (!isDragging) return;
+    var delta = e.clientX - dragStartX;
+    /* Only commit to drag once threshold is crossed — don't move
+       the track on a tiny natural click wobble. */
+    if (Math.abs(delta) > DRAG_THRESHOLD) {
+      if (!hasDragged) {
+        hasDragged = true;
+        track.classList.add('is-dragging');
+      }
+      gsap.set(track, { x: trackStartX + delta });
+    }
+  });
+
+  window.addEventListener('pointerup', function () {
+    if (!isDragging) return;
+    isDragging = false;
+    track.classList.remove('is-dragging');
+    if (window.__lenis) window.__lenis.start();
+
+    if (hasDragged) {
+      /* Tween's internal playhead no longer matches the DOM position after
+         a drag — kill and reinit from the current dragged-to position so
+         the loop resumes seamlessly without a visible jump. */
+      if (tween) { tween.kill(); tween = null; }
+      /* Normalise current x into the [-contentWidth, 0] range */
+      var currentX = parseFloat(gsap.getProperty(track, 'x'));
+      var cw = cachedContentWidth || getContentWidth();
+      var normX = cw > 0 ? ((currentX % cw) - cw) % cw : 0;
+      gsap.set(track, { x: normX });
+      initTween();
+    } else if (tween) {
+      tween.play();
+    }
+    /* hasDragged is intentionally left for the click handler to consume
+       so it can suppress the post-drag click event. */
+  });
+
+  /* ── Custom cursor ──────────────────────────────────────────────── */
+
+  var cursorVisible = false;
+  var cursorX = 0;
+  var cursorY = 0;
+
+  function updateCursorPos(e) {
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+    /* Drive position via CSS custom properties for GPU compositing */
+    cursor.style.setProperty('--tc-x', cursorX + 'px');
+    cursor.style.setProperty('--tc-y', cursorY + 'px');
+  }
+
+  viewport.addEventListener('mouseenter', function (e) {
+    updateCursorPos(e);
+    if (!cursorVisible) {
+      cursorVisible = true;
+      cursor.classList.add('is-visible');
+    }
+  });
+
+  viewport.addEventListener('mousemove', function (e) {
+    updateCursorPos(e);
+  });
+
+  viewport.addEventListener('mouseleave', function () {
+    if (cursorVisible) {
+      cursorVisible = false;
+      cursor.classList.remove('is-visible');
+    }
+  });
+
+  /* ── Item hover highlight ───────────────────────────────────────── */
+
+  track.addEventListener('mouseover', function (e) {
+    var item = e.target.closest('.ticker__item');
+    if (!item) return;
+    item.classList.add('is-hovered');
+    var caption = item.dataset.caption || '';
+    var label   = item.dataset.label   || '';
+    var text = caption && label ? caption + ' \u2014 ' + label : caption || label || 'View';
+    setCursorText(text);
+  });
+
+  track.addEventListener('mouseout', function (e) {
+    var item = e.target.closest('.ticker__item');
+    if (!item) return;
+    item.classList.remove('is-hovered');
+    setCursorText('View');
+  });
+
+  function setCursorText(text) {
+    /* Duplicate with a separator for seamless marquee loop */
+    var sep = '\u00a0\u00a0\u00a0\u00b7\u00a0\u00a0\u00a0';
+    cursorText.textContent = text + sep + text + sep;
+  }
+
+  /* Click: consume hasDragged flag so drag doesn't register as a click */
+  track.addEventListener('click', function () {
+    if (hasDragged) hasDragged = false;
+  });
+
+  /* ── Init ──────────────────────────────────────────────────────── */
+
+  /* Wait for images to have intrinsic widths before measuring */
+  if (document.readyState === 'complete') {
+    initTween();
+  } else {
+    window.addEventListener('load', initTween);
+  }
+
+}());

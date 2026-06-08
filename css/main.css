@@ -504,43 +504,45 @@ body {
   }
 }
 
-/* Scaled metrics: step down with body at each breakpoint */
+/* Scaled metrics: text scales per breakpoint; numeral always 14px */
 @media (min-width: 1025px) {
   .section--work .impact-list__label,
-  .section--work .metric-item,
   .section--work .metric-item__text {
-    font-size: 18px;
+    font-size: 20px;
   }
 }
 
 @media (max-width: 1024px) and (min-width: 769px) {
   .section--work .impact-list__label,
-  .section--work .metric-item,
   .section--work .metric-item__text {
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 
 @media (max-width: 768px) {
   .section--work .impact-list__label,
-  .section--work .metric-item,
   .section--work .metric-item__text {
     font-size: 16px;
   }
 }
 
-/* Full-width bar + label: 24px row, label centered, fill = row height */
+/* Row: border-separated, numeral left + text right */
 .section--work .work__metrics .metric-item {
   position: relative;
   box-sizing: border-box;
-  height: 24px;
-  min-height: 24px;
+  padding: 20px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  margin-bottom: -1px; /* collapse adjacent borders into single line */
   overflow: visible;
-  gap: var(--space-2); /* 8px — bar to label */
-  align-items: stretch;
+  gap: var(--space-4); /* 16px minimum — space-between distributes further */
+  align-items: center;
+  justify-content: space-between;
   font-family: var(--font-mono);
-  line-height: 1.18;
-  --metric-line-height: 1.18;
+  font-size: 20px;
+  font-feature-settings: "case" 1;
+  line-height: 1.13;
+  --metric-line-height: 1.13;
   cursor: default;
   /* Asymmetric: quick fill in, slow smooth clear out */
   --metric-fill-in-duration: 240ms;
@@ -554,7 +556,7 @@ body {
   --metric-text-out-ease: cubic-bezier(0.45, 0.05, 0.55, 0.95);
 }
 
-/* Active fill: full row height, grows left → right */
+/* Active fill: sweeps full row between borders, left → right */
 .section--work .metric-item::before {
   content: '';
   position: absolute;
@@ -566,39 +568,32 @@ body {
   transition: transform var(--metric-fill-out-duration) var(--metric-fill-out-ease);
 }
 
+/* Hide legacy block bullet in this context */
 .section--work .metric-item__block {
+  display: none;
+}
+
+/* Mono Roman numeral — left column */
+.section--work .metric-item__num {
   position: relative;
-  z-index: 0;
-  flex: 1;
-  align-self: stretch;
-  min-width: 0;
-  background-color: transparent;
-  cursor: default;
-  pointer-events: none;
-}
-
-/* Idle: 2px rule at centered line-box baseline */
-.section--work .metric-item__block::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  bottom: calc((100% - 1lh) / 2 - 2px);
-  background-color: var(--color-neutral-fg-strong);
-  transition: opacity 120ms ease;
-}
-
-.section--work .metric-item.is-near .metric-item__block::after {
-  opacity: 0;
+  z-index: 2;
+  flex-shrink: 0;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  line-height: 1.13;
+  color: var(--color-neutral-fg);
+  transition-property: color;
+  transition-duration: var(--metric-text-out-duration);
+  transition-timing-function: var(--metric-text-out-ease);
+  transition-delay: 0ms;
 }
 
 .section--work .metric-item__text {
   position: relative;
   z-index: 2;
   flex-shrink: 0;
-  align-self: center;
-  line-height: var(--metric-line-height, 1.18);
+  letter-spacing: -0.02em;
+  line-height: var(--metric-line-height, 1.13);
   cursor: default;
   text-box-trim: trim-end;
   text-box-edge: cap alphabetic;
@@ -625,6 +620,14 @@ body {
     transition: transform var(--metric-fill-in-duration) var(--metric-fill-in-ease);
   }
 
+  .section--work .metric-item.is-near .metric-item__num,
+  .section--work .metric-item.is-near:hover .metric-item__num {
+    color: var(--color-neutral-bg);
+    transition-duration: var(--metric-text-in-duration);
+    transition-timing-function: var(--metric-text-in-ease);
+    transition-delay: var(--metric-text-in-delay);
+  }
+
   .section--work .metric-item.is-near .metric-item__text,
   .section--work .metric-item.is-near:hover .metric-item__text {
     color: var(--color-neutral-bg);
@@ -639,6 +642,7 @@ body {
     transition: none;
   }
 
+  .section--work .metric-item__num,
   .section--work .metric-item__text {
     transition: none;
   }
@@ -647,20 +651,9 @@ body {
     transform: scaleX(1);
   }
 
+  .section--work .metric-item.is-near .metric-item__num,
   .section--work .metric-item.is-near .metric-item__text {
     color: var(--color-neutral-bg);
-  }
-}
-
-@supports not (height: 1lh) {
-  .section--work .metric-item__block::after {
-    bottom: calc((100% - 1em * var(--metric-line-height, 1.18)) / 2 - 2px);
-  }
-}
-
-@supports not (text-box-trim: trim-end) {
-  .section--work .metric-item__block::after {
-    transform: translateY(1px);
   }
 }
 
@@ -741,7 +734,7 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1); /* 4px between rows */
+  gap: 0; /* borders collapse via margin-bottom: -1px on each item */
 }
 
 .work__project__impact {
@@ -814,305 +807,14 @@ body {
 
 /* ─── Feedback section ───────────────────────────────────────── */
 
-/* Quote/cite — large duo: match about body; stacked: step down for dark block */
-:root {
-  --typography-feedback-quote: var(--typography-quote-body);
-  --typography-feedback-cite:  var(--typography-mono);
-}
-
 @media (max-width: 1024px) {
-  :root {
-    --typography-feedback-quote: 14px;
-    --typography-feedback-cite:  12px;
-  }
 }
 
+/* Feedback section base — component detail in component-feedback.css */
 .section--feedback {
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
-  padding-block: var(--section-fixed-chrome-clearance) 0;
-  box-sizing: border-box;
-  touch-action: pan-y;
-}
-
-.section--feedback > .page-grid {
-  width: 100%;
-}
-
-/* ── Side-by-side layout: feedback (cols 1–5) + about (cols 6–12) ── */
-@media (min-width: 1025px) {
-  .section-duo {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-template-rows: auto minmax(0, 1fr);
-    column-gap: var(--grid-gutter);
-    row-gap: var(--space-6);
-    padding-inline: var(--grid-margin);
-    padding-block-start: var(--section-fixed-chrome-clearance);
-    align-items: stretch;
-    background-color: var(--color-neutral-bg);
-  }
-
-  /*
-   * Subgrid: row 1 = folio labels, row 2 = black box + about copy share one
-   * top line. Wrappers use contents; sections keep a box for #about / snap.
-   */
-  .section-duo .section--feedback,
-  .section-duo .section--about {
-    display: grid;
-    grid-template-rows: subgrid;
-    grid-row: 1 / span 2;
-    grid-template-columns: minmax(0, 1fr);
-    min-height: unset;
-    background-color: transparent;
-  }
-
-  .section-duo .section--feedback {
-    grid-column: 1 / 5;
-    padding: 0;
-  }
-
-  .section-duo .section--about {
-    grid-column: 6 / 13;
-    padding-block-start: 0;
-    padding-inline: 0;
-  }
-
-  .section-duo .section--feedback .page-grid,
-  .section-duo .section--feedback .feedback__inner,
-  .section-duo .section--about .about__scroll,
-  .section-duo .section--about .page-grid {
-    display: contents;
-  }
-
-  .section-duo .section--feedback .page-grid,
-  .section-duo .section--about .page-grid {
-    padding-inline: 0;
-  }
-
-  .section-duo .feedback__title {
-    grid-row: 1;
-    margin: 0;
-    line-height: 1;
-  }
-
-  .section-duo .feedback__block {
-    grid-row: 2;
-    align-self: stretch;
-    min-height: 0;
-  }
-
-  .section-duo .about__label {
-    grid-row: 1;
-    margin: 0;
-    line-height: 1;
-  }
-
-  .section-duo .about__content {
-    grid-row: 2;
-    align-self: start;
-    padding-bottom: var(--space-10);
-  }
-
-  /*
-   * Cap-top alignment (same as work): trim folio labels + first about line so
-   * the black box top edge meets the about body cap line, not half-leading.
-   */
-  .section-duo .feedback__title,
-  .section-duo .about__label,
-  .section-duo .about__body > p:first-child {
-    text-box-trim: trim-start;
-    text-box-edge: cap alphabetic;
-  }
-}
-
-
-.feedback__inner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  flex: 1;
-}
-
-.feedback__title {
-  margin: 0;
-}
-
-/* Progress bar — thin rule that fills over the slide duration */
-.feedback__progress {
-  width: 100%;
-  height: 2px;
-  background-color: rgba(254, 250, 241, 0.2); /* --color-neutral-bg at low opacity */
-  overflow: hidden;
-  margin-top: auto;
-}
-
-.feedback__progress-fill {
-  height: 100%;
-  width: 0%;
-  background-color: var(--color-neutral-bg);
-}
-
-@keyframes feedback-progress-fill {
-  from { width: 0%; }
-  to   { width: 100%; }
-}
-
-.feedback__progress-fill.is-running {
-  animation: feedback-progress-fill linear var(--feedback-carousel-duration, 12s) forwards;
-}
-
-/* Custom cursor label — follows mouse, swaps prev / next by section half */
-.feedback-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 500;
-  pointer-events: none;
-  user-select: none;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: var(--font-weight-regular);
-  letter-spacing: var(--letter-spacing-mono);
-  line-height: 1;
-  color: var(--color-neutral-bg);
-  background-color: var(--color-neutral-fg-strong);
-  padding: 5px 8px;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translate(var(--fc-x, 0px), var(--fc-y, 0px)) scale(0.85);
-  transition:
-    opacity  160ms ease,
-    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform, opacity;
-}
-
-.feedback-cursor.is-visible {
-  opacity: 1;
-  transform: translate(var(--fc-x, 0px), var(--fc-y, 0px)) scale(1);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .section--feedback.is-feedback-nav-active {
-    cursor: none;
-  }
-}
-
-/* Stack all cards on the same grid cell; JS cross-fades between them */
-.feedback__block {
-  --feedback-pixel-step: 10px;
-  flex: 1;
-  background-color: var(--color-neutral-fg-strong);
-  padding: var(--space-10);
-  display: flex;
-  flex-direction: column;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* Pixel-step corners: 1 stair top-left, 3 stairs top-right (page bg shows through) */
-  clip-path: polygon(
-    0 var(--feedback-pixel-step),
-    var(--feedback-pixel-step) var(--feedback-pixel-step),
-    var(--feedback-pixel-step) 0,
-    calc(100% - 3 * var(--feedback-pixel-step)) 0,
-    calc(100% - 3 * var(--feedback-pixel-step)) var(--feedback-pixel-step),
-    calc(100% - 2 * var(--feedback-pixel-step)) var(--feedback-pixel-step),
-    calc(100% - 2 * var(--feedback-pixel-step)) calc(2 * var(--feedback-pixel-step)),
-    calc(100% - var(--feedback-pixel-step)) calc(2 * var(--feedback-pixel-step)),
-    calc(100% - var(--feedback-pixel-step)) calc(3 * var(--feedback-pixel-step)),
-    100% calc(3 * var(--feedback-pixel-step)),
-    100% 100%,
-    0 100%
-  );
-}
-
-.section--feedback.is-feedback-dragging {
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.feedback__quotes {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
-  width: 100%;
-  flex: 1 1 auto;
-  margin-bottom: var(--space-10);
-}
-
-.feedback-card {
-  grid-column: 1;
-  grid-row: 1;
-  min-width: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  color: var(--color-neutral-fg);
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-}
-
-/* Enter-only — same fade-up as work scroll reveal; no exit transition avoids crossfade flicker */
-.feedback-card.is-active {
-  pointer-events: auto;
-  animation: fade-up var(--feedback-carousel-fade-duration) cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .feedback-card.is-active {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
-  .feedback__progress-fill.is-running { animation-duration: 0.01ms; }
-}
-
-.feedback-card__quote {
-  margin: 0;
-}
-
-.feedback-card__quote-icon,
-.feedback-card__source-icon {
-  flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
-  color: var(--color-neutral-bg);
-}
-
-/* Figma orients pixel:quote-right-solid via −scale-y + rotate; reproduce as 2D transform */
-.feedback-card__quote-icon--figma-orient {
-  transform: rotate(180deg) scaleY(-1);
-  transform-origin: center center;
-}
-
-.feedback-card__quote p {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-feedback-quote);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-body);
-  color: var(--color-neutral-bg);
-}
-
-.feedback-card__source {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-}
-
-.feedback-card__source cite {
-  font-family: var(--font-serif);
-  font-style: normal;
-  font-weight: var(--font-weight-light);
-  font-size: var(--typography-feedback-cite);
-  line-height: var(--line-height-normal);
-  letter-spacing: var(--letter-spacing-body);
-  color: var(--color-neutral-bg);
+  padding-block-start: var(--section-fixed-chrome-clearance);
+  padding-block-end: var(--space-12); /* 48px — tighter close before thanks */
+  overflow-x: clip; /* cards can peek at right edge; no horizontal scroll */
 }
 
 /* ─── About section ──────────────────────────────────────────── */
@@ -1479,11 +1181,6 @@ body.pong-active .site {
      · About hero inset doubles to 80px (matches Figma y=80 for Project Info)
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .section--feedback {
-    min-height: unset;
-    padding-block: var(--space-10) 0;
-  }
-
   .section--work {
     padding-top: var(--space-10);
     padding-bottom: var(--space-10);
@@ -1493,10 +1190,6 @@ body.pong-active .site {
     padding-block-start: var(--space-10);
   }
 
-  /* Gap between stacked feedback and about */
-  .section-duo .section--about {
-    padding-block-start: calc(var(--space-10) * 2);
-  }
 }
 
 
@@ -1509,14 +1202,6 @@ body.pong-active .site {
      · About content keeps the medium full 12-column span
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .section--feedback {
-    padding-block: var(--space-10) 0;
-  }
-
-  .feedback__block {
-    --feedback-pixel-step: 8px;
-    padding: var(--space-6); /* 24px — less imposing at tablet */
-  }
 }
 
 
@@ -1528,20 +1213,6 @@ body.pong-active .site {
    Work layout: project body + Impact use stacked 12-col rows (full bleed within section grid).
    ─────────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .section--feedback {
-    min-height: auto;
-    padding-block: var(--space-10) 0;
-  }
-
-  .feedback__block {
-    --feedback-pixel-step: 6px;
-    padding: var(--space-4); /* 16px — tight for narrow screens */
-  }
-
-  .feedback__inner {
-    gap: var(--space-4);
-  }
-
   /* Match intro hero scale — opening/closing bookends on x-small */
   .thanks__title {
     font-size: var(--typography-intro-headline);

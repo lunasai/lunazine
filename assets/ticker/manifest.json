@@ -1,0 +1,101 @@
+{
+  "crate-colors": {
+    "alt": "Crate color system tokens",
+    "caption": "Color system tokens",
+    "label": "Heineken — Crate DS",
+    "sources": {
+      "avif": "./assets/ticker/generated/crate-colors-800w.avif 800w, ./assets/ticker/generated/crate-colors-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/crate-colors-800w.webp 800w, ./assets/ticker/generated/crate-colors-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/crate-colors-800w.png 800w, ./assets/ticker/generated/crate-colors-1600w.png 1600w"
+    },
+    "src": "./assets/ticker/generated/crate-colors-800w.png"
+  },
+  "crate-spacing": {
+    "alt": "Crate spacing and layout system",
+    "caption": "Spacing & layout system",
+    "label": "Heineken — Crate DS",
+    "sources": {
+      "avif": "./assets/ticker/generated/crate-spacing-800w.avif 800w, ./assets/ticker/generated/crate-spacing-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/crate-spacing-800w.webp 800w, ./assets/ticker/generated/crate-spacing-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/crate-spacing-800w.png 800w, ./assets/ticker/generated/crate-spacing-1600w.png 1600w"
+    },
+    "src": "./assets/ticker/generated/crate-spacing-800w.png"
+  },
+  "crate-metrics": {
+    "alt": "Crate component health metrics",
+    "caption": "Component health metrics",
+    "label": "Heineken — Crate DS",
+    "sources": {
+      "avif": "./assets/ticker/generated/crate-metrics-800w.avif 800w, ./assets/ticker/generated/crate-metrics-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/crate-metrics-800w.webp 800w, ./assets/ticker/generated/crate-metrics-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/crate-metrics-800w.png 800w, ./assets/ticker/generated/crate-metrics-1600w.png 1600w"
+    },
+    "src": "./assets/ticker/generated/crate-metrics-800w.png"
+  },
+  "crate-community": {
+    "alt": "Crate community and contributors",
+    "caption": "Community & contributors",
+    "label": "Heineken — Crate DS",
+    "sources": {
+      "avif": "./assets/ticker/generated/crate-community-800w.avif 800w, ./assets/ticker/generated/crate-community-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/crate-community-800w.webp 800w, ./assets/ticker/generated/crate-community-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/crate-community-800w.png 800w, ./assets/ticker/generated/crate-community-1600w.png 1600w"
+    },
+    "src": "./assets/ticker/generated/crate-community-800w.png"
+  },
+  "eazle-loading": {
+    "alt": "Eazle loading and skeleton patterns",
+    "caption": "Loading & skeleton patterns",
+    "label": "Heineken — Crate DS",
+    "sources": {
+      "avif": "./assets/ticker/generated/eazle-loading-800w.avif 800w",
+      "webp": "./assets/ticker/generated/eazle-loading-800w.webp 800w",
+      "jpg": "./assets/ticker/generated/eazle-loading-800w.jpg 800w"
+    },
+    "src": "./assets/ticker/generated/eazle-loading-800w.jpg"
+  },
+  "adidas-recs": {
+    "alt": "Adidas product recommendation framework",
+    "caption": "Product recommendation framework",
+    "label": "Adidas",
+    "sources": {
+      "avif": "./assets/ticker/generated/adidas-recs-800w.avif 800w",
+      "webp": "./assets/ticker/generated/adidas-recs-800w.webp 800w",
+      "png": "./assets/ticker/generated/adidas-recs-800w.png 800w"
+    },
+    "src": "./assets/ticker/generated/adidas-recs-800w.png"
+  },
+  "adidas-recs-slide": {
+    "alt": "Adidas recommendation approach",
+    "caption": "Recommendation approach",
+    "label": "Adidas",
+    "sources": {
+      "avif": "./assets/ticker/generated/adidas-recs-slide-800w.avif 800w",
+      "webp": "./assets/ticker/generated/adidas-recs-slide-800w.webp 800w",
+      "png": "./assets/ticker/generated/adidas-recs-slide-800w.png 800w"
+    },
+    "src": "./assets/ticker/generated/adidas-recs-slide-800w.png"
+  },
+  "adidas-carousel": {
+    "alt": "Adidas shared recommendations carousel",
+    "caption": "Shared recommendations carousel",
+    "label": "Adidas",
+    "sources": {
+      "avif": "./assets/ticker/generated/adidas-carousel-800w.avif 800w, ./assets/ticker/generated/adidas-carousel-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/adidas-carousel-800w.webp 800w, ./assets/ticker/generated/adidas-carousel-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/adidas-carousel-800w.png 800w, ./assets/ticker/generated/adidas-carousel-1600w.png 1600w"
+    },
+    "src": "./assets/ticker/generated/adidas-carousel-800w.png"
+  },
+  "video-gif": {
+    "alt": "Interaction prototype",
+    "caption": "Interaction prototype",
+    "label": "Heineken — Crate DS",
+    "sources": {
+      "avif": "./assets/ticker/generated/video-gif-800w.avif 800w",
+      "webp": "./assets/ticker/generated/video-gif-800w.webp 800w",
+      "jpg": "./assets/ticker/generated/video-gif-800w.jpg 800w"
+    },
+    "src": "./assets/ticker/generated/video-gif-800w.jpg"
+  }
+}

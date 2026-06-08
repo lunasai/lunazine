@@ -1,0 +1,381 @@
+/*
+  css/component-work-ticker.css
+  Infinite horizontal image ticker with custom cursor and modal.
+
+  Placed between #work and .section-duo.
+
+  Structure:
+    .section--ticker        — full-bleed section wrapper
+    .ticker__viewport       — overflow:hidden clip region; drives cursor activation
+    .ticker__track          — the scrolling strip (JS clones items for seamless loop)
+    .ticker__item           — individual image card
+    .ticker-cursor          — fixed "View" label following the mouse (JS-driven)
+    .ticker-modal           — full cream overlay with image + Space Mono caption
+*/
+
+/* ─── Section wrapper ──────────────────────────────────────────── */
+
+.section--ticker {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding-block: var(--space-12); /* 48px breathing above and below */
+  background-color: var(--color-neutral-bg);
+  /* prevent fixed chrome showing through */
+  z-index: 2;
+}
+
+/* ─── Viewport clip ─────────────────────────────────────────────── */
+
+.ticker__viewport {
+  overflow: hidden;
+  width: 100%;
+  cursor: none; /* hide native cursor inside ticker on fine-pointer devices */
+}
+
+@media (hover: none), (pointer: coarse) {
+  .ticker__viewport {
+    cursor: grab;
+  }
+
+  .ticker__viewport:active {
+    cursor: grabbing;
+  }
+}
+
+/* ─── Scrolling track ───────────────────────────────────────────── */
+
+.ticker__track {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Drag state: prevent text / image ghost drag */
+.ticker__track.is-dragging {
+  cursor: grabbing;
+}
+
+/* ─── Individual item ───────────────────────────────────────────── */
+
+.ticker__item {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  /* Fixed height; width is intrinsic from image aspect ratio */
+  height: 370px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-neutral-bg-elevated);
+  cursor: none;
+}
+
+
+@media (max-width: 768px) {
+  .ticker__item {
+    height: 265px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ticker__item {
+    height: 212px;
+  }
+}
+
+.ticker__item img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: none; /* let the image be as wide as its aspect ratio dictates */
+  object-fit: cover;
+  pointer-events: none;
+  /* Idle: high-contrast grayscale as base for the halftone treatment */
+  filter: none;
+  transition:
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter    500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+@media (hover: hover) and (pointer: fine) {
+  .ticker__item.is-hovered img {
+    transform: scale(1.04);
+  }
+}
+
+/* ─── Custom cursor ─────────────────────────────────────────────── */
+
+.ticker-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 500;
+  pointer-events: none;
+  user-select: none;
+
+  /* Ellipse pill — matches "Email me" hover style */
+  padding: var(--control-ellipse-inset-y) calc(var(--control-ellipse-outset-x) + var(--space-2));
+  background-color: var(--color-control-pill-hover-bg);
+  color: var(--color-control-pill-hover-fg);
+  border-radius: var(--radius-control-hover-ellipse); /* 50% = stretched oval */
+
+  max-width: 120px;
+  overflow: hidden;
+
+  font-family: var(--font-mono);
+  font-size: var(--typography-mono);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing-mono);
+  line-height: 1;
+
+  /* JS drives transform via CSS custom props for perf */
+  transform: translate(var(--tc-x, 0px), var(--tc-y, 0px)) translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  transition:
+    opacity  180ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.ticker-cursor.is-visible {
+  opacity: 1;
+  transform: translate(var(--tc-x, 0px), var(--tc-y, 0px)) translate(-50%, -50%) scale(1);
+}
+
+.ticker-cursor__text {
+  display: inline-block;
+  white-space: nowrap;
+  animation: cursor-marquee 3.5s linear infinite;
+}
+
+@keyframes cursor-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Only show on fine-pointer devices */
+@media (hover: none), (pointer: coarse) {
+  .ticker-cursor {
+    display: none;
+  }
+}
+
+/* ─── Modal overlay ─────────────────────────────────────────────── */
+
+.ticker-modal:focus {
+  outline: none;
+}
+
+.ticker-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200; /* above fixed chrome (100) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-margin);
+  box-sizing: border-box;
+
+  background-color: color-mix(in srgb, var(--color-neutral-bg) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity    320ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s   320ms;
+}
+
+.ticker-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  cursor: none;
+  transition:
+    opacity    320ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s   0s;
+}
+
+/* ─── Modal inner — pixel-step corners (matches .feedback__block) ─ */
+
+.ticker-modal__inner {
+  --modal-pixel-step: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: min(900px, calc(100vw - var(--spacing-margin) * 2));
+  max-height: calc(100vh - var(--spacing-margin) * 2);
+  overflow: hidden;
+
+  /* Entry animation: slide up from 20px */
+  transform: translateY(20px);
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Pixel-step corners — same pattern as .feedback__block */
+  clip-path: polygon(
+    0 var(--modal-pixel-step),
+    var(--modal-pixel-step) var(--modal-pixel-step),
+    var(--modal-pixel-step) 0,
+    calc(100% - 3 * var(--modal-pixel-step)) 0,
+    calc(100% - 3 * var(--modal-pixel-step)) var(--modal-pixel-step),
+    calc(100% - 2 * var(--modal-pixel-step)) var(--modal-pixel-step),
+    calc(100% - 2 * var(--modal-pixel-step)) calc(2 * var(--modal-pixel-step)),
+    calc(100% - var(--modal-pixel-step)) calc(2 * var(--modal-pixel-step)),
+    calc(100% - var(--modal-pixel-step)) calc(3 * var(--modal-pixel-step)),
+    100% calc(3 * var(--modal-pixel-step)),
+    100% 100%,
+    0 100%
+  );
+}
+
+.ticker-modal.is-open .ticker-modal__inner {
+  transform: translateY(0);
+}
+
+.ticker-modal__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - var(--spacing-margin) * 4 - 80px); /* leave room for caption */
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Modal caption ─────────────────────────────────────────────── */
+
+.ticker-modal__caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  letter-spacing: var(--letter-spacing-mono);
+  line-height: var(--line-height-normal);
+}
+
+.ticker-modal__label {
+  color: var(--color-neutral-fg-muted);
+  text-transform: uppercase;
+}
+
+.ticker-modal__title {
+  color: var(--color-neutral-fg-strong);
+}
+
+/* ─── Modal close button (keyboard-only; hidden visually) ────────── */
+
+.ticker-modal__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: none;
+  color: transparent;
+  font-size: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ticker-modal__close:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+  outline: 2px solid var(--color-accent-bg);
+  outline-offset: 2px;
+  border-radius: var(--radius-focus);
+}
+
+/* ─── Modal custom cursor ────────────────────────────────────────── */
+
+.modal-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 210;
+  pointer-events: none;
+  user-select: none;
+
+  padding: 7px 14px;
+  background-color: var(--color-neutral-fg-strong);
+  color: var(--color-neutral-fg-on-accent);
+  border-radius: var(--radius-chip-pill);
+
+  font-family: var(--font-mono);
+  font-size: var(--typography-mono);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing-mono);
+  line-height: 1;
+  white-space: nowrap;
+
+  transform: translate(var(--mc-x, 0px), var(--mc-y, 0px)) translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  transition:
+    opacity  180ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.modal-cursor.is-visible {
+  opacity: 1;
+  transform: translate(var(--mc-x, 0px), var(--mc-y, 0px)) translate(-50%, -50%) scale(1);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .modal-cursor { display: none; }
+}
+
+/* ─── Suppress other floating UI while modal is open ────────────── */
+
+body.ticker-modal-open .hover-preview-card,
+body.ticker-modal-open .hover-preview-thumb,
+body.ticker-modal-open .preview-touch-hint {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* ─── Reduced motion ────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .section--ticker .ticker__track {
+    /* Static grid fallback — JS will skip the GSAP tween */
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .ticker-modal,
+  .ticker-modal__inner {
+    transition: none;
+  }
+
+  .ticker-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .ticker-modal.is-open .ticker-modal__inner {
+    transform: none;
+  }
+
+  .ticker__item img {
+    transition: none;
+  }
+}

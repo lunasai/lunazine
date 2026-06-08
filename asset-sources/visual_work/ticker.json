@@ -1,0 +1,68 @@
+{
+  "crate-colors": {
+    "source": "crate_colors.png",
+    "alt": "Crate color system tokens",
+    "caption": "Color system tokens",
+    "label": "Heineken — Crate DS"
+  },
+  "crate-spacing": {
+    "source": "crate_spacing.png",
+    "alt": "Crate spacing and layout system",
+    "caption": "Spacing & layout system",
+    "label": "Heineken — Crate DS"
+  },
+  "crate-metrics": {
+    "source": "crate_metrics.png",
+    "alt": "Crate component health metrics",
+    "caption": "Component health metrics",
+    "label": "Heineken — Crate DS"
+  },
+  "crate-community": {
+    "source": "crate_community.png",
+    "alt": "Crate community and contributors",
+    "caption": "Community & contributors",
+    "label": "Heineken — Crate DS"
+  },
+  "eazle-shapes": {
+    "source": "eazle_shapes.jpeg",
+    "alt": "Eazle brand shapes and identity",
+    "caption": "Brand shapes & identity",
+    "label": "Heineken — Eazle Brand"
+  },
+  "eazle-loading": {
+    "source": "eazle_loading_skeleton.gif",
+    "alt": "Eazle loading and skeleton patterns",
+    "caption": "Loading & skeleton patterns",
+    "label": "Heineken — Crate DS"
+  },
+  "adidas-recs": {
+    "source": "adidas_recs.png",
+    "alt": "Adidas product recommendation framework",
+    "caption": "Product recommendation framework",
+    "label": "Adidas"
+  },
+  "adidas-recs-slide": {
+    "source": "adidas_recs_slide.png",
+    "alt": "Adidas recommendation approach",
+    "caption": "Recommendation approach",
+    "label": "Adidas"
+  },
+  "adidas-carousel": {
+    "source": "adidas_carousel.png",
+    "alt": "Adidas shared recommendations carousel",
+    "caption": "Shared recommendations carousel",
+    "label": "Adidas"
+  },
+  "mix-template": {
+    "source": "1. Mix template.png",
+    "alt": "Mix template design",
+    "caption": "Mix template",
+    "label": "Heineken — Eazle Brand"
+  },
+  "video-gif": {
+    "source": "video_1.gif",
+    "alt": "Interaction prototype",
+    "caption": "Interaction prototype",
+    "label": "Heineken — Crate DS"
+  }
+}

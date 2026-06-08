@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "assets:optimize": "node ./scripts/optimize-assets.mjs",
+    "ticker:optimize": "node ./scripts/optimize-ticker.mjs",
     "sync:moon": "node ./scripts/sync-moon-sprite.mjs",
     "sync:cv": "node ./scripts/sync-cv.mjs",
     "sync:favicons": "node ./scripts/sync-favicons.mjs",

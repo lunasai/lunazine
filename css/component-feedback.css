@@ -1,0 +1,263 @@
+/*
+  css/component-feedback.css
+  Feedback section — full-width timed carousel.
+
+  Layout:
+    · 12-col page-grid
+    · Col 1      : label (top) + timer segments (bottom)
+    · Cols 3–12  : overflow-clipped viewport → sliding card track
+
+  Behaviour (JS-driven):
+    · Auto-advances every DURATION ms
+    · Active segment fills left→right via CSS animation
+    · Hovering or focusing inside the section pauses the timer
+    · Clicking a segment jumps to that card
+    · Drag/swipe left/right advances or goes back
+    · prefers-reduced-motion: no animation, segment fill instant
+*/
+
+/* ─── Typography scale ───────────────────────────────────────────── */
+
+:root {
+  --typography-feedback-quote: 16px;
+  --typography-feedback-cite:  var(--typography-mono);
+}
+
+@media (max-width: 480px) {
+  :root {
+    --typography-feedback-cite: 12px;
+  }
+}
+
+/* ─── Section layout ─────────────────────────────────────────────── */
+
+/* Meta column + viewport sit in the 12-col page-grid */
+.feedback__meta {
+  grid-column: 1 / 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-10);
+  padding-block: var(--space-1);
+}
+
+.feedback__title {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.feedback__viewport {
+  grid-column: 3 / -1;
+  overflow: visible; /* track extends past viewport; section clips at page edge */
+  clip-path: inset(0 -9999px 0 0); /* block left bleed into title/bar column; right overflow free */
+}
+
+.feedback__track {
+  display: flex;
+  gap: var(--space-4);
+  will-change: transform;
+  touch-action: pan-y; /* allow vertical page scroll; horizontal is handled by JS */
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Timer bar ──────────────────────────────────────────────────── */
+
+.feedback__bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(9, 7, 13, 0.1);
+  overflow: hidden;
+}
+
+.feedback__bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-neutral-fg-strong);
+  transform-origin: left center;
+}
+
+/* ─── Cards ──────────────────────────────────────────────────────── */
+
+.feedback-card {
+  --card-pixel-step: 10px;
+
+  flex: 0 0 var(--feedback-card-width, 320px);
+  margin: 0;
+  padding: var(--space-10);
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: 360px;
+
+  background-color: var(--color-neutral-fg-strong);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Pixel-step corners — same pattern as other components */
+  clip-path: polygon(
+    0 var(--card-pixel-step),
+    var(--card-pixel-step) var(--card-pixel-step),
+    var(--card-pixel-step) 0,
+    calc(100% - 3 * var(--card-pixel-step)) 0,
+    calc(100% - 3 * var(--card-pixel-step)) var(--card-pixel-step),
+    calc(100% - 2 * var(--card-pixel-step)) var(--card-pixel-step),
+    calc(100% - 2 * var(--card-pixel-step)) calc(2 * var(--card-pixel-step)),
+    calc(100% - var(--card-pixel-step)) calc(2 * var(--card-pixel-step)),
+    calc(100% - var(--card-pixel-step)) calc(3 * var(--card-pixel-step)),
+    100% calc(3 * var(--card-pixel-step)),
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Quote icon */
+.feedback-card__quote-icon {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  color: var(--color-neutral-bg);
+}
+
+.feedback-card__quote-icon--figma-orient {
+  transform: rotate(180deg) scaleY(-1);
+  transform-origin: center center;
+}
+
+/* Quote body */
+.feedback-card__quote {
+  margin: 0;
+  flex: 1;
+}
+
+.feedback-card__quote p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-feedback-quote);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
+  color: var(--color-neutral-bg);
+}
+
+/* Attribution */
+.feedback-card__source {
+  display: flex;
+  align-items: flex-start;
+}
+
+.feedback-card__source cite {
+  font-family: var(--font-serif);
+  font-style: normal;
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-feedback-cite);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
+  color: rgba(254, 250, 241, 0.6); /* --color-neutral-bg at 60% */
+}
+
+/* ─── Drag state ─────────────────────────────────────────────────── */
+
+.section--feedback.is-dragging {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grabbing;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  /* Scale section padding down to match .section--about at this breakpoint */
+  .section--feedback {
+    padding-block: var(--space-10);
+  }
+
+  .feedback__meta {
+    grid-column: 1 / 3;
+  }
+
+  .feedback__viewport {
+    grid-column: 3 / -1;
+  }
+
+  .feedback-card {
+    --feedback-card-width: 280px;
+    padding: var(--space-6);
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Let cards overflow visually on mobile — viewport handles its own scroll */
+  .section--feedback {
+    overflow: visible;
+  }
+
+  /* On mobile: meta sits above the track, both full-width */
+  .feedback__meta {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-6);
+    padding-bottom: var(--space-4);
+  }
+
+  .feedback__bar {
+    flex: 1;
+    max-width: 120px;
+    height: 3px;
+  }
+
+  .feedback__viewport {
+    grid-column: 1 / -1;
+    /* Bleed to the page edges so cards are fully visible */
+    margin-inline: calc(-1 * var(--grid-margin));
+    padding-inline: var(--grid-margin);
+    /* Native horizontal scroll on touch */
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+  }
+
+  .feedback__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .feedback__track {
+    /* On mobile the track scrolls natively; JS transform not applied */
+    will-change: auto;
+    transition: none;
+  }
+
+  .feedback-card {
+    --feedback-card-width: calc(100vw - var(--grid-margin) * 2 - var(--space-4));
+    scroll-snap-align: start;
+    min-height: 280px;
+    padding: var(--space-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .feedback-card {
+    --card-pixel-step: 6px;
+    padding: var(--space-4);
+  }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback__bar-fill {
+    transition: none;
+  }
+
+  .feedback__track {
+    transition: none;
+  }
+}

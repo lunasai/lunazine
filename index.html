@@ -26,6 +26,8 @@
     <link rel="stylesheet" href="./css/component-bottom.css" />
     <link rel="stylesheet" href="./css/component-scroll-section.css" />
     <link rel="stylesheet" href="./css/component-hover-preview.css" />
+    <link rel="stylesheet" href="./css/component-work-ticker.css" />
+    <link rel="stylesheet" href="./css/component-feedback.css" />
     <link rel="stylesheet" href="./css/component-metric-item.css" />
 
     <link rel="stylesheet" href="./css/main.css" />
@@ -200,19 +202,19 @@
                 <div class="impact-list work__project__impact">
                   <ul class="work__metrics">
                     <li class="metric-item">
-                      <span class="metric-item__block" aria-hidden="true"></span>
+                      <span class="metric-item__num" aria-hidden="true">I</span>
                       <span class="metric-item__text">55% &#x2192; 94% component health in 6 months</span>
                     </li>
                     <li class="metric-item">
-                      <span class="metric-item__block" aria-hidden="true"></span>
+                      <span class="metric-item__num" aria-hidden="true">II</span>
                       <span class="metric-item__text">40 regional platforms &#x2192; 1 global B2B platform</span>
                     </li>
                     <li class="metric-item">
-                      <span class="metric-item__block" aria-hidden="true"></span>
+                      <span class="metric-item__num" aria-hidden="true">III</span>
                       <span class="metric-item__text">Voluntary adoption across 4 local Heineken markets</span>
                     </li>
                     <li class="metric-item">
-                      <span class="metric-item__block" aria-hidden="true"></span>
+                      <span class="metric-item__num" aria-hidden="true">IV</span>
                       <span class="metric-item__text">230% community engagement growth</span>
                     </li>
                   </ul>
@@ -232,11 +234,11 @@
                 <div class="impact-list work__project__impact">
                   <ul class="work__metrics">
                     <li class="metric-item">
-                      <span class="metric-item__block" aria-hidden="true"></span>
+                      <span class="metric-item__num" aria-hidden="true">I</span>
                       <span class="metric-item__text">Increased AOV by <span class="sr-only">confidential percentage</span><span class="work__metric-redacted" aria-hidden="true"><span class="work__metric-redacted__blur">%%</span></span></span>
                     </li>
                     <li class="metric-item">
-                      <span class="metric-item__block" aria-hidden="true"></span>
+                      <span class="metric-item__num" aria-hidden="true">II</span>
                       <span class="metric-item__text">10+ scattered carousels &#x2192; 1 shared component</span>
                     </li>
                   </ul>
@@ -250,60 +252,90 @@
 
       </div><!-- /.work-experience-stack -->
 
-      <!-- Feedback + About: side-by-side on large viewports -->
-      <div class="section-duo">
+      <!-- Work artefacts ticker -->
+      <section class="section section--ticker" aria-label="Work artefacts">
+        <div class="ticker__viewport">
+          <div class="ticker__track">
 
-      <!-- Feedback -->
-      <section class="section section--feedback" id="feedback" aria-labelledby="feedback-heading">
-        <div class="page-grid">
-          <div class="col-full feedback__inner">
-            <h2 class="feedback__title" id="feedback-heading">What they say</h2>
+            <figure class="ticker__item" data-caption="Shared recommendations carousel" data-label="Adidas">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/adidas-carousel-800w.avif 800w, ./assets/ticker/generated/adidas-carousel-1600w.avif 1600w">
+                <source type="image/webp" srcset="./assets/ticker/generated/adidas-carousel-800w.webp 800w, ./assets/ticker/generated/adidas-carousel-1600w.webp 1600w">
+                <img src="./assets/ticker/generated/adidas-carousel-800w.png" alt="Adidas shared recommendations carousel" loading="lazy" draggable="false">
+              </picture>
+            </figure>
 
-            <div class="feedback__block">
-            <div class="feedback__quotes" role="list" aria-label="Feedback quotes">
-              <figure class="feedback-card" role="listitem">
-                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
-                <blockquote class="feedback-card__quote">
-                  <p>She doesn&rsquo;t wait for direction; she identifies opportunities, helps shape strategy, and drives initiatives forward with clarity and purpose. She has a strong ability to operate at both the strategic and execution levels, ensuring vision translates into high-quality, scalable outcomes. She elevated standards, strengthened foundations, and consistently raised the bar for quality across the team.</p>
-                </blockquote>
-                <figcaption class="feedback-card__source">
-                  <cite>Nicole Akin &ndash; Product director at Heineken</cite>
-                </figcaption>
-              </figure>
+            <figure class="ticker__item" data-caption="Color system tokens" data-label="Heineken — Crate DS">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/crate-colors-800w.avif 800w, ./assets/ticker/generated/crate-colors-1600w.avif 1600w">
+                <source type="image/webp" srcset="./assets/ticker/generated/crate-colors-800w.webp 800w, ./assets/ticker/generated/crate-colors-1600w.webp 1600w">
+                <img src="./assets/ticker/generated/crate-colors-800w.png" alt="Crate color system tokens" loading="lazy" draggable="false">
+              </picture>
+            </figure>
 
-              <figure class="feedback-card" role="listitem">
-                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
-                <blockquote class="feedback-card__quote">
-                  <p>Luna consistently delivers high-quality work with attention to detail, even when faced with complex challenges. Her ability to manage projects effectively, while maintaining strong relationships with stakeholders, ensures she consistently meets her goals.</p>
-                </blockquote>
-                <figcaption class="feedback-card__source">
-                  <cite>Jesse de Jong &ndash; Design lead at Heineken</cite>
-                </figcaption>
-              </figure>
+            <figure class="ticker__item" data-caption="Community &amp; contributors" data-label="Heineken — Crate DS">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/crate-community-800w.avif 800w, ./assets/ticker/generated/crate-community-1600w.avif 1600w">
+                <source type="image/webp" srcset="./assets/ticker/generated/crate-community-800w.webp 800w, ./assets/ticker/generated/crate-community-1600w.webp 1600w">
+                <img src="./assets/ticker/generated/crate-community-800w.png" alt="Crate community and contributors" loading="lazy" draggable="false">
+              </picture>
+            </figure>
 
-              <figure class="feedback-card" role="listitem">
-                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
-                <blockquote class="feedback-card__quote">
-                  <p>Luna is truly one of the most dependable and trustworthy people I have the pleasure of working with. Her ability to provide spot-on design advice and navigate complex situations is something I rely on wholeheartedly.</p>
-                </blockquote>
-                <figcaption class="feedback-card__source">
-                  <cite>Andrew Silfkin &ndash; Product design lead at Heineken</cite>
-                </figcaption>
-              </figure>
-              <figure class="feedback-card" role="listitem">
-                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
-                <blockquote class="feedback-card__quote">
-                  <p>Luna played a key role in shaping premium guided selling experiences, contributing to crucial products that helped consumers confidently find the right products for their specific needs by introducing and curating recommendation flows. What stood out most to me was her ability to balance future-thinking design with short-term feasible implementation. Luna consistently collaborated across markets to optimize the data required for meaningful product comparisons. Luna is a valuable asset to any organization looking for a strong designer who can connect the dots across consumer experience, business/brand strategy and technology.</p>
-                </blockquote>
-                <figcaption class="feedback-card__source">
-                  <cite>Serena Isone &ndash; Sr. Product Manager at Adidas</cite>
-                </figcaption>
-              </figure>
-            </div>
-            </div><!-- /.feedback__block -->
-          </div>
-        </div>
+            <figure class="ticker__item" data-caption="Product recommendation framework" data-label="Adidas">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/adidas-recs-800w.avif 800w">
+                <source type="image/webp" srcset="./assets/ticker/generated/adidas-recs-800w.webp 800w">
+                <img src="./assets/ticker/generated/adidas-recs-800w.png" alt="Adidas product recommendation framework" loading="lazy" draggable="false">
+              </picture>
+            </figure>
+
+            <figure class="ticker__item" data-caption="Spacing &amp; layout system" data-label="Heineken — Crate DS">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/crate-spacing-800w.avif 800w, ./assets/ticker/generated/crate-spacing-1600w.avif 1600w">
+                <source type="image/webp" srcset="./assets/ticker/generated/crate-spacing-800w.webp 800w, ./assets/ticker/generated/crate-spacing-1600w.webp 1600w">
+                <img src="./assets/ticker/generated/crate-spacing-800w.png" alt="Crate spacing and layout system" loading="lazy" draggable="false">
+              </picture>
+            </figure>
+
+            <figure class="ticker__item" data-caption="Interaction prototype" data-label="Heineken — Crate DS">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/video-gif-800w.avif 800w">
+                <source type="image/webp" srcset="./assets/ticker/generated/video-gif-800w.webp 800w">
+                <img src="./assets/ticker/generated/video-gif-800w.jpg" alt="Interaction prototype" loading="lazy" draggable="false">
+              </picture>
+            </figure>
+
+            <figure class="ticker__item" data-caption="Component health metrics" data-label="Heineken — Crate DS">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/crate-metrics-800w.avif 800w, ./assets/ticker/generated/crate-metrics-1600w.avif 1600w">
+                <source type="image/webp" srcset="./assets/ticker/generated/crate-metrics-800w.webp 800w, ./assets/ticker/generated/crate-metrics-1600w.webp 1600w">
+                <img src="./assets/ticker/generated/crate-metrics-800w.png" alt="Crate component health metrics" loading="lazy" draggable="false">
+              </picture>
+            </figure>
+
+            <figure class="ticker__item" data-caption="Loading &amp; skeleton patterns" data-label="Heineken — Crate DS">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/eazle-loading-800w.avif 800w">
+                <source type="image/webp" srcset="./assets/ticker/generated/eazle-loading-800w.webp 800w">
+                <img src="./assets/ticker/generated/eazle-loading-800w.jpg" alt="Eazle loading and skeleton patterns" loading="lazy" draggable="false">
+              </picture>
+            </figure>
+
+            <figure class="ticker__item" data-caption="Recommendation approach" data-label="Adidas">
+              <picture>
+                <source type="image/avif" srcset="./assets/ticker/generated/adidas-recs-slide-800w.avif 800w">
+                <source type="image/webp" srcset="./assets/ticker/generated/adidas-recs-slide-800w.webp 800w">
+                <img src="./assets/ticker/generated/adidas-recs-slide-800w.png" alt="Adidas recommendation approach" loading="lazy" draggable="false">
+              </picture>
+            </figure>
+
+          </div><!-- /.ticker__track -->
+        </div><!-- /.ticker__viewport -->
       </section>
+
+      <!-- Custom cursor (outside section so it isn't clipped) -->
+      <div class="ticker-cursor" aria-hidden="true"><span class="ticker-cursor__text">View</span></div>
+
 
       <!-- About -->
       <section class="section section--about" id="about" aria-label="About">
@@ -313,8 +345,8 @@
           <!-- Main copy + CTA (reads first on all viewports) -->
           <div class="col-about about__content">
             <div class="about__body">
-              <p>Design has been part of my life long before it became my career. Back when computers were still a multi-piece setup, a passion for reading and writing led me to start a blog &ndash; only to become completely obsessed with how it looked (and with all the gifs I wanted to make). Turns out that obsession never went away &ndash; it just grew up into design systems, tokens, and the exciting world of how brands communicate at scale.</p>
-              <p>Away from screens, I&rsquo;m a person who shoots on film, listens to loud music, reads a bunch of books while drinking a bunch of coffee, maintains an ever-evolving Japan itinerary I may or may not act on, and enjoys living in Amsterdam with a husband (whom I&rsquo;ve already converted into a designer) and two cats (still working on those).</p>
+              <p>Design has been part of my life long before it became my career. Back when computers were still a multi-piece setup, I started a blog because I wanted to write &mdash; only to become completely obsessed with how it looked (and with all the GIFs I wanted to make).</p>
+              <p>Twelve years later, and after experiencing many faces of design &mdash; graphic, brand, service, digital &mdash; I use my experience and passion for craft to help brands design at scale. Away from screens, I shoot on film, listen to loud music, read books, drink coffee, and &mdash; above all &mdash; rub my cats&rsquo; bellies.</p>
             </div>
             <div class="about__cta">
               <p class="about__cta-label">More about me:</p>
@@ -377,7 +409,68 @@
         </div><!-- /.about__scroll -->
       </section>
 
-      </div><!-- /.section-duo -->
+      <!-- Their words — full-width timed carousel -->
+      <section class="section section--feedback" id="feedback" aria-labelledby="feedback-heading">
+        <div class="page-grid">
+
+          <!-- Col 1: label + timer segments -->
+          <div class="feedback__meta">
+            <h2 class="feedback__title" id="feedback-heading">Their words</h2>
+            <div class="feedback__bar" aria-hidden="true">
+              <div class="feedback__bar-fill"></div>
+            </div>
+          </div>
+
+          <!-- Cols 3–12: scrolling card track -->
+          <div class="feedback__viewport">
+            <div class="feedback__track">
+
+              <figure class="feedback-card" role="tabpanel" aria-label="Quote 1 of 4">
+                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
+                <blockquote class="feedback-card__quote">
+                  <p>She doesn&rsquo;t wait for direction; she identifies opportunities, helps shape strategy, and drives initiatives forward with clarity and purpose. She has a strong ability to operate at both the strategic and execution levels, ensuring vision translates into high-quality, scalable outcomes. She elevated standards, strengthened foundations, and consistently raised the bar for quality across the team.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <cite>Nicole Akin &mdash; Product director at Heineken</cite>
+                </figcaption>
+              </figure>
+
+              <figure class="feedback-card" role="tabpanel" aria-label="Quote 2 of 4">
+                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
+                <blockquote class="feedback-card__quote">
+                  <p>Luna played a key role in shaping premium guided selling experiences, contributing to crucial products that helped consumers confidently find the right products for their specific needs. What stood out most to me was her ability to balance future-thinking design with short-term feasible implementation. Luna is a valuable asset to any organization looking for a strong designer who can connect the dots across consumer experience, business strategy and technology.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <cite>Serena Isone &mdash; Sr. Product Manager at Adidas</cite>
+                </figcaption>
+              </figure>
+
+              <figure class="feedback-card" role="tabpanel" aria-label="Quote 3 of 4">
+                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
+                <blockquote class="feedback-card__quote">
+                  <p>Luna consistently delivers high-quality work with attention to detail, even when faced with complex challenges. Her ability to manage projects effectively, while maintaining strong relationships with stakeholders, ensures she consistently meets her goals.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <cite>Jesse de Jong &mdash; Design lead at Heineken</cite>
+                </figcaption>
+              </figure>
+
+              <figure class="feedback-card" role="tabpanel" aria-label="Quote 4 of 4">
+                <svg class="feedback-card__quote-icon feedback-card__quote-icon--figma-orient" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="#figma-pixel-quote-right-solid"></use></svg>
+                <blockquote class="feedback-card__quote">
+                  <p>Luna is truly one of the most dependable and trustworthy people I have the pleasure of working with. Her ability to provide spot-on design advice and navigate complex situations is something I rely on wholeheartedly.</p>
+                </blockquote>
+                <figcaption class="feedback-card__source">
+                  <cite>Andrew Silfkin &mdash; Product design lead at Heineken</cite>
+                </figcaption>
+              </figure>
+
+            </div><!-- /.feedback__track -->
+          </div><!-- /.feedback__viewport -->
+
+        </div>
+      </section>
+
 
       <!-- Thanks / sign-off -->
       <section class="section section--thanks" id="thanks" aria-label="Sign-off">
@@ -428,6 +521,7 @@
     <script src="./js/hover-preview.js" defer></script>
     <script src="./js/pixel-interactions.js" defer></script>
     <script src="./js/work-slides.js" defer></script>
+    <script src="./js/work-ticker.js" defer></script>
     <script src="./js/bottom-clock.js" defer></script>
     <script src="./js/about-email-copy.js" defer></script>
     <script src="./js/moon-phase.js" defer></script>
@@ -444,6 +538,19 @@
       src="https://static.cloudflareinsights.com/beacon.min.js?token=8a5a2debd1be4c5591172ac74c114d69"
       data-cf-beacon='{"spa": true}'
     ></script>
+
+    <!-- Ticker modal (outside main so inert can be applied to the rest of the page) -->
+    <div class="ticker-modal" role="dialog" aria-modal="true" aria-label="Work artefact detail" aria-hidden="true" tabindex="-1">
+      <div class="ticker-modal__inner">
+        <button class="ticker-modal__close" aria-label="Close">Esc</button>
+        <img class="ticker-modal__img" src="" alt="">
+        <figcaption class="ticker-modal__caption">
+          <span class="ticker-modal__label"></span>
+          <span class="ticker-modal__title"></span>
+        </figcaption>
+      </div>
+      <div class="modal-cursor" aria-hidden="true">Close</div>
+    </div>
 
   </body>
 </html>
