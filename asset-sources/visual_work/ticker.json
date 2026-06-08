@@ -1,44 +1,38 @@
 {
-  "crate-colors": {
-    "source": "crate_colors.png",
-    "alt": "Crate color system tokens",
-    "caption": "Color system tokens",
-    "label": "Heineken — Crate DS"
-  },
-  "crate-spacing": {
-    "source": "crate_spacing.png",
-    "alt": "Crate spacing and layout system",
-    "caption": "Spacing & layout system",
-    "label": "Heineken — Crate DS"
-  },
-  "crate-metrics": {
-    "source": "crate_metrics.png",
-    "alt": "Crate component health metrics",
-    "caption": "Component health metrics",
-    "label": "Heineken — Crate DS"
-  },
   "crate-community": {
     "source": "crate_community.png",
     "alt": "Crate community and contributors",
     "caption": "Community & contributors",
     "label": "Heineken — Crate DS"
   },
-  "eazle-shapes": {
-    "source": "eazle_shapes.jpeg",
-    "alt": "Eazle brand shapes and identity",
-    "caption": "Brand shapes & identity",
-    "label": "Heineken — Eazle Brand"
+  "crate-eazle2": {
+    "source": "crate- eazle2.png",
+    "alt": "Eazle app screens — Heineken Crate",
+    "caption": "Eazle app screens",
+    "label": "Heineken — Eazle"
   },
-  "eazle-loading": {
-    "source": "eazle_loading_skeleton.gif",
-    "alt": "Eazle loading and skeleton patterns",
-    "caption": "Loading & skeleton patterns",
-    "label": "Heineken — Crate DS"
+  "adidas-side-panel-recs": {
+    "source": "adidas_side-panel-recs.mov",
+    "alt": "Adidas product interaction prototype",
+    "caption": "Product interaction prototype",
+    "label": "Adidas"
   },
   "adidas-recs": {
     "source": "adidas_recs.png",
     "alt": "Adidas product recommendation framework",
     "caption": "Product recommendation framework",
+    "label": "Adidas"
+  },
+  "crate-colors": {
+    "source": "crate_colors.png",
+    "alt": "Crate color system tokens",
+    "caption": "Color system tokens",
+    "label": "Heineken — Crate DS"
+  },
+  "adidas-story": {
+    "source": "adidas_story1.mov",
+    "alt": "Adidas product story interaction prototype",
+    "caption": "Product story prototype",
     "label": "Adidas"
   },
   "adidas-recs-slide": {
@@ -49,20 +43,33 @@
   },
   "adidas-carousel": {
     "source": "adidas_carousel.png",
-    "alt": "Adidas shared recommendations carousel",
-    "caption": "Shared recommendations carousel",
+    "alt": "Adidas product showcase",
+    "caption": "Product showcase",
     "label": "Adidas"
   },
-  "mix-template": {
-    "source": "1. Mix template.png",
-    "alt": "Mix template design",
-    "caption": "Mix template",
-    "label": "Heineken — Eazle Brand"
-  },
-  "video-gif": {
-    "source": "video_1.gif",
-    "alt": "Interaction prototype",
-    "caption": "Interaction prototype",
+  "crate-spacing": {
+    "source": "crate_spacing.png",
+    "alt": "Crate spacing and layout system",
+    "caption": "Spacing & layout system",
     "label": "Heineken — Crate DS"
+  },
+  "crate-eazle1": {
+    "source": "crate- eazle1.png",
+    "alt": "Eazle app design — Heineken Crate",
+    "caption": "Eazle app design",
+    "label": "Heineken — Eazle"
+  },
+  "eazle-loading": {
+    "source": "eazle_loading_skeleton.gif",
+    "animated": true,
+    "alt": "Eazle loading and skeleton patterns",
+    "caption": "Loading & skeleton patterns",
+    "label": "Heineken — Eazle"
+  },
+  "loader-eazle": {
+    "source": "loader_eazle.mov",
+    "alt": "Eazle app loading screen micro-interaction",
+    "caption": "App loading animation",
+    "label": "Heineken — Eazle"
   }
 }

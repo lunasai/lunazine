@@ -87,24 +87,49 @@
   }
 }
 
-.ticker__item img {
+.ticker__item img,
+.ticker__item video {
   display: block;
   height: 100%;
   width: auto;
-  max-width: none; /* let the image be as wide as its aspect ratio dictates */
+  max-width: none; /* let the asset be as wide as its aspect ratio dictates */
   object-fit: cover;
   pointer-events: none;
-  /* Idle: high-contrast grayscale as base for the halftone treatment */
   filter: none;
   transition:
     transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
     filter    500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Poster fallback images: hidden by default, shown only in reduced-motion */
+.ticker__item-poster {
+  display: none !important;
+}
 
 @media (hover: hover) and (pointer: fine) {
-  .ticker__item.is-hovered img {
+  .ticker__item.is-hovered img,
+  .ticker__item.is-hovered video {
     transform: scale(1.04);
+  }
+}
+
+/* ─── Reduced motion: swap animated content for static poster ────── */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Hide the video; show its poster fallback img instead */
+  .ticker__item--video video {
+    display: none;
+  }
+
+  /* Hide the animated GIF; show its poster fallback img instead */
+  .ticker__item--gif img:not(.ticker__item-poster) {
+    display: none;
+  }
+
+  /* Reveal the static poster for both video and GIF items */
+  .ticker__item--video .ticker__item-poster,
+  .ticker__item--gif   .ticker__item-poster {
+    display: block !important;
   }
 }
 

@@ -1,37 +1,4 @@
 {
-  "crate-colors": {
-    "alt": "Crate color system tokens",
-    "caption": "Color system tokens",
-    "label": "Heineken — Crate DS",
-    "sources": {
-      "avif": "./assets/ticker/generated/crate-colors-800w.avif 800w, ./assets/ticker/generated/crate-colors-1600w.avif 1600w",
-      "webp": "./assets/ticker/generated/crate-colors-800w.webp 800w, ./assets/ticker/generated/crate-colors-1600w.webp 1600w",
-      "png": "./assets/ticker/generated/crate-colors-800w.png 800w, ./assets/ticker/generated/crate-colors-1600w.png 1600w"
-    },
-    "src": "./assets/ticker/generated/crate-colors-800w.png"
-  },
-  "crate-spacing": {
-    "alt": "Crate spacing and layout system",
-    "caption": "Spacing & layout system",
-    "label": "Heineken — Crate DS",
-    "sources": {
-      "avif": "./assets/ticker/generated/crate-spacing-800w.avif 800w, ./assets/ticker/generated/crate-spacing-1600w.avif 1600w",
-      "webp": "./assets/ticker/generated/crate-spacing-800w.webp 800w, ./assets/ticker/generated/crate-spacing-1600w.webp 1600w",
-      "png": "./assets/ticker/generated/crate-spacing-800w.png 800w, ./assets/ticker/generated/crate-spacing-1600w.png 1600w"
-    },
-    "src": "./assets/ticker/generated/crate-spacing-800w.png"
-  },
-  "crate-metrics": {
-    "alt": "Crate component health metrics",
-    "caption": "Component health metrics",
-    "label": "Heineken — Crate DS",
-    "sources": {
-      "avif": "./assets/ticker/generated/crate-metrics-800w.avif 800w, ./assets/ticker/generated/crate-metrics-1600w.avif 1600w",
-      "webp": "./assets/ticker/generated/crate-metrics-800w.webp 800w, ./assets/ticker/generated/crate-metrics-1600w.webp 1600w",
-      "png": "./assets/ticker/generated/crate-metrics-800w.png 800w, ./assets/ticker/generated/crate-metrics-1600w.png 1600w"
-    },
-    "src": "./assets/ticker/generated/crate-metrics-800w.png"
-  },
   "crate-community": {
     "alt": "Crate community and contributors",
     "caption": "Community & contributors",
@@ -43,16 +10,27 @@
     },
     "src": "./assets/ticker/generated/crate-community-800w.png"
   },
-  "eazle-loading": {
-    "alt": "Eazle loading and skeleton patterns",
-    "caption": "Loading & skeleton patterns",
-    "label": "Heineken — Crate DS",
+  "crate-eazle2": {
+    "alt": "Eazle app screens — Heineken Crate",
+    "caption": "Eazle app screens",
+    "label": "Heineken — Eazle",
     "sources": {
-      "avif": "./assets/ticker/generated/eazle-loading-800w.avif 800w",
-      "webp": "./assets/ticker/generated/eazle-loading-800w.webp 800w",
-      "jpg": "./assets/ticker/generated/eazle-loading-800w.jpg 800w"
+      "avif": "./assets/ticker/generated/crate-eazle2-800w.avif 800w, ./assets/ticker/generated/crate-eazle2-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/crate-eazle2-800w.webp 800w, ./assets/ticker/generated/crate-eazle2-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/crate-eazle2-800w.png 800w, ./assets/ticker/generated/crate-eazle2-1600w.png 1600w"
     },
-    "src": "./assets/ticker/generated/eazle-loading-800w.jpg"
+    "src": "./assets/ticker/generated/crate-eazle2-800w.png"
+  },
+  "adidas-side-panel-recs": {
+    "type": "video",
+    "alt": "Adidas product interaction prototype",
+    "caption": "Product interaction prototype",
+    "label": "Adidas",
+    "sources": {
+      "webm": "./assets/ticker/generated/adidas-side-panel-recs-800h.webm",
+      "mp4": "./assets/ticker/generated/adidas-side-panel-recs-800h.mp4"
+    },
+    "poster": "./assets/ticker/generated/adidas-side-panel-recs-poster.jpg"
   },
   "adidas-recs": {
     "alt": "Adidas product recommendation framework",
@@ -64,6 +42,28 @@
       "png": "./assets/ticker/generated/adidas-recs-800w.png 800w"
     },
     "src": "./assets/ticker/generated/adidas-recs-800w.png"
+  },
+  "crate-colors": {
+    "alt": "Crate color system tokens",
+    "caption": "Color system tokens",
+    "label": "Heineken — Crate DS",
+    "sources": {
+      "avif": "./assets/ticker/generated/crate-colors-800w.avif 800w, ./assets/ticker/generated/crate-colors-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/crate-colors-800w.webp 800w, ./assets/ticker/generated/crate-colors-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/crate-colors-800w.png 800w, ./assets/ticker/generated/crate-colors-1600w.png 1600w"
+    },
+    "src": "./assets/ticker/generated/crate-colors-800w.png"
+  },
+  "adidas-story": {
+    "type": "video",
+    "alt": "Adidas product story interaction prototype",
+    "caption": "Product story prototype",
+    "label": "Adidas",
+    "sources": {
+      "webm": "./assets/ticker/generated/adidas-story-800h.webm",
+      "mp4": "./assets/ticker/generated/adidas-story-800h.mp4"
+    },
+    "poster": "./assets/ticker/generated/adidas-story-poster.jpg"
   },
   "adidas-recs-slide": {
     "alt": "Adidas recommendation approach",
@@ -77,25 +77,55 @@
     "src": "./assets/ticker/generated/adidas-recs-slide-800w.png"
   },
   "adidas-carousel": {
-    "alt": "Adidas shared recommendations carousel",
-    "caption": "Shared recommendations carousel",
+    "alt": "Adidas product showcase",
+    "caption": "Product showcase",
     "label": "Adidas",
     "sources": {
-      "avif": "./assets/ticker/generated/adidas-carousel-800w.avif 800w, ./assets/ticker/generated/adidas-carousel-1600w.avif 1600w",
-      "webp": "./assets/ticker/generated/adidas-carousel-800w.webp 800w, ./assets/ticker/generated/adidas-carousel-1600w.webp 1600w",
-      "png": "./assets/ticker/generated/adidas-carousel-800w.png 800w, ./assets/ticker/generated/adidas-carousel-1600w.png 1600w"
+      "avif": "./assets/ticker/generated/adidas-carousel-800w.avif 800w",
+      "webp": "./assets/ticker/generated/adidas-carousel-800w.webp 800w",
+      "png": "./assets/ticker/generated/adidas-carousel-800w.png 800w"
     },
     "src": "./assets/ticker/generated/adidas-carousel-800w.png"
   },
-  "video-gif": {
-    "alt": "Interaction prototype",
-    "caption": "Interaction prototype",
+  "crate-spacing": {
+    "alt": "Crate spacing and layout system",
+    "caption": "Spacing & layout system",
     "label": "Heineken — Crate DS",
     "sources": {
-      "avif": "./assets/ticker/generated/video-gif-800w.avif 800w",
-      "webp": "./assets/ticker/generated/video-gif-800w.webp 800w",
-      "jpg": "./assets/ticker/generated/video-gif-800w.jpg 800w"
+      "avif": "./assets/ticker/generated/crate-spacing-800w.avif 800w, ./assets/ticker/generated/crate-spacing-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/crate-spacing-800w.webp 800w, ./assets/ticker/generated/crate-spacing-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/crate-spacing-800w.png 800w, ./assets/ticker/generated/crate-spacing-1600w.png 1600w"
     },
-    "src": "./assets/ticker/generated/video-gif-800w.jpg"
+    "src": "./assets/ticker/generated/crate-spacing-800w.png"
+  },
+  "crate-eazle1": {
+    "alt": "Eazle app design — Heineken Crate",
+    "caption": "Eazle app design",
+    "label": "Heineken — Eazle",
+    "sources": {
+      "avif": "./assets/ticker/generated/crate-eazle1-800w.avif 800w, ./assets/ticker/generated/crate-eazle1-1600w.avif 1600w",
+      "webp": "./assets/ticker/generated/crate-eazle1-800w.webp 800w, ./assets/ticker/generated/crate-eazle1-1600w.webp 1600w",
+      "png": "./assets/ticker/generated/crate-eazle1-800w.png 800w, ./assets/ticker/generated/crate-eazle1-1600w.png 1600w"
+    },
+    "src": "./assets/ticker/generated/crate-eazle1-800w.png"
+  },
+  "eazle-loading": {
+    "type": "gif",
+    "alt": "Eazle loading and skeleton patterns",
+    "caption": "Loading & skeleton patterns",
+    "label": "Heineken — Eazle",
+    "src": "./assets/ticker/generated/eazle-loading-800w.gif",
+    "poster": "./assets/ticker/generated/eazle-loading-poster.jpg"
+  },
+  "loader-eazle": {
+    "type": "video",
+    "alt": "Eazle app loading screen micro-interaction",
+    "caption": "App loading animation",
+    "label": "Heineken — Eazle",
+    "sources": {
+      "webm": "./assets/ticker/generated/loader-eazle-800h.webm",
+      "mp4": "./assets/ticker/generated/loader-eazle-800h.mp4"
+    },
+    "poster": "./assets/ticker/generated/loader-eazle-poster.jpg"
   }
 }

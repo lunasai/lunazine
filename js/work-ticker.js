@@ -60,9 +60,25 @@
   var tween = null;
   var TICKER_DURATION = 40; /* seconds for one full loop */
   var cachedContentWidth = 0;
+  var isHovering = false;
 
   function initTween() {
     if (reducedMotion) return;
+
+    /* Guard: don't start before all media has its natural dimensions.
+       Excludes poster fallback imgs (not needed for width calculation).
+       Videos need readyState >= HAVE_METADATA so offsetWidth is non-zero. */
+    var imgs   = Array.from(track.querySelectorAll('img:not(.ticker__item-poster)'));
+    var videos = Array.from(track.querySelectorAll('video'));
+    var notReady = imgs.some(function (img) { return !img.complete || img.naturalWidth === 0; })
+                || videos.some(function (vid) { return vid.readyState < 1; });
+    if (notReady) return;
+
+    /* Kill any previous tween before creating a new one.  Without this,
+       a stale resize-triggered tween (wrong content width) keeps running
+       alongside the correct one — two tweens fighting on the same x
+       property produce sluggish or jittery motion until the next drag. */
+    if (tween) { tween.kill(); tween = null; }
 
     cachedContentWidth = getContentWidth();
     if (cachedContentWidth <= 0) return;
@@ -80,6 +96,13 @@
         })
       }
     });
+
+    /* Respect current hover state — if the mouse is already inside the
+       viewport when the tween is (re)created (e.g. after a drag), apply
+       the slow-hover timescale immediately rather than waiting for the
+       next mouseenter event, which will never fire since the mouse didn't
+       leave and re-enter. */
+    if (isHovering) tween.timeScale(0.4);
   }
 
   /* Re-init on resize (content width changes with font/zoom) */
@@ -99,10 +122,12 @@
   /* ── Speed control on hover ──────────────────────────────────────── */
 
   viewport.addEventListener('mouseenter', function () {
-    if (tween) tween.timeScale(0.25);
+    isHovering = true;
+    if (tween) tween.timeScale(0.4);
   });
 
   viewport.addEventListener('mouseleave', function () {
+    isHovering = false;
     if (tween) tween.timeScale(1);
   });
 
@@ -229,11 +254,46 @@
 
   /* ── Init ──────────────────────────────────────────────────────── */
 
-  /* Wait for images to have intrinsic widths before measuring */
-  if (document.readyState === 'complete') {
-    initTween();
-  } else {
-    window.addEventListener('load', initTween);
+  /* Wait for all ticker media (images + video metadata) before starting
+     the tween. Poster fallback imgs are excluded — they load async and
+     aren't needed for width calculation.
+     Videos need readyState >= HAVE_METADATA (1) so their natural
+     dimensions are available for offsetWidth calculation. */
+  function initWhenReady() {
+    var imgs   = Array.from(track.querySelectorAll('img:not(.ticker__item-poster)'));
+    var videos = Array.from(track.querySelectorAll('video'));
+
+    var pendingImgs = imgs.filter(function (img) {
+      return !img.complete || img.naturalWidth === 0;
+    });
+    var pendingVids = videos.filter(function (vid) {
+      return vid.readyState < 1; /* < HAVE_METADATA */
+    });
+
+    var total = pendingImgs.length + pendingVids.length;
+
+    if (!total) {
+      requestAnimationFrame(initTween);
+      return;
+    }
+
+    var done = 0;
+    function onSettle() {
+      done++;
+      if (done === total) requestAnimationFrame(initTween);
+    }
+
+    pendingImgs.forEach(function (img) {
+      img.addEventListener('load',  onSettle, { once: true });
+      img.addEventListener('error', onSettle, { once: true });
+    });
+
+    pendingVids.forEach(function (vid) {
+      vid.addEventListener('loadedmetadata', onSettle, { once: true });
+      vid.addEventListener('error',          onSettle, { once: true });
+    });
   }
+
+  initWhenReady();
 
 }());
