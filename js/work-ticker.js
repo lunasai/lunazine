@@ -47,10 +47,11 @@
   /* ── Measure content width (single set, not cloned) ─────────────── */
 
   function getContentWidth() {
-    var gap  = 16; /* matches --space-4 in CSS */
     var total = 0;
     originalItems.forEach(function (item) {
-      total += item.offsetWidth + gap;
+      /* Use getBoundingClientRect for sub-pixel accuracy to prevent
+         micro-stutters at the loop wrap point. */
+      total += item.getBoundingClientRect().width;
     });
     return total;
   }
@@ -74,23 +75,23 @@
                 || videos.some(function (vid) { return vid.readyState < 1; });
     if (notReady) return;
 
-    /* Kill any previous tween before creating a new one.  Without this,
-       a stale resize-triggered tween (wrong content width) keeps running
-       alongside the correct one — two tweens fighting on the same x
-       property produce sluggish or jittery motion until the next drag. */
+    /* Kill any previous tween before creating a new one. */
     if (tween) { tween.kill(); tween = null; }
 
     cachedContentWidth = getContentWidth();
     if (cachedContentWidth <= 0) return;
 
-    /* Wrap x using modifiers so the jump back is invisible.
-       Works from any starting x (including post-drag offsets). */
+    /* Standard infinite loop: animate from current position to -contentWidth.
+       We use a relative value "-=" so it works after dragging. */
     tween = gsap.to(track, {
-      x: '-=' + cachedContentWidth,
+      x: "-=" + cachedContentWidth,
       duration: TICKER_DURATION,
-      ease: 'none',
+      ease: "none",
       repeat: -1,
       modifiers: {
+        /* The modifier ensures x always stays within [ -cachedContentWidth, 0 ].
+           This makes the loop truly infinite and seamless regardless of
+           how long it runs or where it's dragged to. */
         x: gsap.utils.unitize(function (x) {
           return parseFloat(x) % cachedContentWidth;
         })
