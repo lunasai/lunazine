@@ -5,6 +5,12 @@
  * Adjacent rows use a midpoint seam so the active row does not flicker
  * at boundaries. Inter-row gaps keep the current row until the seam is crossed.
  * Pointer:fine only.
+ *
+ * Scroll support: Lenis drives scroll via CSS transform, so mousemove never
+ * fires when the page moves under a stationary cursor. We track the last known
+ * cursor position and re-run the proximity check on every Lenis scroll tick
+ * (falling back to the native scroll event) so is-near stays accurate during
+ * scroll-through, giving the same full hover effect as a direct mouse-over.
  */
 
 (function () {
@@ -22,6 +28,13 @@
   var pendingList = null;
   var clearTimerId = 0;
   var refreshRafId = 0;
+
+  /* Last known cursor position — null until the cursor has entered a metrics group */
+  var lastMx = null;
+  var lastMy = null;
+
+  /* rAF guard for the scroll-driven re-evaluation path */
+  var scrollRafId = 0;
 
   function refreshGroupRects(group) {
     group.rects = group.items.map(function (el) {
@@ -144,6 +157,11 @@
     setActive(null);
   }
 
+  function onDocMouseMove(e) {
+    lastMx = e.clientX;
+    lastMy = e.clientY;
+  }
+
   function onMouseMove(e) {
     cancelClearTimer();
     pendingEvent = e;
@@ -157,6 +175,53 @@
       pendingList = null;
       if (!ev || !list) return;
       updateFromPointer(list, ev.clientX, ev.clientY);
+    });
+  }
+
+  /**
+   * Re-evaluate which metric item is under the cursor after a scroll tick.
+   * Lenis moves elements via transform so rects change without any mouse event.
+   * We refresh all rects and re-run the hit test against the last known cursor
+   * position. If the cursor is outside every group we clear the active state.
+   */
+  function onScroll() {
+    if (lastMx === null) return; /* cursor has never entered a metrics group */
+    if (scrollRafId) return;
+    scrollRafId = window.requestAnimationFrame(function () {
+      scrollRafId = 0;
+
+      /* Cancel any pending mousemove work — scroll result takes precedence */
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+        pendingEvent = null;
+        pendingList = null;
+      }
+
+      refreshAllRects();
+
+      var mx = lastMx;
+      var my = lastMy;
+      var hit = null;
+
+      for (var i = 0; i < metricsGroups.length; i++) {
+        var group = metricsGroups[i];
+        var candidate = pickItemInGroup(group, mx, my);
+        if (candidate) {
+          hit = candidate;
+          break;
+        }
+      }
+
+      if (hit) {
+        cancelClearTimer();
+        setActive(hit);
+      } else {
+        /* Cursor is not over any row — clear immediately (no delay needed   */
+        /* because the page moved, not the cursor, so there is no seam risk) */
+        cancelClearTimer();
+        setActive(null);
+      }
     });
   }
 
@@ -205,8 +270,35 @@
       group.list.addEventListener("mouseleave", onMetricsLeave);
     });
 
+    document.addEventListener("mousemove", onDocMouseMove, { passive: true });
     window.addEventListener("resize", scheduleRefreshRects, { passive: true });
-    window.addEventListener("scroll", scheduleRefreshRects, { passive: true });
+
+    /*
+     * Lenis scrolls via CSS transform so native scroll events don't fire.
+     * Hook into the Lenis instance if available; keep the native listener as
+     * a fallback for environments without Lenis (or if the instance loads late).
+     */
+    function attachLenisScroll() {
+      if (window.__lenis) {
+        window.__lenis.on("scroll", onScroll);
+        return true;
+      }
+      return false;
+    }
+
+    if (!attachLenisScroll()) {
+      /* Lenis not yet initialised — retry once after scripts have settled */
+      window.addEventListener(
+        "load",
+        function () {
+          if (!attachLenisScroll()) {
+            /* No Lenis at all — fall back to native scroll */
+            window.addEventListener("scroll", onScroll, { passive: true });
+          }
+        },
+        { once: true }
+      );
+    }
   }
 
   if (document.readyState === "loading") {
