@@ -93,7 +93,7 @@
   height: 100%;
   width: auto;
   max-width: none; /* let the asset be as wide as its aspect ratio dictates */
-  object-fit: cover;
+  object-fit: contain; /* prevent cropping; aspect ratio is preserved by height:100% + width:auto */
   pointer-events: none;
   filter: none;
   transition:

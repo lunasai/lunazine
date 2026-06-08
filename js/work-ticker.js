@@ -28,21 +28,7 @@
   var cursorText = document.querySelector('.ticker-cursor__text');
   if (!viewport || !track || !cursor) return;
 
-  /* ── Clone items for seamless infinite loop ─────────────────────
-     We duplicate the entire set of items so the track is 2× content width.
-     GSAP animates x from 0 → -contentWidth, then repeat: -1 wraps silently.
-  ────────────────────────────────────────────────────────────────── */
-
-  var originalItems = Array.from(track.querySelectorAll('.ticker__item'));
-
-  if (!reducedMotion) {
-    originalItems.forEach(function (item) {
-      var clone = item.cloneNode(true);
-      clone.setAttribute('aria-hidden', 'true');
-      clone.removeAttribute('tabindex');
-      track.appendChild(clone);
-    });
-  }
+  var originalItems = [];
 
   /* ── Measure content width (single set, not cloned) ─────────────── */
 
@@ -77,6 +63,23 @@
 
     /* Kill any previous tween before creating a new one. */
     if (tween) { tween.kill(); tween = null; }
+
+    /* Clone items for seamless infinite loop ─────────────────────
+       We do this ONLY ONCE after everything is ready, so clones have
+       the correct natural dimensions from the start.
+    ────────────────────────────────────────────────────────────────── */
+    if (originalItems.length === 0) {
+      originalItems = Array.from(track.querySelectorAll('.ticker__item'));
+      originalItems.forEach(function (item) {
+        var clone = item.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        clone.removeAttribute('tabindex');
+        /* Ensure videos in clones also autoplay */
+        var cloneVids = clone.querySelectorAll('video');
+        cloneVids.forEach(function(v) { v.play().catch(function() {}); });
+        track.appendChild(clone);
+      });
+    }
 
     cachedContentWidth = getContentWidth();
     if (cachedContentWidth <= 0) return;
