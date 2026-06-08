@@ -57,7 +57,24 @@
 }
 
 
-/* ── 4. Block bullet ─────────────────────────────────────────────────────── */
+/* ── 4. Roman numeral index ───────────────────────────────────────────────── */
+
+.metric-item__num {
+  display:          block;
+  flex-shrink:      0;
+  font-family:      var(--font-mono);
+  font-size:        var(--typography-mono); /* 14px */
+  font-weight:      var(--font-weight-regular);
+  font-style:       normal;
+  font-synthesis:   none;
+  font-feature-settings: "case" 1;
+  line-height:      1.13;
+  letter-spacing:   -0.02em;
+  color:            var(--color-neutral-fg);
+  transition:       color 0.2s ease;
+}
+
+/* ── 5. Block bullet (legacy — kept for non-section contexts) ─────────────── */
 
 .metric-item__block {
   display:          block;
@@ -68,7 +85,7 @@
 }
 
 
-/* ── 5. Text + sweep (box = copy width, not flex-grow row width) ─────────── */
+/* ── 6. Text + sweep (box = copy width, not flex-grow row width) ─────────── */
 
 .metric-item__text {
   position:         relative;
@@ -101,7 +118,7 @@
 }
 
 
-/* ── 6. Hover — fill matches text box, copy inverts ──────────────────────── */
+/* ── 7. Hover — fill matches text box, copy inverts ──────────────────────── */
 
 @media (hover: hover) and (pointer: fine) {
   .metric-item:hover .metric-item__text::before {
@@ -114,7 +131,7 @@
 }
 
 
-/* ── 7. Reduced motion — instant snap ───────────────────────────────────── */
+/* ── 8. Reduced motion — instant snap ───────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   .metric-item__text,

@@ -1,7 +1,7 @@
 /**
  * Work section metric items — exactly one active row at a time.
  *
- * Hit targets are the 24px row boxes only (not label overflow).
+ * Hit targets are the row boxes only (not label overflow).
  * Adjacent rows use a midpoint seam so the active row does not flicker
  * at boundaries. Inter-row gaps keep the current row until the seam is crossed.
  * Pointer:fine only.
@@ -13,7 +13,7 @@
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
   var CLEAR_DELAY_MS = 160;
-  var HIT_SLOP_Y = 2; /* invisible extension above/below the 24px row box */
+  var HIT_SLOP_Y = 2; /* invisible extension above/below each row box */
 
   var metricsGroups = [];
   var active = null;
