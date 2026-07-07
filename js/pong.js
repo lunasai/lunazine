@@ -9,16 +9,24 @@
   const ctx = canvas.getContext('2d');
 
   // ── Game config ──────────────────────────────────────────────
+  // Speeds are relative so the game feels the same at any viewport size:
+  // ballSpeed/speedCap are court-widths per second, aiSpeed and KB_SPEED
+  // are court-heights per second. Converted to px/s where applied.
   const LEVELS = [
-    { ballSpeed: 8.5,  aiSpeed: 5.5,  speedCap: 19, serveDelay: 600 },
-    { ballSpeed: 11,   aiSpeed: 7.65, speedCap: 25, serveDelay: 400 },
-    { ballSpeed: 14,   aiSpeed: 10.2, speedCap: 32, serveDelay: 250 },
+    { ballSpeed: 0.55, aiSpeed: 0.60, speedCap: 1.10, serveDelay: 600 },
+    { ballSpeed: 0.72, aiSpeed: 0.82, speedCap: 1.45, serveDelay: 400 },
+    { ballSpeed: 0.92, aiSpeed: 1.10, speedCap: 1.85, serveDelay: 250 },
   ];
-  const KB_SPEED        = 7;
+  const KB_SPEED        = 0.75;
   const PADDLE_W_PCT    = 0.045;
   const PADDLE_H_PCT    = 0.262;
   const BALL_SIZE_PCT   = 0.044;
   const AI_ERROR_FACTOR = [0.63, 0.35, 0.14];
+
+  const MOUSE_SMOOTHING = 20;    // paddle follow snappiness (higher = tighter)
+  const ENGLISH_FACTOR  = 0.35;  // how much paddle velocity transfers to ball vy
+  const MAX_DT          = 0.032; // clamp dt across tab switches / hitches
+  const WIN_SCORE       = 7;     // first to this wins the match
 
   const SAFE_TOP    = 90;
   const SAFE_BOTTOM = 80;
@@ -65,9 +73,15 @@
   let keys          = {};
   let scores        = { left: 0, right: 0 };
   let aiErrorOffset = 0;
+  let lastFrame     = 0;
 
-  let leftPaddle  = { x: 0, y: 0, w: 0, h: 0 };
-  let rightPaddle = { x: 0, y: 0, w: 0, h: 0 };
+  let shakeMag = 0;
+  let shakeEnd = 0;
+  let scorePop = { side: null, end: 0 };
+  let gameOver = null; // null | 'left' | 'right' (winning side)
+
+  let leftPaddle  = { x: 0, y: 0, w: 0, h: 0, vy: 0 };
+  let rightPaddle = { x: 0, y: 0, w: 0, h: 0, vy: 0 };
   let ball        = { x: 0, y: 0, size: 0, vx: 0, vy: 0 };
 
   // ── Easing ───────────────────────────────────────────────────
@@ -98,6 +112,32 @@
     const b = parseInt(hex.slice(4, 6), 16);
     if (isNaN(r)) return `rgba(9,7,13,${alpha})`;
     return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  // ── Sound (square-wave blips, no assets) ─────────────────────
+  let audioCtx = null;
+
+  function ensureAudio() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!audioCtx) audioCtx = new AC();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function blip(freq, dur, slideTo) {
+    if (!audioCtx || audioCtx.state !== 'running') return;
+    const t   = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g   = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(freq, t);
+    if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.04, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + dur + 0.02);
   }
 
   function elapsedMs() {
@@ -168,12 +208,17 @@
   function enter() {
     scores        = { left: 0, right: 0 };
     paused        = false;
+    gameOver      = null;
     serving       = true;
     playStarted   = false;
     mouseY        = -1;
     keys          = {};
     running       = true;
     timelineStart = performance.now();
+    lastFrame     = timelineStart;
+    shakeEnd      = 0;
+    scorePop      = { side: null, end: 0 };
+    ensureAudio();
 
     document.body.classList.add('pong-active');
     overlay.removeAttribute('aria-hidden');
@@ -238,7 +283,7 @@
 
   // ── Physics helpers ──────────────────────────────────────────
   function capSpeed() {
-    const cap = LEVELS[levelIndex].speedCap;
+    const cap = LEVELS[levelIndex].speedCap * W;
     const mag = Math.hypot(ball.vx, ball.vy);
     if (mag > cap) {
       ball.vx = (ball.vx / mag) * cap;
@@ -263,9 +308,10 @@
     serveTimer = setTimeout(() => {
       serving = false;
       const angle = Math.random() * 0.5 - 0.25;
-      const spd   = LEVELS[levelIndex].ballSpeed;
+      const spd   = LEVELS[levelIndex].ballSpeed * W;
       ball.vx = direction * spd * Math.cos(angle);
       ball.vy = spd * Math.sin(angle);
+      blip(440, 0.05);
     }, delay);
   }
 
@@ -300,7 +346,12 @@
     ball.vy = 0;
   }
 
-  const ro = new ResizeObserver(() => { if (running) layoutCourt(); });
+  const ro = new ResizeObserver(() => {
+    if (!running) return;
+    layoutCourt();
+    // Velocities are px/s derived from the old court size — re-serve.
+    if (playStarted) resetBall(1, false);
+  });
   ro.observe(overlay);
 
   // ── Input ────────────────────────────────────────────────────
@@ -314,6 +365,11 @@
   });
 
   overlay.addEventListener('mouseleave', () => { mouseY = -1; });
+
+  // Tap / click anywhere restarts from the win screen (touch has no spacebar)
+  overlay.addEventListener('pointerdown', () => {
+    if (running && gameOver) rematch();
+  });
 
   overlay.addEventListener('pointerdown', (e) => {
     if (!running || e.pointerType === 'mouse') return;
@@ -346,7 +402,8 @@
     keys[e.code] = true;
     if (playStarted && (e.code === 'Space' || e.code === 'KeyP')) {
       e.preventDefault();
-      paused = !paused;
+      if (gameOver) rematch();
+      else paused = !paused;
     }
     if (e.code === 'Escape') exit();
     if (playStarted && e.code === 'KeyZ') setLevel(levelIndex - 1);
@@ -367,36 +424,76 @@
     localStorage.setItem('luna-pong-level', levelIndex);
   }
 
+  // ── Hit feedback ─────────────────────────────────────────────
+  function paddleHitFx() {
+    shakeMag = 3;
+    shakeEnd = performance.now() + 120;
+    blip(520, 0.06);
+  }
+
+  function scoreFx(side) {
+    scorePop = { side, end: performance.now() + 350 };
+    blip(210, 0.28, 130);
+  }
+
+  function endGame(side) {
+    gameOver = side;
+    clearTimeout(serveTimer);
+    serving = true;
+    ball.x  = W / 2 - ball.size / 2;
+    ball.y  = H / 2 - ball.size / 2;
+    ball.vx = 0;
+    ball.vy = 0;
+    // Ascending jingle for a win, descending for a loss
+    if (side === 'left') blip(330, 0.35, 880);
+    else                 blip(330, 0.35, 110);
+  }
+
+  function rematch() {
+    scores   = { left: 0, right: 0 };
+    scorePop = { side: null, end: 0 };
+    gameOver = null;
+    paused   = false;
+    resetBall(1, false);
+  }
+
   // ── Update ───────────────────────────────────────────────────
-  function update() {
+  function update(dt) {
     const elapsed = elapsedMs();
 
     if (elapsed >= T.PLAY_START) beginPlay();
 
+    const prevLeftY = leftPaddle.y;
     if (mouseY >= 0) {
-      leftPaddle.y = mouseY - leftPaddle.h / 2;
+      // Smoothed follow — gives the paddle weight and makes its velocity
+      // meaningful for english on contact.
+      const target = mouseY - leftPaddle.h / 2;
+      leftPaddle.y += (target - leftPaddle.y) * (1 - Math.exp(-MOUSE_SMOOTHING * dt));
     } else {
-      if (keys['ArrowUp'])   leftPaddle.y -= KB_SPEED;
-      if (keys['ArrowDown']) leftPaddle.y += KB_SPEED;
+      if (keys['ArrowUp'])   leftPaddle.y -= KB_SPEED * H * dt;
+      if (keys['ArrowDown']) leftPaddle.y += KB_SPEED * H * dt;
     }
-    leftPaddle.y = Math.max(0, Math.min(H - leftPaddle.h, leftPaddle.y));
+    leftPaddle.y  = Math.max(0, Math.min(H - leftPaddle.h, leftPaddle.y));
+    leftPaddle.vy = dt > 0 ? (leftPaddle.y - prevLeftY) / dt : 0;
 
     if (!playStarted || paused || serving) return;
 
+    const prevRightY = rightPaddle.y;
     if (ball.vx > 0) {
       const target = (ball.y + ball.size / 2) + aiErrorOffset - (rightPaddle.h / 2);
       const diff   = target - rightPaddle.y;
       if (Math.abs(diff) > 1) {
-        rightPaddle.y += Math.sign(diff) * Math.min(LEVELS[levelIndex].aiSpeed, Math.abs(diff));
+        rightPaddle.y += Math.sign(diff) * Math.min(LEVELS[levelIndex].aiSpeed * H * dt, Math.abs(diff));
       }
     }
-    rightPaddle.y = Math.max(0, Math.min(H - rightPaddle.h, rightPaddle.y));
+    rightPaddle.y  = Math.max(0, Math.min(H - rightPaddle.h, rightPaddle.y));
+    rightPaddle.vy = dt > 0 ? (rightPaddle.y - prevRightY) / dt : 0;
 
-    ball.x += ball.vx;
-    ball.y += ball.vy;
+    ball.x += ball.vx * dt;
+    ball.y += ball.vy * dt;
 
-    if (ball.y <= 0)             { ball.y = 0;             ball.vy =  Math.abs(ball.vy); }
-    if (ball.y + ball.size >= H) { ball.y = H - ball.size; ball.vy = -Math.abs(ball.vy); }
+    if (ball.y <= 0)             { ball.y = 0;             ball.vy =  Math.abs(ball.vy); blip(300, 0.05); }
+    if (ball.y + ball.size >= H) { ball.y = H - ball.size; ball.vy = -Math.abs(ball.vy); blip(300, 0.05); }
 
     const ballCx = ball.x + ball.size / 2;
     const ballCy = ball.y + ball.size / 2;
@@ -408,10 +505,12 @@
         ballCy             < leftPaddle.y + leftPaddle.h) {
       ball.x = leftPaddle.x + leftPaddle.w;
       const relY = ((ballCy - leftPaddle.y) / leftPaddle.h) - 0.5;
+      const eng  = Math.max(-H, Math.min(H, leftPaddle.vy)) * ENGLISH_FACTOR;
       ball.vx    = Math.abs(ball.vx) * 1.04;
-      ball.vy    = relY * LEVELS[levelIndex].ballSpeed * 2.2;
+      ball.vy    = relY * LEVELS[levelIndex].ballSpeed * W * 2.2 + eng;
       capSpeed();
       randomizeAiError();
+      paddleHitFx();
     }
 
     if (ball.vx > 0 &&
@@ -421,13 +520,23 @@
         ballCy             < rightPaddle.y + rightPaddle.h) {
       ball.x = rightPaddle.x - ball.size;
       const relY = ((ballCy - rightPaddle.y) / rightPaddle.h) - 0.5;
+      const eng  = Math.max(-H, Math.min(H, rightPaddle.vy)) * ENGLISH_FACTOR;
       ball.vx    = -Math.abs(ball.vx) * 1.04;
-      ball.vy    = relY * LEVELS[levelIndex].ballSpeed * 2.2;
+      ball.vy    = relY * LEVELS[levelIndex].ballSpeed * W * 2.2 + eng;
       capSpeed();
+      paddleHitFx();
     }
 
-    if (ball.x + ball.size < 0) { scores.right = Math.min(999, scores.right + 1); resetBall(1,  false); }
-    if (ball.x > W)             { scores.left  = Math.min(999, scores.left  + 1); resetBall(-1, false); }
+    if (ball.x + ball.size < 0) {
+      scores.right += 1;
+      if (scores.right >= WIN_SCORE) endGame('right');
+      else { scoreFx('right'); resetBall(1, false); }
+    }
+    if (ball.x > W) {
+      scores.left += 1;
+      if (scores.left >= WIN_SCORE) endGame('left');
+      else { scoreFx('left'); resetBall(-1, false); }
+    }
   }
 
   // ── Draw helpers ─────────────────────────────────────────────
@@ -446,13 +555,22 @@
     ctx.stroke();
     ctx.setLineDash([]);
 
+    const now = performance.now();
+
     const scoreSize = W < 480 ? 12 : 18;
-    ctx.font         = `${scoreSize}px 'Space Mono', monospace`;
     ctx.fillStyle    = c.accent;
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(String(scores.left).padStart(3, '0'),  W / 4,     SAFE_TOP);
-    ctx.fillText(String(scores.right).padStart(3, '0'), 3 * W / 4, SAFE_TOP);
+    const drawScore = (value, x, side) => {
+      let size = scoreSize;
+      if (scorePop.side === side && now < scorePop.end) {
+        size = scoreSize * (1 + 0.5 * easeOutCubic((scorePop.end - now) / 350));
+      }
+      ctx.font = `${size}px 'Space Mono', monospace`;
+      ctx.fillText(String(value).padStart(3, '0'), x, SAFE_TOP);
+    };
+    drawScore(scores.left,  W / 4,     'left');
+    drawScore(scores.right, 3 * W / 4, 'right');
 
     ctx.fillStyle = c.accent;
     ctx.fillRect(leftPaddle.x,  leftPaddle.y,  leftPaddle.w, leftPaddle.h);
@@ -521,13 +639,24 @@
     ctx.fillStyle = c.bg;
     ctx.fillRect(0, 0, W, H);
 
+    const nowT    = performance.now();
+    const shaking = !reducedMotion && nowT < shakeEnd;
+    if (shaking) {
+      const p = (shakeEnd - nowT) / 120;
+      ctx.save();
+      ctx.translate(
+        (Math.random() * 2 - 1) * shakeMag * p,
+        (Math.random() * 2 - 1) * shakeMag * p
+      );
+    }
     drawCourt(c, courtA);
+    if (shaking) ctx.restore();
     drawScrim(scrimA);
 
     if (digits.length) drawCountdownDigits(digits, c);
     if (hintA > 0) drawIntroHint(c, hintA);
 
-    if (playStarted && serving && !paused) {
+    if (playStarted && serving && !paused && !gameOver) {
       ctx.font         = `${scoreSize}px 'Space Mono', monospace`;
       ctx.fillStyle    = hexToRgba(c.accent, 0.45 * courtA);
       ctx.textAlign    = 'center';
@@ -545,13 +674,39 @@
       ctx.fillText('PAUSED', W / 2, H / 2);
     }
 
-    if (playStarted && hintA <= 0) drawPlayHint(c, paused);
+    if (gameOver) {
+      ctx.fillStyle = 'rgba(254,250,241,0.92)';
+      ctx.fillRect(0, 0, W, H);
+
+      const bigSize = W < 480 ? 32 : 48;
+      ctx.font         = `${bigSize}px 'Space Mono', monospace`;
+      ctx.fillStyle    = c.accent;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(gameOver === 'left' ? 'YOU WIN' : 'CPU WINS', W / 2, H / 2 - 24);
+
+      ctx.font      = `${scoreSize}px 'Space Mono', monospace`;
+      ctx.fillStyle = hexToRgba(c.text, 0.55);
+      ctx.fillText(
+        `${String(scores.left).padStart(3, '0')} — ${String(scores.right).padStart(3, '0')}`,
+        W / 2,
+        H / 2 + 28
+      );
+
+      ctx.font      = `10px 'Space Mono', monospace`;
+      ctx.fillStyle = hexToRgba(c.text, 0.35);
+      ctx.fillText('space — rematch  ·  esc — exit', W / 2, H / 2 + 68);
+    }
+
+    if (playStarted && hintA <= 0 && !gameOver) drawPlayHint(c, paused);
   }
 
   // ── Loop ─────────────────────────────────────────────────────
-  function loop() {
+  function loop(now) {
     if (!running) return;
-    update();
+    const dt  = Math.min(MAX_DT, Math.max(0, (now - lastFrame) / 1000));
+    lastFrame = now;
+    update(dt);
     draw();
     rafId = requestAnimationFrame(loop);
   }
