@@ -229,6 +229,8 @@ body {
 .section--about.will-animate .about__tagline:not(.in-view),
 .section--about.will-animate .about__label:not(.in-view),
 .section--about.will-animate .about__body p:not(.in-view),
+.section--about.will-animate .about__tools-label:not(.in-view),
+.section--about.will-animate .about__tools-list:not(.in-view),
 .section--about.will-animate .about__cta:not(.in-view) {
   opacity: 0;
 }
@@ -242,6 +244,8 @@ body {
 .section--about.will-animate .about__tagline.in-view,
 .section--about.will-animate .about__label.in-view,
 .section--about.will-animate .about__body p.in-view,
+.section--about.will-animate .about__tools-label.in-view,
+.section--about.will-animate .about__tools-list.in-view,
 .section--about.will-animate .about__cta.in-view {
   animation: fade-up var(--scroll-reveal-fade-duration) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -390,7 +394,8 @@ body {
 /* Section labels — mono folio markers, uppercase */
 .work__title,
 .feedback__title,
-.about__label {
+.about__label,
+.about__tools-label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-regular);
   font-size: var(--typography-mono);
@@ -1040,6 +1045,208 @@ body {
 
 .about__body p + p {
   margin-top: var(--space-4); /* 16px */
+}
+
+/* Outbound link inside body copy. Underlined so it reads as a real link,
+   unlike the crosshair hover-preview spans in the work section. Takes the
+   body ink rather than the accent — two accent words in one sentence pull
+   harder than the sentence deserves. The accent arrives on hover, where it
+   confirms the affordance instead of announcing it. */
+.about__body .about__link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+  text-decoration-color: var(--color-neutral-fg-muted);
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+}
+
+.about__body .about__link:hover {
+  color: var(--color-accent-fg);
+  text-decoration-color: var(--color-accent-fg);
+}
+
+.about__body .about__link:focus-visible {
+  outline: 2px solid var(--color-accent-bg);
+  outline-offset: 3px;
+  border-radius: var(--radius-focus);
+}
+
+/* ─── About: self-built tools ─────────────────────────
+   Hairline rows below the bio. Constrained to 6/12 cols on medium+
+   so the list keeps a readable measure while .about__body stays
+   full-width. Hover reuses the .metric-item contract: a ::before
+   scales from the left across the name box only, inverting fg/bg.
+   ──────────────────────────────────────────── */
+
+/* Spacing only — type comes from the shared section-label rule above,
+   so this label always matches "What I say" / "Their words". */
+.about__tools-label {
+  margin: 0 0 var(--space-6);
+}
+
+.about__tools-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Split layout: bio and tools sit side by side so both halves of the row
+   carry content at any width — the section stays full-bleed, and the bio
+   picks up a readable measure from the 7-column span rather than a cap.
+   Below 769px both blocks span the full grid and stack, bio first.
+   Specificity note: .section--about .about__content (0,2,0) intentionally
+   beats .col-about (0,1,0), which sets span 12. */
+@media (min-width: 769px) {
+  .section--about .about__label,
+  .section--about .about__content {
+    grid-column: 1 / span 7;
+  }
+
+  /* display: contents promotes the label and list to grid items, so the
+     label shares the first row with "What I say" and the list starts on
+     the same line as the bio. Keeps the h3 next to its ul in the DOM. */
+  .section--about .about__tools {
+    display: contents;
+  }
+
+  .section--about .about__tools-label,
+  .section--about .about__tools-list {
+    grid-column: 9 / span 4;
+  }
+}
+
+/* ─── Tools list: built, not shipped yet ──────────────────────
+   Delete this whole block to ship it — that restores the split
+   layout defined above. Placed after that media query so it wins
+   on source order (identical 0,2,0 specificity, and media queries
+   add none). Markup stays in index.html.
+   ─────────────────────────────────────────────────────────── */
+.section--about .about__tools {
+  display: none;
+}
+
+/* Bio measure: at 12 columns the copy ran ~158 characters per line on a
+   wide monitor — roughly twice a comfortable measure. Six columns lands
+   near 75-80. The section itself stays full-bleed; only the running text
+   is constrained. Label keeps the full span so it still reads as the
+   section heading rather than a caption on the column. */
+@media (min-width: 769px) {
+  .section--about .about__label {
+    grid-column: 1 / span 12;
+  }
+
+  .section--about .about__content {
+    grid-column: 1 / span 6;
+  }
+}
+
+@media (max-width: 768px) {
+  .about__tools {
+    grid-column: 1 / span 12;
+    /* .page-grid sets row-gap 0, so the stacked block needs its own space */
+    margin-top: var(--space-10);
+  }
+}
+
+.tool-row {
+  border-top: 1px solid var(--color-neutral-stroke);
+}
+
+.tool-row:last-child {
+  border-bottom: 1px solid var(--color-neutral-stroke);
+}
+
+.tool-row__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Arrow sits next to the name, not at the far edge of the row —
+   it stays legible as part of the link at any block width. */
+.tool-row__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.tool-row__link:focus-visible {
+  outline: 2px solid var(--color-accent-bg);
+  outline-offset: 3px;
+  border-radius: var(--radius-focus);
+}
+
+/* isolation + z-index keep the sweep behind the glyphs without
+   pulling the row out of the section stacking context. */
+.tool-row__name {
+  position: relative;
+  isolation: isolate;
+  width: fit-content;
+  max-width: 100%;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: var(--typography-body-md);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
+  color: var(--color-neutral-fg-strong);
+  transition: color 180ms ease;
+}
+
+.tool-row__name::before {
+  content: "";
+  position: absolute;
+  inset: -2px -6px;
+  z-index: -1;
+  background: var(--color-accent-bg);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tool-row__link:hover .tool-row__name::before,
+.tool-row__link:focus-visible .tool-row__name::before {
+  transform: scaleX(1);
+}
+
+.tool-row__link:hover .tool-row__name,
+.tool-row__link:focus-visible .tool-row__name {
+  color: var(--color-neutral-fg-on-accent);
+}
+
+.tool-row__desc {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--typography-mono);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-neutral-fg-muted);
+}
+
+.tool-row__arrow {
+  font-family: var(--font-mono);
+  font-size: var(--typography-mono);
+  letter-spacing: var(--letter-spacing-mono);
+  color: var(--color-neutral-fg-muted);
+  transition: transform 200ms ease, color 200ms ease;
+}
+
+.tool-row__link:hover .tool-row__arrow {
+  color: var(--color-accent-fg);
+  transform: translate(3px, -3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-row__name::before,
+  .tool-row__name,
+  .tool-row__arrow {
+    transition: none;
+  }
 }
 
 /* Don’t stretch with .about__content (column flex defaults to align-items: stretch);
