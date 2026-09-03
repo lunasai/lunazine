@@ -37,7 +37,7 @@
     },
     {
       container: '.section--about',
-      items: '.about__tagline, .about__label, .about__body p, .about__cta'
+      items: '.about__tagline, .about__label, .about__body p, .about__tools-label, .about__tools-list, .about__cta'
     }
   ];
 
