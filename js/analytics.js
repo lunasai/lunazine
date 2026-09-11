@@ -13,11 +13,18 @@
     }
   }
 
+  /* Where on the page a contact control lives, for the `location` prop */
+  function contactLocation(el) {
+    if (el.closest('.bottom')) return 'bottom_bar';
+    if (el.closest('#thanks')) return 'thanks_section';
+    return 'about_section';
+  }
+
   /* ── Email copy ─────────────────────────────────────────────────── */
 
   document.querySelectorAll('.js-copy-email').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var location = btn.closest('.bottom') ? 'bottom_bar' : 'about_section';
+      var location = contactLocation(btn);
       track('email_copy', { location: location });
     });
   });
@@ -26,25 +33,35 @@
 
   document.querySelectorAll('.js-feedback-download').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var location = btn.closest('.bottom') ? 'bottom_bar' : 'about_section';
+      var location = contactLocation(btn);
       track('cv_download', { location: location });
     });
   });
 
   /* ── LinkedIn ───────────────────────────────────────────────────── */
 
-  var linkedin = document.querySelector('a[href*="linkedin.com"]');
-  if (linkedin) {
-    linkedin.addEventListener('click', function () {
-      track('linkedin_click');
+  document.querySelectorAll('a[href*="linkedin.com"]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      track('linkedin_click', { location: contactLocation(link) });
     });
-  }
+  });
 
   /* ── Nav links ──────────────────────────────────────────────────── */
 
   document.querySelectorAll('.navbar a[href]').forEach(function (link) {
     link.addEventListener('click', function () {
       track('nav_click', { target: link.getAttribute('href') });
+    });
+  });
+
+  /* ── Project links (About) ──────────────────────────────────────── */
+
+  document.querySelectorAll('.about__link').forEach(function (link) {
+    link.addEventListener('click', function () {
+      track('project_click', {
+        project: link.textContent.trim(),
+        href: link.getAttribute('href'),
+      });
     });
   });
 
@@ -56,6 +73,38 @@
       track('pong_click');
     });
   }
+
+  /* ── Work-section hover previews ────────────────────────────────── */
+  /*
+    Fires when someone dwells on a [data-preview-id] element long enough for the
+    preview to matter (not on every incidental mouse-over), and once per element
+    per page load so a hover-jitter can't inflate the count. Keyboard focus
+    counts immediately.
+  */
+
+  var DWELL_MS = 400;
+  var seenPreviews = {};
+
+  function trackPreview(el) {
+    var id = el.getAttribute('data-preview-id');
+    if (!id || seenPreviews[id]) return;
+    seenPreviews[id] = true;
+    track('preview_open', { preview: id, label: el.textContent.trim() });
+  }
+
+  document.querySelectorAll('[data-preview-id]').forEach(function (el) {
+    var timer = null;
+
+    el.addEventListener('mouseenter', function () {
+      timer = setTimeout(function () { trackPreview(el); }, DWELL_MS);
+    });
+
+    el.addEventListener('mouseleave', function () {
+      if (timer) { clearTimeout(timer); timer = null; }
+    });
+
+    el.addEventListener('focus', function () { trackPreview(el); });
+  });
 
   /* ── Ticker modal open ──────────────────────────────────────────── */
 

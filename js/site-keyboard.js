@@ -1,7 +1,10 @@
 /**
  * Site keyboard behaviour:
  * - Skip scrolls to #main-content without moving focus (next Tab → Home).
- * - Focusing fixed header/footer chrome scrolls the page so that control is in context.
+ * - Keyboard-focusing fixed header/footer chrome scrolls the page so that control
+ *   is in context. Mouse/touch focus is ignored: a click already has its own
+ *   destination, and scrolling here would hijack it (e.g. "Email me" jumping to
+ *   the sign-off, or Work/About snapping to the top before their anchor scroll).
  */
 (function () {
   "use strict";
@@ -50,6 +53,7 @@
       var t = e.target;
       if (!(t instanceof Element)) return;
       if (!t.closest("a, button, [tabindex='0']")) return;
+      if (!t.matches(":focus-visible")) return;
       scrollForChrome(t);
     },
     true

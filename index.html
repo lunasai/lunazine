@@ -33,8 +33,26 @@
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.css" />
 
-    <!-- Umami Analytics -->
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="c8eb18b0-559a-4ec8-a0ff-2c4f65581c60"></script>
+    <!-- Umami Analytics.
+         Cookieless: sets no cookies, writes nothing to the browser, and
+         collects no personal data. Visitors are counted with a salted daily
+         hash that is discarded, so nobody is tracked across days or sites.
+
+         Loaded only on lunaborgo.com so local dev, preview builds and LAN
+         addresses never report. To opt out in any browser, run:
+           localStorage.setItem('umami.disabled', 1)
+    -->
+    <script>
+      (function () {
+        var host = location.hostname;
+        if (host !== 'lunaborgo.com' && !/\.lunaborgo\.com$/.test(host)) return;
+        var s = document.createElement('script');
+        s.defer = true;
+        s.src = 'https://cloud.umami.is/script.js';
+        s.setAttribute('data-website-id', 'c8eb18b0-559a-4ec8-a0ff-2c4f65581c60');
+        document.head.appendChild(s);
+      })();
+    </script>
   </head>
   <body>
     <svg class="svg-symbol-sprite" aria-hidden="true" focusable="false" width="0" height="0">
@@ -543,7 +561,7 @@
             </pre>
             <div class="thanks__text">
               <h2 class="thanks__title">Thanks for the visit.</h2>
-              <p class="thanks__body-p">If you&rsquo;d like to see more of my work, wanna partner for a project or just chat about design, send me a mail! I&rsquo;d love to hear from you ^^</p>
+              <p class="thanks__body-p">Wanna partner for a project, or just chat about design?<br />Let&rsquo;s <a class="thanks__link" href="https://www.linkedin.com/in/lunaborgo" target="_blank" rel="noopener noreferrer">connect</a>. I&rsquo;d love to hear from you ^^</p>
             </div>
             <p class="thanks__signoff">Enough work? <a href="./pong.html" class="button button--chrome button--chrome-outline thanks__pong-link">Play pong</a></p>
           </div>

@@ -32,6 +32,10 @@ body {
   /* Apply Fraunces WONK axis globally — inherits to all serif elements.
      Non-variable fonts (Space Mono, Montagu Slab) silently ignore unknown axes. */
   font-variation-settings: var(--font-variation-serif);
+  /* Better line breaking site-wide: avoids single-word last lines and short
+     final lines in body copy. Inherited, so it reaches every text block.
+     Progressive enhancement — browsers without support wrap as before. */
+  text-wrap: pretty;
 }
 
 
@@ -1052,7 +1056,8 @@ body {
    body ink rather than the accent — two accent words in one sentence pull
    harder than the sentence deserves. The accent arrives on hover, where it
    confirms the affordance instead of announcing it. */
-.about__body .about__link {
+.about__body .about__link,
+.thanks__link {
   color: inherit;
   text-decoration: underline;
   text-decoration-thickness: 1px;
@@ -1061,12 +1066,14 @@ body {
   transition: color 160ms ease, text-decoration-color 160ms ease;
 }
 
-.about__body .about__link:hover {
+.about__body .about__link:hover,
+.thanks__link:hover {
   color: var(--color-accent-fg);
   text-decoration-color: var(--color-accent-fg);
 }
 
-.about__body .about__link:focus-visible {
+.about__body .about__link:focus-visible,
+.thanks__link:focus-visible {
   outline: 2px solid var(--color-accent-bg);
   outline-offset: 3px;
   border-radius: var(--radius-focus);
