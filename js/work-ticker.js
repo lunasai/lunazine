@@ -102,6 +102,10 @@
       if (!down) return;
       down = false;
       viewport.classList.remove('is-dragging');
+      if (moved) {
+        wasDrag = true;
+        setTimeout(function () { wasDrag = false; }, 0);
+      }
     });
     /* Stop images/links being dragged natively */
     viewport.addEventListener('dragstart', function (e) { e.preventDefault(); });
@@ -155,6 +159,8 @@
         var clone = item.cloneNode(true);
         clone.setAttribute('aria-hidden', 'true');
         clone.removeAttribute('tabindex');
+        clone.removeAttribute('role');
+        clone.removeAttribute('aria-label');
         /* Ensure videos in clones also autoplay */
         var cloneVids = clone.querySelectorAll('video');
         cloneVids.forEach(function(v) { v.play().catch(function() {}); });
@@ -222,6 +228,7 @@
   var dragStartX    = 0;
   var trackStartX   = 0;
   var hasDragged    = false;
+  var wasDrag       = false; /* true for the click event that ends a drag */
   /* 10px threshold: large enough that normal trackpad click movement
      never triggers a drag, small enough that intentional scrubbing
      starts immediately. */
@@ -259,6 +266,8 @@
     if (window.__lenis) window.__lenis.start();
 
     if (hasDragged) {
+      wasDrag = true;
+      setTimeout(function () { wasDrag = false; }, 0);
       /* Tween's internal playhead no longer matches the DOM position after
          a drag — kill and reinit from the current dragged-to position so
          the loop resumes seamlessly without a visible jump. */
@@ -334,10 +343,183 @@
     cursorText.textContent = text + sep + text + sep;
   }
 
-  /* Click: consume hasDragged flag so drag doesn't register as a click */
-  track.addEventListener('click', function () {
-    if (hasDragged) hasDragged = false;
-  });
+
+  /* ── Detail modal: media + project context side by side ─────────── */
+
+  var modal = document.querySelector('.ticker-modal');
+  if (modal) {
+    var mInner  = modal.querySelector('.ticker-modal__inner');
+    var mMedia  = modal.querySelector('.ticker-modal__media');
+    var mPanel  = modal.querySelector('.ticker-modal__panel');
+    var mLabel  = modal.querySelector('.ticker-modal__label');
+    var mTitle  = modal.querySelector('.ticker-modal__title');
+    var mDesc   = modal.querySelector('.ticker-modal__desc');
+    var mMeta   = modal.querySelector('.ticker-modal__meta');
+    var mCount  = modal.querySelector('.ticker-modal__count');
+    var mClose  = modal.querySelector('.ticker-modal__close');
+    var mNavBtns = Array.from(modal.querySelectorAll('.ticker-modal__nav-btn'));
+    var mCursor = modal.querySelector('.modal-cursor');
+    var lastFocus = null;
+    var currentIndex = -1;
+
+    /* Only the original (non-cloned) items are navigable */
+    function getItems() {
+      return Array.from(track.querySelectorAll('.ticker__item:not([aria-hidden="true"])'));
+    }
+
+    function pickSrc(item) {
+      /* Largest webp candidate if available, else the <img> src */
+      var src = item.querySelector('picture source[type="image/webp"]');
+      if (src && src.srcset) {
+        var parts = src.srcset.split(',').map(function (c) { return c.trim().split(/\s+/)[0]; });
+        return parts[parts.length - 1];
+      }
+      var img = item.querySelector('img:not(.ticker__item-poster)');
+      return img ? img.currentSrc || img.src : '';
+    }
+
+    function setMeta(key, value) {
+      var row = modal.querySelector('[data-meta="' + key + '"]');
+      if (!row) return;
+      row.hidden = !value;
+      row.querySelector('dd').textContent = value || '';
+    }
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    function buildMedia(item) {
+      var old = mMedia.querySelector('video');
+      if (old) old.pause();
+      mMedia.textContent = '';
+      var vid = item.querySelector('video');
+      var poster = item.querySelector('.ticker__item-poster');
+      var el;
+      if (vid && !reducedMotion) {
+        el = document.createElement('video');
+        el.muted = true; el.loop = true; el.autoplay = true; el.playsInline = true;
+        el.setAttribute('playsinline', '');
+        vid.querySelectorAll('source').forEach(function (sEl) { el.appendChild(sEl.cloneNode(true)); });
+        if (poster) el.poster = poster.getAttribute('src');
+        el.play && el.play().catch(function () {});
+      } else {
+        el = document.createElement('img');
+        el.src = poster && (vid || item.classList.contains('ticker__item--gif'))
+          ? poster.getAttribute('src')
+          : pickSrc(item);
+        var base = item.querySelector('img');
+        el.alt = base ? base.alt : '';
+      }
+      el.className = 'ticker-modal__img';
+      mMedia.appendChild(el);
+    }
+
+    function showIndex(i) {
+      var items = getItems();
+      if (!items.length) return;
+      currentIndex = (i + items.length) % items.length;
+      var item = items[currentIndex];
+
+      buildMedia(item);
+      mLabel.textContent = item.dataset.label || '';
+      mTitle.textContent = item.dataset.caption || '';
+      setMeta('company', item.dataset.company);
+      setMeta('role',    item.dataset.role);
+      setMeta('year',    item.dataset.year);
+      mMeta.hidden = !(item.dataset.company || item.dataset.role || item.dataset.year);
+      mDesc.textContent = item.dataset.desc || '';
+      mDesc.hidden = !item.dataset.desc;
+      mCount.textContent = pad(currentIndex + 1) + ' / ' + pad(items.length);
+      mPanel.scrollTop = 0;
+    }
+
+    function openModal(item) {
+      lastFocus = document.activeElement;
+      showIndex(getItems().indexOf(item));
+
+      modal.setAttribute('aria-hidden', 'false');
+      modal.classList.add('is-open');
+      document.body.classList.add('ticker-modal-open');
+      if (window.__lenis) window.__lenis.stop();
+      modal.focus({ preventScroll: true });
+    }
+
+    function closeModal() {
+      if (!modal.classList.contains('is-open')) return;
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('ticker-modal-open');
+      if (mCursor) mCursor.classList.remove('is-visible');
+      if (window.__lenis) window.__lenis.start();
+      var v = mMedia.querySelector('video');
+      if (v) v.pause();
+      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+    }
+
+    /* Open: click (ignoring clicks that ended a drag) or Enter/Space */
+    track.addEventListener('click', function (e) {
+      var item = e.target.closest('.ticker__item');
+      if (!item || wasDrag) return;
+      openModal(item);
+    });
+    track.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var item = e.target.closest('.ticker__item');
+      if (!item) return;
+      e.preventDefault();
+      openModal(item);
+    });
+    originalItems_forFocus();
+
+    /* Prev / next */
+    mNavBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        showIndex(currentIndex + Number(btn.dataset.dir));
+      });
+    });
+
+    /* Close: backdrop click, close button */
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeModal();
+    });
+    mClose.addEventListener('click', closeModal);
+
+    /* Keyboard: Esc closes, arrows navigate, Tab cycles inside the card */
+    document.addEventListener('keydown', function (e) {
+      if (!modal.classList.contains('is-open')) return;
+      if (e.key === 'Escape') { closeModal(); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); showIndex(currentIndex + 1); return; }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); showIndex(currentIndex - 1); return; }
+      if (e.key === 'Tab') {
+        var focusables = [mClose].concat(mNavBtns);
+        var idx = focusables.indexOf(document.activeElement);
+        var next = idx === -1
+          ? (e.shiftKey ? focusables.length - 1 : 0)
+          : (idx + (e.shiftKey ? -1 : 1) + focusables.length) % focusables.length;
+        e.preventDefault();
+        focusables[next].focus();
+      }
+    });
+
+    /* "Close" cursor pill over the backdrop only (fine pointers) */
+    modal.addEventListener('mousemove', function (e) {
+      if (!mCursor) return;
+      mCursor.style.setProperty('--mc-x', e.clientX + 'px');
+      mCursor.style.setProperty('--mc-y', e.clientY + 'px');
+      mCursor.classList.toggle('is-visible', e.target === modal);
+    });
+    modal.addEventListener('mouseleave', function () {
+      if (mCursor) mCursor.classList.remove('is-visible');
+    });
+  }
+
+  function originalItems_forFocus() {
+    Array.from(track.querySelectorAll('.ticker__item')).forEach(function (it) {
+      it.setAttribute('tabindex', '0');
+      it.setAttribute('role', 'button');
+      var base = it.querySelector('img');
+      it.setAttribute('aria-label', 'Open ' + (it.dataset.caption || (base && base.alt) || 'project') + ' details');
+    });
+  }
 
   /* ── Init ──────────────────────────────────────────────────────── */
 

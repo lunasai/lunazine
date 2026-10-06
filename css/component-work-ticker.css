@@ -192,10 +192,6 @@
 
 /* ─── Modal overlay ─────────────────────────────────────────────── */
 
-.ticker-modal:focus {
-  outline: none;
-}
-
 .ticker-modal {
   position: fixed;
   inset: 0;
@@ -206,9 +202,10 @@
   padding: var(--spacing-margin);
   box-sizing: border-box;
 
-  background-color: color-mix(in srgb, var(--color-neutral-bg) 70%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* Dark scrim so the cream card reads as a contained surface */
+  background-color: color-mix(in srgb, var(--color-neutral-fg-strong) 72%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
@@ -216,41 +213,46 @@
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity    320ms cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 0s   320ms;
+    opacity    280ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s   280ms;
+}
+
+.ticker-modal:focus {
+  outline: none;
 }
 
 .ticker-modal.is-open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  cursor: none;
+  cursor: none; /* custom "Close" pill over the backdrop */
   transition:
-    opacity    320ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity    280ms cubic-bezier(0.22, 1, 0.36, 1),
     visibility 0s   0s;
 }
 
-/* ─── Modal inner — pixel-step corners (matches .feedback__block) ─ */
+/* ─── Card — pixel-step corner (matches .feedback-card) ─────────── */
 
 .ticker-modal__inner {
   --modal-pixel-step: 10px;
+  --modal-pad: var(--space-8);
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  max-width: min(900px, calc(100vw - var(--spacing-margin) * 2));
-  max-height: calc(100vh - var(--spacing-margin) * 2);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 34%, 400px);
+  width: min(1200px, 100%);
+  height: min(720px, 100%);
   overflow: hidden;
+  cursor: auto; /* native cursor inside the card */
 
-  /* Entry animation: slide up from 20px */
-  transform: translateY(20px);
-  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  background-color: var(--color-neutral-bg);
+  color: var(--color-neutral-fg);
 
-  /* Pixel-step corners — same pattern as .feedback__block */
+  /* Entry: rise 16px */
+  transform: translateY(16px);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+
   clip-path: polygon(
-    0 var(--modal-pixel-step),
-    var(--modal-pixel-step) var(--modal-pixel-step),
-    var(--modal-pixel-step) 0,
+    0 0,
     calc(100% - 3 * var(--modal-pixel-step)) 0,
     calc(100% - 3 * var(--modal-pixel-step)) var(--modal-pixel-step),
     calc(100% - 2 * var(--modal-pixel-step)) var(--modal-pixel-step),
@@ -267,21 +269,44 @@
   transform: translateY(0);
 }
 
+/* ─── Media column ──────────────────────────────────────────────── */
+
+.ticker-modal__media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--modal-pad);
+  box-sizing: border-box;
+  background-color: var(--color-neutral-bg-elevated); /* same warm plate as ticker items */
+  border-right: 1px solid var(--color-neutral-stroke);
+}
+
 .ticker-modal__img {
   display: block;
-  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
-  max-height: calc(100vh - var(--spacing-margin) * 4 - 80px); /* leave room for caption */
   object-fit: contain;
   border-radius: var(--radius-sm);
 }
 
-/* ─── Modal caption ─────────────────────────────────────────────── */
+/* ─── Context panel ─────────────────────────────────────────────── */
 
-.ticker-modal__caption {
+.ticker-modal__panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--modal-pad);
+  box-sizing: border-box;
+  gap: var(--space-8);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
   font-family: var(--font-mono);
   font-weight: var(--font-weight-regular);
   font-size: var(--typography-mono);
@@ -289,46 +314,198 @@
   line-height: var(--line-height-normal);
 }
 
+/* Head: eyebrow label + close */
+.ticker-modal__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
 .ticker-modal__label {
+  margin: 0;
   color: var(--color-neutral-fg-muted);
   text-transform: uppercase;
 }
 
+.ticker-modal__close {
+  appearance: none;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+  color: var(--color-neutral-fg);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 160ms ease, color 160ms ease;
+}
+
+.ticker-modal__close:hover {
+  color: var(--color-accent-fg);
+  text-decoration-color: currentColor;
+}
+
+/* Body: title · meta rows · description */
+.ticker-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  flex: 1 1 auto;
+}
+
 .ticker-modal__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: 28px;
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-body);
+  color: var(--color-neutral-fg-strong);
+  text-wrap: balance;
+}
+
+/* Hairline rows — label left, value right (cf. .experience-panel__row) */
+.ticker-modal__meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-neutral-stroke);
+}
+
+.ticker-modal__meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--color-neutral-stroke);
+  font-feature-settings: 'case' 1;
+}
+
+.ticker-modal__meta[hidden],
+.ticker-modal__meta-row[hidden],
+.ticker-modal__desc[hidden] {
+  display: none;
+}
+
+.ticker-modal__meta dt {
+  flex: 0 0 auto;
+  color: var(--color-neutral-fg-muted);
+  text-transform: uppercase;
+}
+
+.ticker-modal__meta dd {
+  margin: 0;
+  text-align: right;
   color: var(--color-neutral-fg-strong);
 }
 
-/* ─── Modal close button (keyboard-only; hidden visually) ────────── */
+.ticker-modal__desc {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-light);
+  font-size: 16px;
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-body);
+  color: var(--color-neutral-fg);
+}
 
-.ticker-modal__close {
-  position: absolute;
-  top: var(--space-4);
-  right: var(--space-4);
-  z-index: 1;
+/* Foot: counter + prev/next */
+.ticker-modal__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-neutral-stroke);
+}
+
+.ticker-modal__count {
+  margin: 0;
+  color: var(--color-neutral-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ticker-modal__nav {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.ticker-modal__nav-btn {
+  appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
+  margin: 0;
   padding: 0;
   background: transparent;
-  border: none;
-  cursor: none;
-  color: transparent;
-  font-size: 0;
-  opacity: 0;
-  pointer-events: none;
+  border: 1px solid var(--color-neutral-fg-strong);
+  border-radius: var(--radius-chip-pill);
+  color: var(--color-neutral-fg-strong);
+  font-family: var(--font-glyph-arrow);
+  font-size: var(--typography-mono);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
-.ticker-modal__close:focus-visible {
-  opacity: 1;
-  pointer-events: auto;
+.ticker-modal__nav-btn:hover {
+  background-color: var(--color-control-pill-hover-bg);
+  color: var(--color-control-pill-hover-fg);
+  border-color: transparent;
+}
+
+.ticker-modal__close:focus-visible,
+.ticker-modal__nav-btn:focus-visible {
   outline: 2px solid var(--color-accent-bg);
-  outline-offset: 2px;
+  outline-offset: 3px;
   border-radius: var(--radius-focus);
 }
 
-/* ─── Modal custom cursor ────────────────────────────────────────── */
+/* ─── Responsive ────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .ticker-modal__inner {
+    --modal-pad: var(--space-6);
+    grid-template-columns: minmax(0, 1fr) clamp(280px, 38%, 360px);
+  }
+}
+
+@media (max-width: 768px) {
+  .ticker-modal {
+    padding: var(--space-4);
+  }
+
+  .ticker-modal__inner {
+    --modal-pad: var(--space-5);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 44%) minmax(0, 1fr);
+    height: 100%;
+  }
+
+  .ticker-modal__media {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-neutral-stroke);
+  }
+
+  .ticker-modal__panel {
+    gap: var(--space-6);
+  }
+
+  .ticker-modal__title {
+    font-size: 24px;
+  }
+}
+
+/* ─── Modal custom cursor (backdrop only) ───────────────────────── */
 
 .modal-cursor {
   position: fixed;
@@ -338,10 +515,10 @@
   pointer-events: none;
   user-select: none;
 
-  padding: 7px 14px;
-  background-color: var(--color-neutral-fg-strong);
-  color: var(--color-neutral-fg-on-accent);
-  border-radius: var(--radius-chip-pill);
+  padding: var(--control-ellipse-inset-y) calc(var(--control-ellipse-outset-x) + var(--space-2));
+  background-color: var(--color-neutral-bg);
+  color: var(--color-neutral-fg-strong);
+  border-radius: var(--radius-control-hover-ellipse);
 
   font-family: var(--font-mono);
   font-size: var(--typography-mono);
@@ -365,6 +542,7 @@
 
 @media (hover: none), (pointer: coarse) {
   .modal-cursor { display: none; }
+  .ticker-modal.is-open { cursor: auto; }
 }
 
 /* ─── Suppress other floating UI while modal is open ────────────── */

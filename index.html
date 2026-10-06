@@ -278,7 +278,7 @@
         <div class="ticker__viewport">
           <div class="ticker__track">
 
-            <figure class="ticker__item" data-caption="Community &amp; contributors" data-label="Heineken — Crate DS">
+            <figure class="ticker__item" data-caption="Community &amp; contributors" data-label="Heineken — Crate DS" data-role="TODO role" data-year="TODO year" data-desc="TODO: two or three sentences of context about this project and what you did.">
               <picture>
                 <source type="image/avif" srcset="./assets/ticker/generated/crate-community-800w.avif 800w, ./assets/ticker/generated/crate-community-1600w.avif 1600w">
                 <source type="image/webp" srcset="./assets/ticker/generated/crate-community-800w.webp 800w, ./assets/ticker/generated/crate-community-1600w.webp 1600w">
@@ -600,15 +600,32 @@
     <script src="./js/analytics.js" defer></script>
 
     <!-- Ticker modal (outside main so inert can be applied to the rest of the page) -->
-    <div class="ticker-modal" role="dialog" aria-modal="true" aria-label="Work artefact detail" aria-hidden="true" tabindex="-1">
-      <div class="ticker-modal__inner">
-        <button class="ticker-modal__close" aria-label="Close">Esc</button>
-        <img class="ticker-modal__img" src="" alt="">
-        <figcaption class="ticker-modal__caption">
-          <span class="ticker-modal__label"></span>
-          <span class="ticker-modal__title"></span>
-        </figcaption>
-      </div>
+    <div class="ticker-modal" role="dialog" aria-modal="true" aria-labelledby="ticker-modal-title" aria-hidden="true" tabindex="-1">
+      <article class="ticker-modal__inner">
+        <div class="ticker-modal__media"></div>
+        <div class="ticker-modal__panel">
+          <header class="ticker-modal__head">
+            <p class="ticker-modal__label"></p>
+            <button class="ticker-modal__close" type="button" aria-label="Close dialog">Close <span aria-hidden="true">&times;</span></button>
+          </header>
+          <div class="ticker-modal__body">
+            <h3 class="ticker-modal__title" id="ticker-modal-title"></h3>
+            <dl class="ticker-modal__meta">
+              <div class="ticker-modal__meta-row" data-meta="company"><dt>Company</dt><dd></dd></div>
+              <div class="ticker-modal__meta-row" data-meta="role"><dt>Role</dt><dd></dd></div>
+              <div class="ticker-modal__meta-row" data-meta="year"><dt>Year</dt><dd></dd></div>
+            </dl>
+            <p class="ticker-modal__desc"></p>
+          </div>
+          <footer class="ticker-modal__foot">
+            <p class="ticker-modal__count" aria-live="polite"></p>
+            <div class="ticker-modal__nav">
+              <button class="ticker-modal__nav-btn" type="button" data-dir="-1" aria-label="Previous artefact"><span aria-hidden="true">&#x2190;</span></button>
+              <button class="ticker-modal__nav-btn" type="button" data-dir="1" aria-label="Next artefact"><span aria-hidden="true">&#x2192;</span></button>
+            </div>
+          </footer>
+        </div>
+      </article>
       <div class="modal-cursor" aria-hidden="true">Close</div>
     </div>
 
