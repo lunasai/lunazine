@@ -18,7 +18,9 @@
   if (!window.gsap) return;
 
   var gsap = window.gsap;
-  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* ?reduce-motion in the URL forces the static layout (handy for testing). */
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+    /[?&]reduce-motion\b/.test(window.location.search);
 
   /* ── DOM refs ──────────────────────────────────────────────────── */
 
@@ -27,6 +29,85 @@
   var cursor     = document.querySelector('.ticker-cursor');
   var cursorText = document.querySelector('.ticker-cursor__text');
   if (!viewport || !track || !cursor) return;
+
+  /* ── Static mode (reduced motion): user-driven scroll strip ──────── */
+
+  function initStaticStrip() {
+    var section = viewport.closest('.section--ticker');
+    if (section) section.classList.add('is-static');
+
+    /* Keyboard: make the strip focusable so arrow keys scroll it natively */
+    viewport.setAttribute('tabindex', '0');
+    viewport.setAttribute('role', 'region');
+    viewport.setAttribute('aria-label', 'Work artefacts. Scroll horizontally with arrow keys, the buttons below, or by dragging.');
+
+    /* Prev / next buttons — a visible, discoverable alternative to keys */
+    var nav = document.createElement('div');
+    nav.className = 'ticker__nav';
+    function makeBtn(dir, label, glyph) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ticker__nav-btn';
+      b.setAttribute('aria-label', label);
+      b.textContent = glyph;
+      b.addEventListener('click', function () {
+        viewport.scrollBy({ left: dir * viewport.clientWidth * 0.8, behavior: 'auto' });
+      });
+      return b;
+    }
+    var prev = makeBtn(-1, 'Previous work artefacts', '\u2190');
+    var next = makeBtn(1, 'Next work artefacts', '\u2192');
+    nav.appendChild(prev);
+    nav.appendChild(next);
+    viewport.insertAdjacentElement('afterend', nav);
+
+    function updateNav() {
+      var max = viewport.scrollWidth - viewport.clientWidth - 1;
+      prev.disabled = viewport.scrollLeft <= 0;
+      next.disabled = viewport.scrollLeft >= max;
+    }
+    viewport.addEventListener('scroll', updateNav, { passive: true });
+    window.addEventListener('resize', updateNav);
+    window.addEventListener('load', updateNav);
+    updateNav();
+
+    /* Arrow keys / Home / End when the strip is focused */
+    viewport.addEventListener('keydown', function (e) {
+      var step = viewport.clientWidth * 0.5;
+      if (e.key === 'ArrowRight') viewport.scrollBy({ left: step });
+      else if (e.key === 'ArrowLeft') viewport.scrollBy({ left: -step });
+      else if (e.key === 'Home') viewport.scrollTo({ left: 0 });
+      else if (e.key === 'End') viewport.scrollTo({ left: viewport.scrollWidth });
+      else return;
+      e.preventDefault();
+    });
+
+    /* Mouse drag-to-scroll (touch already scrolls natively) */
+    var down = false, moved = false, startX = 0, startLeft = 0;
+    viewport.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      down = true; moved = false;
+      startX = e.clientX; startLeft = viewport.scrollLeft;
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!down) return;
+      var dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) > 5) {
+        moved = true;
+        viewport.classList.add('is-dragging');
+      }
+      if (moved) viewport.scrollLeft = startLeft - dx;
+    });
+    window.addEventListener('pointerup', function () {
+      if (!down) return;
+      down = false;
+      viewport.classList.remove('is-dragging');
+    });
+    /* Stop images/links being dragged natively */
+    viewport.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  }
+
+  if (reducedMotion) initStaticStrip();
 
   var originalItems = [];
 
@@ -147,6 +228,8 @@
   var DRAG_THRESHOLD = 10;
 
   viewport.addEventListener('pointerdown', function (e) {
+    /* Reduced motion: viewport scrolls natively; don't hijack the pointer */
+    if (reducedMotion) return;
     isDragging  = true;
     hasDragged  = false;
     dragStartX  = e.clientX;
