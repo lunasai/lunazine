@@ -106,26 +106,54 @@
     el.addEventListener('focus', function () { trackPreview(el); });
   });
 
-  /* ── Ticker modal open ──────────────────────────────────────────── */
+  /* ── Ticker modal ───────────────────────────────────────────────
+     Driven by events from work-ticker.js. Props:
+       artefact — the card's caption (stable even when headlines change)
+       project  — "Company × Project" eyebrow
+       via      — how it happened (click / keyboard / button / arrow / esc / backdrop) */
 
-  var tickerModal = document.querySelector('.ticker-modal');
-  if (tickerModal) {
-    var observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (mutation) {
-        if (mutation.attributeName === 'class') {
-          var isOpen = tickerModal.classList.contains('is-open');
-          if (isOpen) {
-            var label = tickerModal.querySelector('.ticker-modal__label');
-            var title = tickerModal.querySelector('.ticker-modal__title');
-            track('ticker_item_open', {
-              label: label ? label.textContent.trim() : '',
-              title: title ? title.textContent.trim() : '',
-            });
-          }
-        }
-      });
-    });
-    observer.observe(tickerModal, { attributes: true });
+  var tickerViewed = 0;
+
+  function tickerProps(item, via) {
+    return {
+      artefact: item.dataset.caption || '',
+      project:  item.dataset.label || '',
+      via:      via || '',
+    };
   }
 
+  document.addEventListener('ticker:open', function (e) {
+    tickerViewed = 1;
+    track('ticker_item_open', tickerProps(e.detail.item, e.detail.via));
+  });
+
+  document.addEventListener('ticker:change', function (e) {
+    if (!e.detail.via) return; /* the change fired while opening — already counted */
+    tickerViewed++;
+    track('ticker_item_view', tickerProps(e.detail.item, e.detail.via));
+  });
+
+  document.addEventListener('ticker:close', function (e) {
+    track('ticker_close', { viewed: tickerViewed, via: (e.detail && e.detail.via) || '' });
+  });
+
+
+  /* ── Section reach ──────────────────────────────────────────────
+     Fires once per page view when a section reaches the middle of the
+     viewport. Intro is skipped — every visit starts there. */
+
+  if ('IntersectionObserver' in window) {
+    var reachObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var name = entry.target.className.match(/section--([\w-]+)/);
+        track('section_view', { section: name ? name[1] : entry.target.id });
+        reachObserver.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -50% 0px' });
+
+    document.querySelectorAll('main .section:not(.section--intro)').forEach(function (el) {
+      reachObserver.observe(el);
+    });
+  }
 })();

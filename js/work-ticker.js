@@ -414,7 +414,8 @@
       mMedia.appendChild(el);
     }
 
-    function showIndex(i) {
+    /* via: how the change happened ('button' | 'arrow'); null when opening */
+    function showIndex(i, via) {
       var items = getItems();
       if (!items.length) return;
       currentIndex = (i + items.length) % items.length;
@@ -433,22 +434,25 @@
       mDesc.hidden = !item.dataset.desc;
       mCount.textContent = (currentIndex + 1) + ' of ' + items.length;
       mPanel.scrollTop = 0;
-      document.dispatchEvent(new CustomEvent('ticker:change', { detail: { item: item, index: currentIndex } }));
+      document.dispatchEvent(new CustomEvent('ticker:change', { detail: { item: item, index: currentIndex, via: via || null } }));
     }
 
-    function openModal(item) {
+    function openModal(item, via) {
       lastFocus = document.activeElement;
-      showIndex(getItems().indexOf(item));
+      /* Loop clones are appended in the same order as the originals, so
+         map any clicked card back to its original by position */
+      var all = Array.from(track.querySelectorAll('.ticker__item'));
+      showIndex(all.indexOf(item) % getItems().length, null);
 
       modal.setAttribute('aria-hidden', 'false');
       modal.classList.add('is-open');
       document.body.classList.add('ticker-modal-open');
       if (window.__lenis) window.__lenis.stop();
       modal.focus({ preventScroll: true });
-      document.dispatchEvent(new CustomEvent('ticker:open', { detail: { item: item } }));
+      document.dispatchEvent(new CustomEvent('ticker:open', { detail: { item: item, index: currentIndex, via: via } }));
     }
 
-    function closeModal() {
+    function closeModal(via) {
       if (!modal.classList.contains('is-open')) return;
       modal.classList.remove('is-open');
       modal.setAttribute('aria-hidden', 'true');
@@ -458,43 +462,43 @@
       var v = mMedia.querySelector('video');
       if (v) v.pause();
       if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
-      document.dispatchEvent(new CustomEvent('ticker:close'));
+      document.dispatchEvent(new CustomEvent('ticker:close', { detail: { via: via } }));
     }
 
     /* Open: click (ignoring clicks that ended a drag) or Enter/Space */
     track.addEventListener('click', function (e) {
       var item = e.target.closest('.ticker__item');
       if (!item || wasDrag) return;
-      openModal(item);
+      openModal(item, 'click');
     });
     track.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       var item = e.target.closest('.ticker__item');
       if (!item) return;
       e.preventDefault();
-      openModal(item);
+      openModal(item, 'keyboard');
     });
     originalItems_forFocus();
 
     /* Prev / next */
     mNavBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
-        showIndex(currentIndex + Number(btn.dataset.dir));
+        showIndex(currentIndex + Number(btn.dataset.dir), 'button');
       });
     });
 
     /* Close: backdrop click, close button */
     modal.addEventListener('click', function (e) {
-      if (e.target === modal) closeModal();
+      if (e.target === modal) closeModal('backdrop');
     });
-    mClose.addEventListener('click', closeModal);
+    mClose.addEventListener('click', function () { closeModal('button'); });
 
     /* Keyboard: Esc closes, arrows navigate, Tab cycles inside the card */
     document.addEventListener('keydown', function (e) {
       if (!modal.classList.contains('is-open')) return;
-      if (e.key === 'Escape') { closeModal(); return; }
-      if (e.key === 'ArrowRight') { e.preventDefault(); showIndex(currentIndex + 1); return; }
-      if (e.key === 'ArrowLeft')  { e.preventDefault(); showIndex(currentIndex - 1); return; }
+      if (e.key === 'Escape') { closeModal('esc'); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); showIndex(currentIndex + 1, 'arrow'); return; }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); showIndex(currentIndex - 1, 'arrow'); return; }
       if (e.key === 'Tab') {
         var focusables = [mClose].concat(mNavBtns);
         var idx = focusables.indexOf(document.activeElement);
