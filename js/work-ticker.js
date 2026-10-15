@@ -349,7 +349,7 @@
   var modal = document.querySelector('.ticker-modal');
   if (modal) {
     var mInner  = modal.querySelector('.ticker-modal__inner');
-    var mMedia  = modal.querySelector('.ticker-modal__media');
+    var mMedia  = modal.querySelector('.ticker-modal__frame');
     var mPanel  = modal.querySelector('.ticker-modal__panel');
     var mLabel  = modal.querySelector('.ticker-modal__label');
     var mTitle  = modal.querySelector('.ticker-modal__title');
@@ -385,8 +385,6 @@
       row.querySelector('dd').textContent = value || '';
     }
 
-    function pad(n) { return (n < 10 ? '0' : '') + n; }
-
     function buildMedia(item) {
       var old = mMedia.querySelector('video');
       if (old) old.pause();
@@ -403,7 +401,10 @@
         el.play && el.play().catch(function () {});
       } else {
         el = document.createElement('img');
-        el.src = poster && (vid || item.classList.contains('ticker__item--gif'))
+        /* Static poster for videos (reduced motion only reaches here) and
+           for GIFs under reduced motion; otherwise the animated GIF itself */
+        var isGif = item.classList.contains('ticker__item--gif');
+        el.src = poster && (vid || (isGif && reducedMotion))
           ? poster.getAttribute('src')
           : pickSrc(item);
         var base = item.querySelector('img');
@@ -420,16 +421,19 @@
       var item = items[currentIndex];
 
       buildMedia(item);
-      mLabel.textContent = item.dataset.label || '';
-      mTitle.textContent = item.dataset.caption || '';
+      /* Eyebrow: "Company • Project" (+ year when set) */
+      var eyebrow = (item.dataset.label || '').split(/\s+[—–-]\s+/);
+      if (item.dataset.year) eyebrow.push(item.dataset.year);
+      mLabel.textContent = eyebrow.filter(Boolean).join(' \u2022 ');
+      mTitle.textContent = item.dataset.headline || item.dataset.caption || '';
       setMeta('company', item.dataset.company);
       setMeta('role',    item.dataset.role);
-      setMeta('year',    item.dataset.year);
-      mMeta.hidden = !(item.dataset.company || item.dataset.role || item.dataset.year);
+      mMeta.hidden = !(item.dataset.company || item.dataset.role);
       mDesc.textContent = item.dataset.desc || '';
       mDesc.hidden = !item.dataset.desc;
-      mCount.textContent = pad(currentIndex + 1) + ' / ' + pad(items.length);
+      mCount.textContent = (currentIndex + 1) + ' of ' + items.length;
       mPanel.scrollTop = 0;
+      document.dispatchEvent(new CustomEvent('ticker:change', { detail: { item: item, index: currentIndex } }));
     }
 
     function openModal(item) {
@@ -441,6 +445,7 @@
       document.body.classList.add('ticker-modal-open');
       if (window.__lenis) window.__lenis.stop();
       modal.focus({ preventScroll: true });
+      document.dispatchEvent(new CustomEvent('ticker:open', { detail: { item: item } }));
     }
 
     function closeModal() {
@@ -453,6 +458,7 @@
       var v = mMedia.querySelector('video');
       if (v) v.pause();
       if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+      document.dispatchEvent(new CustomEvent('ticker:close'));
     }
 
     /* Open: click (ignoring clicks that ended a drag) or Enter/Space */
