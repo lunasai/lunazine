@@ -600,7 +600,8 @@ body {
 .section--work .metric-item__text {
   position: relative;
   z-index: 2;
-  flex-shrink: 0;
+  flex-shrink: 1; /* shrink + wrap beside the numeral; 0 overflowed the row on narrow screens */
+  min-width: 0;
   letter-spacing: -0.02em;
   line-height: var(--metric-line-height, 1.13);
   cursor: default;
