@@ -750,19 +750,6 @@ body {
   width: 100%;
 }
 
-/* Adidas: keep €X.XXM/year shape without exposing the figure */
-.work__metric-redacted {
-  white-space: nowrap;
-}
-
-.work__metric-redacted__blur {
-  display: inline-block;
-  filter: blur(3px);
-  user-select: none;
-  letter-spacing: 0.12em;
-  margin-inline: 0.06em;
-}
-
 /* ─── Job experience list (work section #4) ─────────────────── */
 
 .work__experience {
