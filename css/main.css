@@ -617,6 +617,25 @@ body {
   display: none;
 }
 
+/* Phones: rows wrap, so right-aligned text no longer lines up. Switch to a
+   two-column list — fixed numeral column, text left-aligned from one x,
+   numeral sitting on the first line's baseline. */
+@media (max-width: 480px) {
+  .section--work .work__metrics .metric-item {
+    justify-content: flex-start;
+    align-items: baseline;
+  }
+
+  .section--work .metric-item__num {
+    flex: 0 0 2.5em; /* fits "III" / "IV" so every row's text starts at the same x */
+  }
+
+  .section--work .metric-item__text {
+    flex: 1 1 auto;
+    text-align: left;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   /* Neutralize component-metric-item :hover; only .is-near drives active state */
   .section--work .metric-item:hover:not(.is-near) .metric-item__text,
