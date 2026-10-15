@@ -22,7 +22,7 @@ When the user asks to change pile hover feel (more explosive, calmer, magnetic, 
 4. **Use `PILE_GRAVITY` and `PILE_DRAG_X`** for airborne pile grains after hover ejection.
 5. **Mirror changes** in `PixelPileFooter.tsx` if the brand_ref package should stay aligned.
 6. **Do not remove** `prefers-reduced-motion` guard in `handleHover` (no hover erosion when reduced motion is on).
-7. After large grid-size changes, mention that users may need to clear `localStorage` key `pixelPileGrid` to avoid a mismatched saved pile.
+7. After large grid-size changes, mention that users may need to clear `localStorage` key `pixelPileGrid.v3` to avoid a mismatched saved pile.
 
 Current behavior model (as implemented):
 
@@ -107,7 +107,7 @@ Values below reflect **`js/pixel-interactions.js` as of this doc** — verify in
 | `PILE_GRAVITY` | Downward acceleration per frame (pile grains only) | Heavier, faster fall | Floatier hang time |
 | `PILE_DRAG_X` | Horizontal speed retained per frame (0–1) | More sideways skid | Motion dies sideways quickly |
 | `MAX_PILE_PARTICLES` | Max flying grains at once | More dots (CPU cost) | Effect caps sooner |
-| `PEAK_RATIO` | Starting hill height (% of grid rows) | Taller default mound | Flatter start |
+| `PILE_START_PROFILE` | Starting silhouette (column heights as a fraction of viewport height) | Scale values up for a taller start | Scale down for a flatter start |
 | `DOT_SIZE` | Pixel square size (px) | Chunkier, fewer cells | Finer grid |
 
 ### `HOVER_RADIUS` (px)
@@ -142,13 +142,13 @@ Multiplies `vx` each frame (`vx *= PILE_DRAG_X`). Lower = sideways speed bleeds 
 
 Safety cap. When full, new ejections are skipped until grains land or expire.
 
-### `PEAK_RATIO`
+### `PILE_START_PROFILE`
 
-Only affects **initial** pile shape in `initPile` and fresh loads — not hover directly.
+The starting silhouette, traced from a pile Luna liked (180 samples, each a fraction of viewport height). `initPile` resamples it to any grid size and multiplies it by `PILE_START_SCALE` (currently 0.5), so you can change the overall height there. It only affects fresh loads, not hover. When you change it, bump `STORAGE_KEY` so returning visitors see the new shape.
 
 ### `DOT_SIZE`
 
-Shared with cursor trail. Changing it resizes the grid; saved `pixelPileGrid` in localStorage invalidates on dimension change.
+Shared with cursor trail. Changing it resizes the grid; saved `pixelPileGrid.v3` in localStorage invalidates on dimension change.
 
 ---
 
@@ -238,15 +238,15 @@ Feels like pixels **flee** the cursor; less like an explosion + gravity.
 | Messier random spray | ↑ `HOVER_JITTER` |
 | Faster drop after pop | ↑ `PILE_GRAVITY` |
 | More sideways skid while falling | ↑ `PILE_DRAG_X` (closer to 1) |
-| Taller default pile | ↑ `PEAK_RATIO` |
-| Reset weird pile after tuning | Clear `localStorage` → `pixelPileGrid` |
+| Taller default pile | Scale up `PILE_START_PROFILE` (and bump the storage key) |
+| Reset weird pile after tuning | Clear `localStorage` → `pixelPileGrid.v3` |
 
 ---
 
 ## Accessibility & persistence
 
 - **`prefers-reduced-motion: reduce`:** `handleHover` returns immediately; pile is static, no hover erosion.
-- **`localStorage` key `pixelPileGrid`:** Saves settled pile every 5s. Stale saves are dropped when grid width/height changes.
+- **`localStorage` key `pixelPileGrid.v3`:** Saves settled pile every 5s. Stale saves are dropped when grid width/height changes.
 
 ---
 

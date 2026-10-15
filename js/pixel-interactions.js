@@ -275,7 +275,6 @@
   const ARC_CROSS_DAMP           = 0.72; /* looser arcs — less vertical kill on horizontal swipes */
   const LAUNCH_LIFT_ON_SWIPE     = 0.45; /* upward nudge when swipe is mostly horizontal */
   const LAND_SEARCH_COLS         = 2;    /* place grain in nearest empty cell ±N columns */
-  const PEAK_RATIO               = 0.03;
 
   /** Pile simulation band height (px), pinned to viewport bottom — tracks innerHeight. */
   let pileBandHeightPx = Math.round(window.innerHeight);
@@ -335,14 +334,44 @@
 
   // ── Grid helpers ──────────────────────────────────────────────────────────────
 
+  /**
+   * Starting silhouette: column heights as a fraction of the pile band
+   * (viewport) height, sampled left → right. Traced from a played-with pile
+   * Luna liked (2026-10-15). Resampled to any grid width/height.
+   */
+  const PILE_START_PROFILE = [
+    .087, .090, .093, .098, .100, .101, .108, .109, .109, .108, .106, .106,
+    .108, .108, .106, .099, .094, .087, .082, .082, .082, .085, .086, .089,
+    .091, .091, .086, .083, .082, .080, .080, .081, .082, .086, .086, .088,
+    .089, .089, .091, .096, .099, .101, .102, .110, .115, .122, .128, .134,
+    .134, .133, .133, .135, .135, .129, .124, .120, .120, .118, .118, .118,
+    .117, .114, .110, .105, .105, .102, .102, .097, .095, .090, .086, .082,
+    .077, .071, .071, .068, .068, .068, .071, .072, .072, .078, .078, .079,
+    .081, .083, .088, .089, .089, .088, .081, .081, .088, .088, .091, .102,
+    .102, .089, .089, .096, .110, .096, .086, .083, .077, .074, .073, .071,
+    .071, .071, .069, .069, .074, .074, .074, .076, .076, .081, .085, .087,
+    .088, .091, .091, .088, .088, .093, .099, .104, .109, .115, .121, .124,
+    .131, .138, .138, .135, .135, .134, .133, .129, .129, .129, .129, .129,
+    .129, .129, .129, .126, .122, .122, .123, .123, .121, .115, .109, .106,
+    .106, .106, .106, .106, .106, .102, .102, .102, .098, .095, .094, .087,
+    .087, .090, .101, .110, .120, .128, .138, .147, .155, .155, .151, .151
+  ];
+
+  /** Overall height of the starting pile relative to the traced profile. */
+  const PILE_START_SCALE = 0.5;
+
   function initPile(gridW) {
-    const gh        = getGridH();
-    const grid      = new Uint8Array(gridW * gh);
-    const peakCells = Math.floor(gh * PEAK_RATIO);
+    const gh   = getGridH();
+    const grid = new Uint8Array(gridW * gh);
+    const n    = PILE_START_PROFILE.length;
 
     for (let c = 0; c < gridW; c++) {
-      const xNorm = (2 * c) / gridW - 1;
-      const h = Math.round(peakCells * Math.sqrt(Math.max(0, 1 - xNorm * xNorm)));
+      /* Linear interpolation across the profile */
+      const pos  = (c + 0.5) / gridW * (n - 1);
+      const i    = Math.floor(pos);
+      const t    = pos - i;
+      const frac = PILE_START_PROFILE[i] * (1 - t) + PILE_START_PROFILE[Math.min(i + 1, n - 1)] * t;
+      const h    = Math.min(gh, Math.round(frac * PILE_START_SCALE * gh));
       for (let r = gh - 1; r >= gh - h; r--) {
         grid[r * gridW + c] = 1;
       }
@@ -350,7 +379,7 @@
     return grid;
   }
 
-  const STORAGE_KEY = "pixelPileGrid";
+  const STORAGE_KEY = "pixelPileGrid.v3"; /* bumped when the starting shape changes */
 
   function savePileGrid() {
     if (!pileGrid) return;
